@@ -1,68 +1,78 @@
 import pandas as pd
 import re
-import os
+
+# ─────────────────────────────────────────
+# SYNTAX CHECK
+# ─────────────────────────────────────────
 
 def check_syntax(query):
     """
-    Check for basic Cypher syntax errors using pattern matching.
-    Returns (is_error, error_message)
+    Apply rule-based checks to detect common Cypher syntax errors.
+    Returns (is_error: bool, error_message: str)
     """
     if not query or query.strip() == '':
         return True, "Empty query"
 
     query = query.strip()
 
-    # Check for unmatched parentheses
+    # Check balanced brackets
     if query.count('(') != query.count(')'):
         return True, "Unmatched parentheses"
 
-    # Check for unmatched square brackets
     if query.count('[') != query.count(']'):
         return True, "Unmatched square brackets"
 
-    # Check for unmatched curly braces
     if query.count('{') != query.count('}'):
         return True, "Unmatched curly braces"
 
-    # Check query starts with valid Cypher keyword
+    # Check query begins with a valid Cypher keyword
     valid_starts = [
         'MATCH', 'CREATE', 'MERGE', 'RETURN',
         'WITH', 'CALL', 'UNWIND', 'OPTIONAL'
     ]
     first_word = query.upper().split()[0] if query.split() else ''
     if first_word not in valid_starts:
-        return True, f"Does not start with valid keyword: {first_word}"
+        return True, f"Invalid opening keyword: {first_word}"
 
-    # Check RETURN or action clause exists
-    upper_query = query.upper()
-    if 'RETURN' not in upper_query and 'DELETE' not in upper_query and \
-       'SET' not in upper_query and 'CREATE' not in upper_query and \
-       'MERGE' not in upper_query:
+    # Check a RETURN or action clause is present
+    upper = query.upper()
+    has_action = any(kw in upper for kw in [
+        'RETURN', 'DELETE', 'SET', 'CREATE', 'MERGE'
+    ])
+    if not has_action:
         return True, "Missing RETURN or action clause"
 
     # Check for unclosed string literals
-    # Remove content inside strings first to handle apostrophes in names
-    clean_query = query.replace("\\'", "").replace('\\"', "")
-    clean_query = re.sub(r'"[^"]*"', '""', clean_query)
-    clean_query = re.sub(r"'[^']*'", "''", clean_query)
-    if clean_query.count("'") % 2 != 0:
-        return True, "Unclosed single quote string"
-    if clean_query.count('"') % 2 != 0:
-        return True, "Unclosed double quote string"
+    # Strip string contents first to avoid counting apostrophes in names
+    clean = query.replace("\\'", "").replace('\\"', "")
+    clean = re.sub(r'"[^"]*"', '""', clean)
+    clean = re.sub(r"'[^']*'", "''", clean)
+
+    if clean.count("'") % 2 != 0:
+        return True, "Unclosed single-quote string"
+    if clean.count('"') % 2 != 0:
+        return True, "Unclosed double-quote string"
 
     return False, ""
 
+
+# ─────────────────────────────────────────
+# MAIN CLASSIFIER
+# ─────────────────────────────────────────
+
 def run_syntax_classifier():
     df = pd.read_csv("data/generated_queries.csv")
-    df['generated_cypher'] = df['generated_cypher'].fillna('')
-    df['error'] = df['error'].fillna('')
+    df['generated_cypher'] = df['generated_cypher'].fillna('').astype(str)
 
     if 'syntax_error' not in df.columns:
         df['syntax_error'] = 0
     if 'syntax_error_msg' not in df.columns:
         df['syntax_error_msg'] = ''
 
-    print("Running syntax classifier on 200 queries...")
+    df['syntax_error'] = df['syntax_error'].fillna(0).astype(int)
+    df['syntax_error_msg'] = df['syntax_error_msg'].fillna('').astype(str)
+
+    print("Syntax Error Classifier")
     print("="*50)
 
     syntax_count = 0
@@ -76,22 +86,21 @@ def run_syntax_classifier():
 
         is_error, msg = check_syntax(query)
 
+        df.at[i, 'syntax_error'] = 1 if is_error else 0
+        df.at[i, 'syntax_error_msg'] = msg if is_error else ''
+
         if is_error:
-            df.at[i, 'syntax_error'] = 1
-            df.at[i, 'syntax_error_msg'] = msg
             syntax_count += 1
-            print(f"[{i+1}] SYNTAX ERROR — {msg}")
-            print(f"     Q: {row['question'][:60]}...")
-        else:
-            df.at[i, 'syntax_error'] = 0
-            df.at[i, 'syntax_error_msg'] = ''
+            print(f"[{i+1}] SYNTAX ERROR | {msg}")
+            print(f"      {row['question'][:70]}")
 
     df.to_csv("data/generated_queries.csv", index=False)
 
     print("="*50)
-    print(f"Syntax errors found: {syntax_count}/200")
-    print(f"Clean queries: {200 - syntax_count}/200")
-    print("Results saved to data/generated_queries.csv")
+    print(f"Syntax errors    : {syntax_count} / 200")
+    print(f"Clean queries    : {200 - syntax_count} / 200")
+    print("Saved → data/generated_queries.csv")
+
 
 if __name__ == "__main__":
     run_syntax_classifier()

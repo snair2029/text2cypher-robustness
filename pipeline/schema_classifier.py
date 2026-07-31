@@ -1,12 +1,15 @@
 import pandas as pd
 import re
-import json
-import os
+
+# ─────────────────────────────────────────
+# SCHEMA EXTRACTION
+# ─────────────────────────────────────────
 
 def extract_schema_elements(schema_str):
     """
-    Extract node labels, relationship types and property names
-    from the schema string.
+    Parse the schema string and return sets of known
+    node labels, relationship types, and property names.
+    Handles multiple schema formats (markdown, JSON, table).
     """
     node_labels = set()
     relationship_types = set()
@@ -17,42 +20,41 @@ def extract_schema_elements(schema_str):
 
     schema_str = str(schema_str)
 
-    # Extract node labels - pattern: (label) or :Label or **Label**
-    node_patterns = [
-        r'\*\*(\w+)\*\*',           # **NodeLabel**
-        r':\s*([A-Z][a-zA-Z_]*)',   # :NodeLabel
-        r'\(([A-Z][a-zA-Z_]*)\)',   # (NodeLabel)
-    ]
-    for pattern in node_patterns:
-        matches = re.findall(pattern, schema_str)
-        node_labels.update(matches)
+    # Node labels — matches **Label**, :Label, (Label)
+    for pattern in [
+        r'\*\*(\w+)\*\*',
+        r':\s*([A-Z][a-zA-Z_]*)',
+        r'\(([A-Z][a-zA-Z_]*)\)',
+    ]:
+        node_labels.update(re.findall(pattern, schema_str))
 
-    # Extract relationship types - pattern: [:REL_TYPE] or -[:REL]-
-    rel_patterns = [
-        r'\[:([A-Z_]+)\]',          # [:REL_TYPE]
-        r'-\[:([A-Z_]+)\]',         # -[:REL_TYPE]
-        r'"([A-Z_]+)":\s*{[^}]*"type":\s*"relationship"',  # JSON format
-    ]
-    for pattern in rel_patterns:
-        matches = re.findall(pattern, schema_str)
-        relationship_types.update(matches)
+    # Relationship types — matches [:REL_TYPE]
+    for pattern in [
+        r'\[:([A-Z_]+)\]',
+        r'-\[:([A-Z_]+)\]',
+        r'"([A-Z_]+)":\s*{[^}]*"type":\s*"relationship"',
+    ]:
+        relationship_types.update(re.findall(pattern, schema_str))
 
-    # Extract property names
-    prop_patterns = [
-        r'`(\w+)`:\s*(?:STRING|INTEGER|FLOAT|BOOLEAN|DATE)',  # `prop`: TYPE
-        r'"(\w+)":\s*{[^}]*"type"',   # JSON format
-        r'- `(\w+)`',                  # - `property`
-    ]
-    for pattern in prop_patterns:
-        matches = re.findall(pattern, schema_str)
-        property_names.update(matches)
+    # Property names — matches `prop`: TYPE or JSON format
+    for pattern in [
+        r'`(\w+)`:\s*(?:STRING|INTEGER|FLOAT|BOOLEAN|DATE)',
+        r'"(\w+)":\s*{[^}]*"type"',
+        r'- `(\w+)`',
+    ]:
+        property_names.update(re.findall(pattern, schema_str))
 
     return node_labels, relationship_types, property_names
 
+
+# ─────────────────────────────────────────
+# QUERY EXTRACTION
+# ─────────────────────────────────────────
+
 def extract_query_elements(query_str):
     """
-    Extract node labels, relationship types and properties
-    used in the generated query.
+    Parse the generated Cypher query and return sets of
+    node labels, relationship types, and properties used.
     """
     node_labels = set()
     relationship_types = set()
@@ -63,46 +65,46 @@ def extract_query_elements(query_str):
 
     query_str = str(query_str)
 
-    # Extract node labels from query - (n:Label) or (:Label)
-    node_matches = re.findall(r'\(\w*:([A-Za-z_]\w*)', query_str)
-    node_labels.update(node_matches)
-
-    # Extract relationship types - [:REL_TYPE]
-    rel_matches = re.findall(r'\[:([A-Z_]+)\]', query_str)
-    relationship_types.update(rel_matches)
-
-    # Extract property names - n.property
-    prop_matches = re.findall(r'\w+\.([a-zA-Z_]\w*)', query_str)
-    property_names.update(prop_matches)
+    node_labels.update(re.findall(r'\(\w*:([A-Za-z_]\w*)', query_str))
+    relationship_types.update(re.findall(r'\[:([A-Z_]+)\]', query_str))
+    property_names.update(re.findall(r'\w+\.([a-zA-Z_]\w*)', query_str))
 
     return node_labels, relationship_types, property_names
 
+
+# ─────────────────────────────────────────
+# HALLUCINATION CHECK
+# ─────────────────────────────────────────
+
 def check_schema_hallucination(query, schema):
     """
-    Check if the query uses elements not present in the schema.
-    Returns (is_hallucination, details)
+    Compare query elements against schema elements.
+    Returns (is_hallucination: bool, detail_message: str)
     """
-    schema_nodes, schema_rels, schema_props = extract_schema_elements(schema)
-    query_nodes, query_rels, query_props = extract_query_elements(query)
+    schema_nodes, schema_rels, _ = extract_schema_elements(schema)
+    query_nodes, query_rels, _ = extract_query_elements(query)
 
-    hallucinated = []
+    issues = []
 
-    # Check node labels
     if schema_nodes:
+        schema_nodes_lower = {s.lower() for s in schema_nodes}
         for node in query_nodes:
-            if node not in schema_nodes and node.lower() not in \
-               {s.lower() for s in schema_nodes}:
-                hallucinated.append(f"Node label not in schema: {node}")
+            if node.lower() not in schema_nodes_lower:
+                issues.append(f"Node not in schema: {node}")
 
-    # Check relationship types
     if schema_rels:
         for rel in query_rels:
             if rel not in schema_rels:
-                hallucinated.append(f"Relationship not in schema: {rel}")
+                issues.append(f"Relationship not in schema: {rel}")
 
-    if hallucinated:
-        return True, "; ".join(hallucinated)
+    if issues:
+        return True, "; ".join(issues)
     return False, ""
+
+
+# ─────────────────────────────────────────
+# MAIN CLASSIFIER
+# ─────────────────────────────────────────
 
 def run_schema_classifier():
     df = pd.read_csv("data/generated_queries.csv")
@@ -114,7 +116,7 @@ def run_schema_classifier():
     if 'schema_hallucination_msg' not in df.columns:
         df['schema_hallucination_msg'] = ''
 
-    print("Running schema hallucination classifier on 200 queries...")
+    print("Schema Hallucination Classifier")
     print("="*50)
 
     hallucination_count = 0
@@ -127,24 +129,23 @@ def run_schema_classifier():
             df.at[i, 'schema_hallucination'] = 0
             continue
 
-        is_hallucination, msg = check_schema_hallucination(query, schema)
+        is_error, msg = check_schema_hallucination(query, schema)
 
-        if is_hallucination:
-            df.at[i, 'schema_hallucination'] = 1
-            df.at[i, 'schema_hallucination_msg'] = msg[:300]
+        df.at[i, 'schema_hallucination'] = 1 if is_error else 0
+        df.at[i, 'schema_hallucination_msg'] = msg[:300] if is_error else ''
+
+        if is_error:
             hallucination_count += 1
-            print(f"[{i+1}] HALLUCINATION — {msg[:80]}")
-            print(f"     Q: {row['question'][:60]}...")
-        else:
-            df.at[i, 'schema_hallucination'] = 0
-            df.at[i, 'schema_hallucination_msg'] = ''
+            print(f"[{i+1}] HALLUCINATION | {msg[:80]}")
+            print(f"      {row['question'][:70]}")
 
     df.to_csv("data/generated_queries.csv", index=False)
 
     print("="*50)
-    print(f"Schema hallucinations found: {hallucination_count}/200")
-    print(f"Schema-conformant queries: {200 - hallucination_count}/200")
-    print("Results saved to data/generated_queries.csv")
+    print(f"Schema hallucinations : {hallucination_count} / 200")
+    print(f"Schema-conformant     : {200 - hallucination_count} / 200")
+    print("Saved → data/generated_queries.csv")
+
 
 if __name__ == "__main__":
     run_schema_classifier()
