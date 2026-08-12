@@ -1,0 +1,5 @@
+Error Type,simple,medium,complex,Total
+Syntax Error,0,0,0,0
+Schema Hallucination,0,1,10,11
+Logical Error,7,12,6,25
+Performance Issue,10,10,3,23

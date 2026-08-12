@@ -1,0 +1,9 @@
+Metric,Error Type,Spearman r,P-value,Significant (p<0.05)
+bleu_score,syntax_error,,,No
+bleu_score,schema_hallucination,-0.1553,0.0281,Yes
+bleu_score,logical_error,-0.0955,0.1785,No
+bleu_score,performance_error,0.0944,0.1836,No
+exact_match,syntax_error,,,No
+exact_match,schema_hallucination,-0.0662,0.3518,No
+exact_match,logical_error,-0.0444,0.5321,No
+exact_match,performance_error,0.2697,0.0001,Yes

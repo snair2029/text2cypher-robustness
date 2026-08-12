@@ -1,0 +1,42 @@
+question,manual_label,pipeline_label,bleu_score,exact_match
+How many cars have more than 4 cylinders?,logical_error,logical_error,39.4876,0
+Which three tweets have the highest replies?,logical_error,performance_issue,70.9869,0
+List the first 3 Zones that have a size of 16.,no_error,no_error,41.4289,0
+Which businesses have reviews that mention 'IPA'?,no_error,no_error,90.6187,0
+How many statements do we have?,no_error,no_error,100.0,1
+Count the number of climbers.,no_error,no_error,100.0,1
+How many different types of beds are there?,no_error,multiple_errors,69.1054,0
+Fetch the Author where author_id ends with a9!,logical_error,no_error,29.1759,0
+How many parties are there?,no_error,no_error,100.0,1
+"""pheonix에 위치하고 있는 회사는 모두 몇개인가?""",no_error,logical_error,71.4747,0
+List the top 5 oldest directors in the database.,no_error,no_error,68.6654,0
+Which category does 'Ducky's Car Wash' belong to?,no_error,no_error,94.1194,0
+Who wrote the movie 'Speed Racer'?,no_error,no_error,100.0,1
+Find the Article where title contains Solut!,logical_error,no_error,25.3365,0
+List the top 5 categories with the most products.,no_error,no_error,63.8823,0
+List ids for all student who are on scholarship.,multiple_errors,no_error,27.4449,0
+List the first 5 movies released in 1995.,logical_error,no_error,50.3925,0
+How many video games do you have?,no_error,logical_error,53.4826,0
+List all the answers with a negative score.,no_error,no_error,100.0,0
+Fetch the Keyword where key_id ends with d8!,logical_error,no_error,29.1759,0
+Show streams that feature more than 3 games.,logical_error,no_error,76.5775,0
+What are the different majors?,no_error,performance_issue,100.0,1
+Which organization has the most subsidiaries?,no_error,no_error,51.7449,0
+What is the total number of airlines?,no_error,logical_error,53.4826,0
+What activities do we have?,no_error,performance_issue,100.0,1
+What are the top 5 oldest movies in the database?,no_error,no_error,71.3691,0
+Find all 'Vehicle Crime' crimes,logical_error,no_error,7.0957,0
+Find the Topic for which label starts with Pop!,no_error,no_error,53.0362,0
+Show the top 3 Filings with the latest end dates.,no_error,performance_issue,100.0,0
+Finds all nodes,no_error,performance_issue,100.0,1
+Which 5 movies have Tom Hanks in the cast?,no_error,no_error,82.84,0
+How many students are there for each major?,no_error,performance_issue,75.4186,0
+"""Who is the CEO of Neo4j?""",no_error,no_error,73.6824,0
+List the top 5 questions tagged with 'graphql'.,no_error,no_error,62.1765,0
+What are the names of all songs in English?,multiple_errors,no_error,25.7094,0
+What is the location point of 'Ninja Mike's'?,no_error,no_error,100.0,1
+How many bank branches are there?,no_error,logical_error,29.9822,0
+Who was born in 1965 and has directed a movie?,no_error,no_error,67.1083,0
+Find the streams with the most user chatters.,no_error,no_error,63.5909,0
+List the movies with more than 1000 votes.,no_error,no_error,100.0,1
+List all the subject names.,no_error,performance_issue,100.0,1
