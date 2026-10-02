@@ -148,6 +148,10 @@ def show_saved_review(row):
 
     st.markdown("**Why was this decision recorded?**")
     st.write(text(row.get("manual_review_reason")))
+    reconciliation = text(row.get("manual_reconciliation_notes"))
+    if reconciliation:
+        st.markdown("**Updated interpretation**")
+        st.write(reconciliation)
 
     st.caption(
         "These are AI-assisted findings from query inspection, the supplied "
@@ -447,10 +451,65 @@ elif page == "Explore an example":
         )
 
         st.markdown("**Was efficiency measured?**")
-        st.write(
-            "No. Query plans were inspected where available; runtime "
-            "and database work have not been measured."
-        )
+        profile_path = PROJECT / "outputs/performance_profile_summary.csv"
+        if profile_path.exists():
+            profile = pd.read_csv(profile_path)
+            pair = profile[
+                profile["instance_id"].eq(selected_id)
+            ].copy()
+        else:
+            pair = pd.DataFrame()
+
+        if not pair.empty:
+            st.write(
+                "Yes — this example was included in the paired performance "
+                "study. Each query had one warm-up and three measured runs."
+            )
+            display_columns = [
+                "query_kind",
+                "repetitions",
+                "db_hits_median",
+                "client_elapsed_profile_ms_median",
+            ]
+            st.dataframe(
+                pair[display_columns].rename(columns={
+                    "query_kind": "Query",
+                    "repetitions": "Measured runs",
+                    "db_hits_median": "Median database hits",
+                    "client_elapsed_profile_ms_median":
+                        "Median client time with PROFILE (ms)",
+                }),
+                hide_index=True,
+                use_container_width=True,
+            )
+            st.caption(
+                "Database hits describe work recorded by plan operators. "
+                "Client timing includes network transfer and PROFILE overhead. "
+                "These measurements apply to the tested graph and session."
+            )
+        else:
+            plan_status = text(row.get("performance_status"))
+            if plan_status == "source_graph_unavailable":
+                st.write(
+                    "Performance was not assessed because the source "
+                    "database was unavailable."
+                )
+            elif plan_status == "generated_syntax_error":
+                st.write(
+                    "Performance was not assessed because the generated "
+                    "query contains a syntax error."
+                )
+            elif plan_status == "plan_inspected_no_cartesian_product":
+                st.write(
+                    "This example was outside the measured subset. "
+                    "Its query plan was inspected; the saved evidence "
+                    "is available below."
+                )
+            else:
+                st.write(
+                    "This example was outside the measured subset. "
+                    "See the technical evidence for its plan-check status."
+                )
 
     st.caption("STEP 4 · THE SAVED REVIEW")
     show_saved_review(row)
@@ -618,6 +677,156 @@ else:
     st.caption(
         "A plan without a Cartesian product is not automatically efficient."
     )
+
+    st.subheader("How do these results answer the research questions?")
+    st.markdown(
+        "**RQ1 — What kinds of failures occur?** "
+        "The syntax checks, schema checks and reviewed query differences "
+        "describe the failure patterns found, while keeping uncertain "
+        "and unavailable cases visible."
+    )
+    st.markdown(
+        "**RQ2 — Do text scores reflect query problems?** "
+        "BLEU and Exact Match are compared with recorded syntax outcomes "
+        "and determinate logical-review assessments. These are descriptive "
+        "associations within the stated samples."
+    )
+
+    st.subheader("Review across all three sample groups")
+    validation_path = PROJECT / "outputs/human_validation.csv"
+    if validation_path.exists():
+        validation = pd.read_csv(validation_path)
+        st.write(
+            "The 40-case review covers 10 short, 20 medium-length and "
+            "10 long questions. These groups describe question length."
+        )
+        assessments = {
+            "syntax_assessment": "Syntax",
+            "schema_assessment": "Schema",
+            "logical_assessment": "Query meaning",
+            "reference_assessment": "Reference quality",
+        }
+        review_counts = []
+        for field, label in assessments.items():
+            if field in validation.columns:
+                for assessment, count in validation[field].value_counts().items():
+                    review_counts.append({
+                        "Check": label,
+                        "Assessment": str(assessment).replace("_", " "),
+                        "Cases": int(count),
+                    })
+        st.dataframe(
+            pd.DataFrame(review_counts),
+            hide_index=True,
+            use_container_width=True,
+        )
+        st.caption(
+            "Student-verified, AI-assisted assessments; not an independent "
+            "accuracy estimate. Uncertain cases remain separate."
+        )
+    else:
+        st.info("The saved 40-case review file is unavailable.")
+
+    st.subheader("Measured performance")
+    profile_path = PROJECT / "outputs/performance_profile_summary.csv"
+    if profile_path.exists():
+        profile = pd.read_csv(profile_path)
+        st.metric("Measured query pairs", profile["instance_id"].nunique())
+        st.write(
+            "Generated and reference queries were measured for the 52 "
+            "previously matching pairs. Warm-ups are excluded from the "
+            "summary; each query has three measured repetitions."
+        )
+        st.caption(
+            "This selected subset does not establish efficiency across "
+            "all 200 queries. Timing includes network transfer and PROFILE overhead."
+        )
+        with st.expander("View performance measurements"):
+            st.dataframe(profile, hide_index=True, use_container_width=True)
+        st.download_button(
+            "Download performance measurements",
+            profile_path.read_bytes(),
+            file_name=profile_path.name,
+            mime="text/csv",
+        )
+
+    correlation_path = PROJECT / "outputs/spearman_results.csv"
+    if correlation_path.exists():
+        st.subheader("Text scores and recorded error assessments")
+        correlations = pd.read_csv(correlation_path)
+        display = correlations[
+            ["metric", "target", "paired_records", "spearman_rho"]
+        ].copy()
+
+        display["metric"] = display["metric"].replace({
+            "bleu_score": "BLEU",
+            "exact_match": "Exact Match — historical",
+            "case_sensitive_trimmed_exact_match":
+                "Exact Match — case-sensitive",
+        })
+        display["target"] = display["target"].replace({
+            "neo4j_syntax_error": "Syntax checks",
+            "validation_review_logical_error": "40-case review: determinate cases",
+            "reviewed_error_vs_acceptable_alternative":
+                "Flagged review: errors vs alternatives",
+        })
+        display["spearman_rho"] = display["spearman_rho"].map(
+            lambda value: (
+                f"{value:.3f}" if pd.notna(value)
+                else "Not defined"
+            )
+        )
+        display = display.rename(columns={
+            "metric": "Text metric",
+            "target": "Compared with",
+            "paired_records": "Cases",
+            "spearman_rho": "Correlation",
+        })
+        st.dataframe(display, hide_index=True, use_container_width=True)
+
+        with st.expander("View the full correlation evidence"):
+            st.dataframe(
+                correlations, hide_index=True, use_container_width=True
+            )
+        st.caption(
+            "Negative correlations mean higher text scores tended to accompany "
+            "the no-error category under the recorded rules. The sample and "
+            "review method limit interpretation. A blank coefficient means "
+            "the correlation could not be calculated."
+        )
+
+    st.subheader("Research figures")
+    figure_folder = PROJECT / "outputs/final_figures"
+    figures = [
+        ("figure_01_evaluation_coverage", "Evaluation outcomes and coverage"),
+        ("figure_02_bleu_by_question_length", "BLEU by question length"),
+        ("figure_03_bleu_by_review_outcome", "BLEU by flagged-case review outcome"),
+        ("figure_04_validation_assessments", "The 40-case review"),
+        ("figure_05_paired_performance", "Paired performance measurements"),
+    ]
+    caption_path = figure_folder / "figure_captions.csv"
+    with st.expander("View and download the final figures"):
+        for filename, title in figures:
+            png = figure_folder / (filename + ".png")
+            pdf = figure_folder / (filename + ".pdf")
+            if png.exists():
+                st.markdown("**" + title + "**")
+                st.image(str(png), use_container_width=True)
+                if pdf.exists():
+                    st.download_button(
+                        "Download PDF",
+                        pdf.read_bytes(),
+                        file_name=pdf.name,
+                        mime="application/pdf",
+                        key="download_" + filename,
+                    )
+        if caption_path.exists():
+            st.markdown("**Figure captions and interpretation**")
+            st.dataframe(
+                pd.read_csv(caption_path),
+                hide_index=True,
+                use_container_width=True,
+            )
 
     st.subheader("Download the evidence")
     left, right = st.columns(2)

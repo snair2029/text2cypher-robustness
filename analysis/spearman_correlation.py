@@ -52,6 +52,23 @@ def run_spearman_correlation():
 
         df[metric] = numeric
 
+    validation = pd.read_csv(
+        PROJECT / "outputs/human_validation.csv",
+        dtype=str,
+    ).fillna("")
+
+    if validation["instance_id"].duplicated().any():
+        raise ValueError("Duplicate human-validation IDs.")
+    if not set(validation["instance_id"]).issubset(set(df["instance_id"])):
+        raise ValueError("Unknown human-validation IDs.")
+
+    df = df.merge(
+        validation[["instance_id", "logical_assessment"]],
+        on="instance_id",
+        how="left",
+        validate="one_to_one",
+    )
+
     # Unknown outcomes remain missing, rather than becoming zero.
     targets = {
         "neo4j_syntax_error": (
@@ -61,6 +78,16 @@ def run_spearman_correlation():
             }),
             "All records with accepted or syntax_error status",
             "Only two syntax errors were observed; association is fragile.",
+        ),
+        "validation_review_logical_error": (
+            df["logical_assessment"].map({
+                "error_present": 1,
+                "no_error_identified": 0,
+            }),
+            "Determinate logical assessments in the 40-case stratified sample",
+            "Student-verified AI-assisted review. Uncertain cases excluded; "
+            "no_error_identified is limited to recorded interpretation rules. "
+            "This is not independent ground truth or a population estimate.",
         ),
         "reviewed_error_vs_acceptable_alternative": (
             df["manual_logical_review_status"].map({

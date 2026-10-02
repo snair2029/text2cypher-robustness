@@ -18,6 +18,8 @@ STAGES = {
     "syntax": "syntax_generated_status",
     "schema_names": "schema_generated_name_coverage_status",
     "schema_properties": "schema_generated_property_name_status",
+    "schema_endpoints": "schema_generated_endpoint_status",
+    "schema_endpoint_review": "schema_generated_endpoint_review_status",
     "logical_comparison": "logical_status",
     "logical_review": "manual_logical_review_status",
     "performance_plan": "performance_status",
@@ -146,7 +148,7 @@ def run_cross_tabulation():
     print("Historical Exact Match lowercases and trims query text.")
     print("The added Exact Match preserves case and trims query text.")
     print("Neither text metric establishes answer correctness.")
-    print("The separate partial 40-case AI-assisted review is not included.")
+    print("The completed 40-case AI-assisted validation is reported separately in classifier_validation.csv.")
 
     print("\nSaved: outputs/cross_tabulation.csv")
     print("Saved: outputs/bleu_by_complexity.csv")

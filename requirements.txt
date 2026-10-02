@@ -1,0 +1,13 @@
+pandas==3.0.3
+numpy==2.5.1
+scipy==1.18.0
+matplotlib==3.11.1
+streamlit==1.64.0
+neo4j==6.2.0
+python-dotenv==1.2.2
+sacrebleu==2.6.0
+google-genai==2.10.0
+
+# Needed to download the Hugging Face dataset again.
+# Not installed in the audited environment; version not recorded.
+datasets

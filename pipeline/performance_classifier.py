@@ -456,10 +456,179 @@ def run_profile_measurements():
     print("Original queries and EXPLAIN evidence were not changed.")
 
 
+
+def summarise_profile_measurements():
+    """Validate saved PROFILE runs and summarise measured repetitions."""
+    import hashlib
+    import numpy as np
+
+    source = PROJECT / "outputs/performance_profile.csv"
+    target = PROJECT / "outputs/performance_profile_summary.csv"
+    query_path = PROJECT / "data/generated_queries.csv"
+
+    runs = pd.read_csv(source, keep_default_na=False)
+    queries = pd.read_csv(query_path, keep_default_na=False)
+
+    required = {
+        "instance_id", "database", "phase", "repetition", "query_kind",
+        "query_sha256", "profile_status", "current_pair_result_match",
+        "returned_rows", "db_hits", "client_elapsed_profile_ms",
+    }
+    missing = required - set(runs.columns)
+    if missing:
+        raise ValueError(f"Missing measurement columns: {sorted(missing)}")
+
+    if queries["instance_id"].eq("").any():
+        raise ValueError("Missing source query IDs.")
+    if queries["instance_id"].duplicated().any():
+        raise ValueError("Duplicate source query IDs.")
+    if runs["instance_id"].eq("").any():
+        raise ValueError("Missing measurement IDs.")
+    if runs.empty:
+        raise ValueError("No saved measurements.")
+
+    if not runs["profile_status"].eq("measured").all():
+        raise ValueError(
+            "Some runs are inconclusive. Review them before summarising."
+        )
+
+    if not runs["phase"].isin(["warmup", "measurement"]).all():
+        raise ValueError("Unexpected measurement phase.")
+    if not runs["query_kind"].isin(["reference", "generated"]).all():
+        raise ValueError("Unexpected query kind.")
+
+    for column in (
+        "repetition", "current_pair_result_match", "returned_rows",
+        "db_hits", "client_elapsed_profile_ms",
+    ):
+        runs[column] = pd.to_numeric(runs[column], errors="raise")
+        if not np.isfinite(runs[column]).all():
+            raise ValueError(f"Non-finite values in {column}.")
+
+    for column in ("repetition", "returned_rows", "db_hits"):
+        if not runs[column].mod(1).eq(0).all():
+            raise ValueError(f"Non-integer values in {column}.")
+
+    if (runs[["returned_rows", "db_hits",
+              "client_elapsed_profile_ms"]] < 0).any().any():
+        raise ValueError("Negative measurement values.")
+
+    keys = ["instance_id", "query_kind", "phase", "repetition"]
+    if runs.duplicated(keys).any():
+        raise ValueError("Duplicate measurement runs.")
+
+    # Verify that the saved measurements refer to the current query text.
+    source_queries = queries.set_index("instance_id")
+    for (instance_id, kind), group in runs.groupby(
+        ["instance_id", "query_kind"]
+    ):
+        if instance_id not in source_queries.index:
+            raise ValueError(f"Unknown query ID: {instance_id}")
+
+        column = "cypher" if kind == "reference" else "generated_cypher"
+        query = str(source_queries.loc[instance_id, column])
+        expected_hash = hashlib.sha256(
+            query.encode("utf-8")
+        ).hexdigest()
+
+        if not group["query_sha256"].eq(expected_hash).all():
+            raise ValueError(
+                f"Saved measurements use different query text: "
+                f"{instance_id}, {kind}"
+            )
+
+    expected_runs = {
+        (kind, phase, repetition)
+        for kind in ("reference", "generated")
+        for phase, repetitions in (
+            ("warmup", [0]),
+            ("measurement", [1, 2, 3]),
+        )
+        for repetition in repetitions
+    }
+
+    for instance_id, group in runs.groupby("instance_id"):
+        actual_runs = set(zip(
+            group["query_kind"], group["phase"], group["repetition"]
+        ))
+        if actual_runs != expected_runs:
+            raise ValueError(
+                f"Incomplete repetition schedule: {instance_id}"
+            )
+        if group["database"].nunique() != 1 or group["database"].eq("").any():
+            raise ValueError(f"Inconsistent database: {instance_id}")
+
+        for column in ("server_version", "execution_node", "comparison_mode"):
+            if column in group.columns and group[column].nunique() != 1:
+                raise ValueError(
+                    f"Inconsistent {column} within pair: {instance_id}"
+                )
+
+    measured = runs.loc[runs["phase"].eq("measurement")].copy()
+    pair_agreement = measured.groupby("instance_id").apply(
+        lambda group: bool(
+            group["current_pair_result_match"].eq(1).all()
+            and group["returned_rows"].gt(0).all()
+        )
+    )
+
+    summary = measured.groupby(
+        ["instance_id", "database", "query_kind"], as_index=False
+    ).agg(
+        repetitions=("repetition", "size"),
+        returned_rows_min=("returned_rows", "min"),
+        returned_rows_max=("returned_rows", "max"),
+        db_hits_median=("db_hits", "median"),
+        db_hits_min=("db_hits", "min"),
+        db_hits_max=("db_hits", "max"),
+        client_elapsed_profile_ms_median=("client_elapsed_profile_ms", "median"),
+        client_elapsed_profile_ms_min=("client_elapsed_profile_ms", "min"),
+        client_elapsed_profile_ms_max=("client_elapsed_profile_ms", "max"),
+    )
+
+    summary["all_repetitions_nonempty_result_match"] = (
+        summary["instance_id"].map(pair_agreement)
+    )
+    summary = summary.sort_values(
+        ["instance_id", "query_kind"]
+    ).reset_index(drop=True)
+
+    # Preserve the previous summary before replacing it.
+    if target.exists():
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        backup = target.with_name(
+            f"performance_profile_summary.before_rebuild_{stamp}.csv"
+        )
+        backup.write_bytes(target.read_bytes())
+
+    temporary = target.with_suffix(".tmp")
+    summary.to_csv(temporary, index=False)
+    temporary.replace(target)
+
+    print("PERFORMANCE SUMMARY REBUILT")
+    print("Total saved runs:", len(runs))
+    print("Warm-ups excluded:", runs["phase"].eq("warmup").sum())
+    print("Measured runs:", len(measured))
+    print("Query pairs:", measured["instance_id"].nunique())
+    print("Summary rows:", len(summary))
+    print("Pairs matching with non-empty results in every measured repetition:",
+          int(pair_agreement.sum()))
+    print("Other pairs:", int((~pair_agreement).sum()))
+    print("PASS: query hashes and repetition schedules verified.")
+    print("Saved:", target)
+    print("No database queries were executed.")
+    print("Original queries and raw measurements were not changed.")
+    print("Timing includes network transfer and PROFILE overhead.")
+
+
 if __name__ == "__main__":
     import sys
-    if "--profile" in sys.argv:
+
+    if "--summarise" in sys.argv:
+        if len(sys.argv) != 2:
+            raise SystemExit("Use --summarise by itself.")
+        summarise_profile_measurements()
+    elif "--profile" in sys.argv:
         run_profile_measurements()
     else:
         run_performance_classifier()
-
