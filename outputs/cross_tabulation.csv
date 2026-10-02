@@ -1,5 +1,55 @@
-Error Type,simple,medium,complex,Total
-Syntax Error,0,0,0,0
-Schema Hallucination,0,1,10,11
-Logical Error,7,12,6,25
-Performance Issue,10,10,3,23
+stage,question_length_group,outcome,records,group_records,percent_of_group
+syntax,simple,accepted,50,50,100.0
+syntax,medium,accepted,100,100,100.0
+syntax,complex,accepted,48,50,96.0
+syntax,complex,syntax_error,2,50,4.0
+schema_names,simple,detected_names_covered,49,50,98.0
+schema_names,simple,no_explicit_names_detected,1,50,2.0
+schema_names,medium,detected_names_covered,98,100,98.0
+schema_names,medium,partial_check_relationship_schema_unavailable,2,100,2.0
+schema_names,complex,detected_names_covered,48,50,96.0
+schema_names,complex,partial_check_relationship_schema_unavailable,2,50,4.0
+schema_properties,simple,detected_names_present_somewhere_in_schema,42,50,84.0
+schema_properties,simple,no_static_property_names_detected,8,50,16.0
+schema_properties,medium,detected_names_present_somewhere_in_schema,97,100,97.0
+schema_properties,medium,no_static_property_names_detected,3,100,3.0
+schema_properties,complex,detected_names_present_somewhere_in_schema,50,50,100.0
+logical_comparison,simple,source_graph_unavailable,22,50,44.0
+logical_comparison,simple,observed_result_match,14,50,28.0
+logical_comparison,simple,output_shape_differs_needs_review,6,50,12.0
+logical_comparison,simple,observed_result_difference,6,50,12.0
+logical_comparison,simple,result_limit_inconclusive,1,50,2.0
+logical_comparison,simple,both_empty_inconclusive,1,50,2.0
+logical_comparison,medium,observed_result_match,33,100,33.0
+logical_comparison,medium,source_graph_unavailable,32,100,32.0
+logical_comparison,medium,output_shape_differs_needs_review,18,100,18.0
+logical_comparison,medium,observed_result_difference,11,100,11.0
+logical_comparison,medium,result_limit_inconclusive,2,100,2.0
+logical_comparison,medium,both_empty_inconclusive,2,100,2.0
+logical_comparison,medium,timeout_inconclusive,1,100,1.0
+logical_comparison,medium,reference_defect_needs_review,1,100,1.0
+logical_comparison,complex,source_graph_unavailable,35,50,70.0
+logical_comparison,complex,observed_result_difference,6,50,12.0
+logical_comparison,complex,observed_result_match,5,50,10.0
+logical_comparison,complex,generated_syntax_error,2,50,4.0
+logical_comparison,complex,reference_defect_needs_review,1,50,2.0
+logical_comparison,complex,output_shape_differs_needs_review,1,50,2.0
+logical_review,simple,not_reviewed,38,50,76.0
+logical_review,simple,reviewed_without_final_binary_label,5,50,10.0
+logical_review,simple,confirmed_generated_error_under_recorded_rules,4,50,8.0
+logical_review,simple,acceptable_output_alternative,3,50,6.0
+logical_review,medium,not_reviewed,71,100,71.0
+logical_review,medium,reviewed_without_final_binary_label,20,100,20.0
+logical_review,medium,acceptable_output_alternative,6,100,6.0
+logical_review,medium,confirmed_generated_error_under_recorded_rules,3,100,3.0
+logical_review,complex,not_reviewed,43,50,86.0
+logical_review,complex,confirmed_generated_error_under_recorded_rules,3,50,6.0
+logical_review,complex,reviewed_without_final_binary_label,3,50,6.0
+logical_review,complex,acceptable_output_alternative,1,50,2.0
+performance_plan,simple,plan_inspected_no_cartesian_product,28,50,56.0
+performance_plan,simple,source_graph_unavailable,22,50,44.0
+performance_plan,medium,plan_inspected_no_cartesian_product,67,100,67.0
+performance_plan,medium,source_graph_unavailable,33,100,33.0
+performance_plan,complex,source_graph_unavailable,35,50,70.0
+performance_plan,complex,plan_inspected_no_cartesian_product,13,50,26.0
+performance_plan,complex,generated_syntax_error,2,50,4.0

@@ -1,135 +1,157 @@
 """
-cross_tabulation.py
-Phase 5 — Cross-Tabulation Analysis
-Robustness Testing for LLM-Based Text-to-Cypher Systems
+Summarise revised evaluation evidence by question-length group.
 
-Produces cross-tabulation of error types against query complexity
-levels (simple, medium, complex) to identify whether certain error
-types are more prevalent at specific complexity levels.
-Addresses RQ1: what are the most common failure modes.
-
+Uses assembled results, preserves uncertainty and excludes historical
+classifier flags from final outcome counts. Group percentages describe
+recorded outcomes, not overall correctness.
 """
 
+from pathlib import Path
 import pandas as pd
-import os
 
-# ─────────────────────────────────────────
-# LOAD DATA
-# ─────────────────────────────────────────
+PROJECT = Path(__file__).resolve().parents[1]
+OUTPUTS = PROJECT / "outputs"
+INPUT = OUTPUTS / "evaluation_results.csv"
+GROUPS = ["simple", "medium", "complex"]
 
-def load_data():
-    df = pd.read_csv("data/generated_queries.csv")
-    df['complexity'] = df['complexity'].fillna('unknown').astype(str)
-    df['syntax_error'] = df['syntax_error'].fillna(0).astype(int)
-    df['schema_hallucination'] = df['schema_hallucination'].fillna(0).astype(int)
-    df['logical_error'] = df['logical_error'].fillna(0).astype(int)
-    df['performance_error'] = df['performance_error'].fillna(0).astype(int)
-    df['bleu_score'] = df['bleu_score'].fillna(0).astype(float)
-    df['exact_match'] = df['exact_match'].fillna(0).astype(int)
-    return df
+STAGES = {
+    "syntax": "syntax_generated_status",
+    "schema_names": "schema_generated_name_coverage_status",
+    "schema_properties": "schema_generated_property_name_status",
+    "logical_comparison": "logical_status",
+    "logical_review": "manual_logical_review_status",
+    "performance_plan": "performance_status",
+}
 
 
-# ─────────────────────────────────────────
-# CROSS-TABULATION
-# ─────────────────────────────────────────
+def save_csv(frame, path):
+    temporary = path.with_suffix(".csv.tmp")
+    frame.to_csv(temporary, index=False)
+    temporary.replace(path)
+
 
 def run_cross_tabulation():
-    df = load_data()
-    complexity_order = ['simple', 'medium', 'complex']
+    df = pd.read_csv(INPUT, dtype=str).fillna("")
 
-    print("Cross-Tabulation Analysis")
-    print("="*60)
-
-    # ── Error counts by complexity ──
-    print("\nError Type Distribution by Complexity Level")
-    print("-"*60)
-
-    error_cols = {
-        'Syntax Error': 'syntax_error',
-        'Schema Hallucination': 'schema_hallucination',
-        'Logical Error': 'logical_error',
-        'Performance Issue': 'performance_error'
+    required = {
+        "instance_id", "complexity", "bleu_score", "exact_match",
+        "case_sensitive_trimmed_exact_match", *STAGES.values(),
     }
+    missing = required - set(df.columns)
+    if missing:
+        raise SystemExit(f"Missing columns: {sorted(missing)}")
 
-    results = []
-    print(f"\n{'Error Type':<25} {'Simple':>8} {'Medium':>8} "
-          f"{'Complex':>8} {'Total':>8}")
-    print("-"*60)
+    if df["instance_id"].str.strip().eq("").any():
+        raise SystemExit("Missing instance IDs.")
+    if df["instance_id"].duplicated().any():
+        raise SystemExit("Duplicate instance IDs.")
 
-    for label, col in error_cols.items():
-        row = {'Error Type': label}
-        total = 0
-        counts = []
-        for c in complexity_order:
-            count = df[df['complexity'] == c][col].sum()
-            row[c] = int(count)
-            counts.append(int(count))
-            total += count
-        row['Total'] = int(total)
-        results.append(row)
-        print(f"{label:<25} {counts[0]:>8} {counts[1]:>8} "
-              f"{counts[2]:>8} {total:>8}")
+    df["complexity"] = df["complexity"].str.strip().str.lower()
+    unexpected = set(df["complexity"]) - set(GROUPS)
+    if unexpected:
+        raise SystemExit(f"Unexpected groups: {sorted(unexpected)}")
 
-    # Any error row
-    df['any_error'] = (
-        (df['syntax_error'] == 1) |
-        (df['schema_hallucination'] == 1) |
-        (df['logical_error'] == 1) |
-        (df['performance_error'] == 1)
-    ).astype(int)
+    df["bleu_score"] = pd.to_numeric(df["bleu_score"], errors="coerce")
+    if df["bleu_score"].isna().any():
+        raise SystemExit("Missing or invalid BLEU scores; inspect before analysis.")
+    if not df["bleu_score"].between(0, 100).all():
+        raise SystemExit("BLEU scores outside 0–100.")
 
-    print("-"*60)
-    any_counts = []
-    any_total = 0
-    for c in complexity_order:
-        count = df[df['complexity'] == c]['any_error'].sum()
-        any_counts.append(int(count))
-        any_total += count
-    print(f"{'Any Error':<25} {any_counts[0]:>8} {any_counts[1]:>8} "
-          f"{any_counts[2]:>8} {any_total:>8}")
+    metric_columns = [
+        "exact_match", "case_sensitive_trimmed_exact_match"
+    ]
+    for column in metric_columns:
+        values = df[column]
+        invalid = ~values.isin(["", "0", "1", "0.0", "1.0"])
+        if invalid.any():
+            raise SystemExit(f"Invalid binary values in {column}.")
+        df[column] = pd.to_numeric(values, errors="coerce")
 
-    # ── Queries per complexity ──
-    print(f"\n{'Total Queries':<25} ", end="")
-    for c in complexity_order:
-        print(f"{len(df[df['complexity']==c]):>8}", end="")
-    print(f"{len(df):>8}")
+    output_rows = []
 
-    # ── Error rate by complexity ──
-    print("\n\nError Rate by Complexity Level (percentage)")
-    print("-"*60)
-    print(f"\n{'Error Type':<25} {'Simple':>8} {'Medium':>8} {'Complex':>8}")
-    print("-"*50)
+    print("REVISED EVALUATION SUMMARY")
+    print("Groups describe question length, not proven query difficulty.")
 
-    n_simple = len(df[df['complexity'] == 'simple'])
-    n_medium = len(df[df['complexity'] == 'medium'])
-    n_complex = len(df[df['complexity'] == 'complex'])
+    for stage, column in STAGES.items():
+        outcomes = df[column].replace("", "not_recorded")
+        table = pd.crosstab(df["complexity"], outcomes).reindex(
+            GROUPS, fill_value=0
+        )
+        print(f"\n{stage.upper()}")
+        print(table.to_string())
 
-    for label, col in error_cols.items():
-        s = df[df['complexity']=='simple'][col].sum() / n_simple * 100
-        m = df[df['complexity']=='medium'][col].sum() / n_medium * 100
-        c = df[df['complexity']=='complex'][col].sum() / n_complex * 100
-        print(f"{label:<25} {s:>7.1f}% {m:>7.1f}% {c:>7.1f}%")
+        for group in GROUPS:
+            subset = df.loc[df["complexity"].eq(group)]
+            counts = subset[column].replace(
+                "", "not_recorded"
+            ).value_counts()
 
-    # ── BLEU by complexity ──
-    print("\n\nAverage BLEU Score by Complexity Level")
-    print("-"*60)
-    bleu_by_complexity = df.groupby('complexity')['bleu_score'].agg(
-        ['mean', 'median', 'std']
-    ).reindex(complexity_order)
-    print(bleu_by_complexity.round(2).to_string())
+            for outcome, count in counts.items():
+                output_rows.append({
+                    "stage": stage,
+                    "question_length_group": group,
+                    "outcome": outcome,
+                    "records": int(count),
+                    "group_records": len(subset),
+                    "percent_of_group": round(
+                        100 * count / len(subset), 2
+                    ),
+                })
 
-    # ── Save results ──
-    results_df = pd.DataFrame(results)
-    results_df.to_csv("outputs/cross_tabulation.csv", index=False)
+    metric_rows = []
+    for group in GROUPS + ["all"]:
+        subset = (
+            df if group == "all"
+            else df.loc[df["complexity"].eq(group)]
+        )
+        scores = subset["bleu_score"]
 
-    bleu_by_complexity.round(2).to_csv("outputs/bleu_by_complexity.csv")
+        row = {
+            "question_length_group": group,
+            "records": len(subset),
+            "bleu_records": int(scores.count()),
+            "bleu_mean": scores.mean(),
+            "bleu_median": scores.median(),
+            "bleu_std": scores.std(),
+        }
 
-    print("\n" + "="*60)
-    print("Saved → outputs/cross_tabulation.csv")
-    print("Saved → outputs/bleu_by_complexity.csv")
-    print("="*60)
+        for column in metric_columns:
+            values = subset[column].dropna()
+            row[column + "_assessable"] = len(values)
+            row[column + "_count"] = int(values.sum())
+            row[column + "_percent"] = (
+                100 * values.mean() if len(values) else None
+            )
+
+        metric_rows.append(row)
+
+    metrics = pd.DataFrame(metric_rows)
+    print("\nTEXT METRICS")
+    print(metrics.round(4).to_string(index=False))
+
+    OUTPUTS.mkdir(parents=True, exist_ok=True)
+    save_csv(
+        pd.DataFrame(output_rows),
+        OUTPUTS / "cross_tabulation.csv",
+    )
+    save_csv(metrics, OUTPUTS / "bleu_by_complexity.csv")
+
+    print("\nINTERPRETATION")
+    print("Outcome percentages use all records in each stated group.")
+    print("Unavailable, inconclusive and unreviewed cases remain visible.")
+    print("The 48-case review was selected for comparison differences.")
+    print("Its reviewed errors are not an overall logical-error rate.")
+    print("Schema-name coverage does not establish complete schema validity.")
+    print("Plan inspection does not establish measured efficiency.")
+    print("Historical Exact Match lowercases and trims query text.")
+    print("The added Exact Match preserves case and trims query text.")
+    print("Neither text metric establishes answer correctness.")
+    print("The separate partial 40-case AI-assisted review is not included.")
+
+    print("\nSaved: outputs/cross_tabulation.csv")
+    print("Saved: outputs/bleu_by_complexity.csv")
+    print("Original queries and diagnostic evidence were not changed.")
 
 
 if __name__ == "__main__":
-    os.makedirs("outputs", exist_ok=True)
     run_cross_tabulation()

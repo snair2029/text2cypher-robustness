@@ -1,4 +1,5 @@
-complexity,mean,median,std
-simple,67.77,67.89,25.8
-medium,59.68,58.87,23.07
-complex,53.94,52.03,15.54
+question_length_group,records,bleu_records,bleu_mean,bleu_median,bleu_std,exact_match_assessable,exact_match_count,exact_match_percent,case_sensitive_trimmed_exact_match_assessable,case_sensitive_trimmed_exact_match_count,case_sensitive_trimmed_exact_match_percent
+simple,50,50,67.768156,67.88685000000001,25.797641319173316,50,11,22.0,50,10,20.0
+medium,100,100,59.680373,58.869249999999994,23.073791022939293,100,3,3.0,100,3,3.0
+complex,50,50,53.940204,52.02585,15.541691612548986,50,0,0.0,50,0,0.0
+all,200,200,60.26727650000001,58.41475,22.640165563986525,200,14,7.000000000000001,200,13,6.5

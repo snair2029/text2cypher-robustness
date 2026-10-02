@@ -1,0 +1,1490 @@
+review_order,instance_id,question,schema,reference_cypher,generated_cypher,complexity,case_sha256,source_file_sha256,selection_seed,review_order_seed,syntax_assessment,schema_assessment,logical_assessment,reference_assessment,review_reason,reviewer,reviewed_at_utc,assistance_used,performance_assessment,review_status,proposed_syntax_assessment,proposed_schema_assessment,proposed_logical_assessment,proposed_reference_assessment,proposed_reason,proposal_method,proposal_created_at_utc,prior_exposure,verification_status,verified_at_utc
+1,instance_id_35775,Which organizations have a parent organization with a higher revenue?,"Node properties:
+- **Person**
+  - `name`: STRING Example: ""Julie Spellman Sweet""
+  - `id`: STRING Example: ""Eaf0bpz6NNoqLVUCqNZPAew""
+  - `summary`: STRING Example: ""CEO at Accenture""
+- **Organization**
+  - `revenue`: FLOAT Example: ""1.2E8""
+  - `motto`: STRING Example: """"
+  - `nbrEmployees`: INTEGER Example: ""375""
+  - `isDissolved`: BOOLEAN 
+  - `id`: STRING Example: ""E0ZU8eCc5OaqS1LU9qE3n3w""
+  - `isPublic`: BOOLEAN 
+  - `name`: STRING Example: ""New Energy Group""
+  - `summary`: STRING Example: ""Software company based in Rome, Metropolitan City ""
+- **IndustryCategory**
+  - `name`: STRING Example: ""Electronic Products Manufacturers""
+  - `id`: STRING Example: ""EUNd__O4zMNW81lAXNK2GNw""
+- **City**
+  - `id`: STRING Example: ""EZHWv2xKgN92oYDKSjhJ2gw""
+  - `summary`: STRING Example: ""City in and county seat of King County, Washington""
+  - `name`: STRING Example: ""Seattle""
+- **Country**
+  - `name`: STRING Example: ""United States of America""
+  - `id`: STRING Example: ""E01d4EK33MmCosgI2KXa4-A""
+  - `summary`: STRING Example: ""Country in North America""
+- **Article**
+  - `id`: STRING Example: ""ART176872705964""
+  - `sentiment`: FLOAT Example: ""0.856""
+  - `author`: STRING Example: ""David Correa""
+  - `siteName`: STRING Example: ""MrWeb""
+  - `summary`: STRING Example: ""Boston and Mumbai-based consumer behavior analyses""
+  - `date`: DATE_TIME Example: ""2022-03-10T00:00:00Z""
+  - `title`: STRING Example: ""Funds for Consumer Behavior Specialist Infinite An""
+- **Chunk**
+  - `text`: STRING Example: ""Boston and Mumbai-based consumer behavior analyses""
+- **Fewshot**
+  - `Question`: STRING Available options: ['How is Emil Eifrem connected to Michael Hunger? ', 'What are the latest news regarding Google? ', 'Are there any news regarding return to office poli', 'What is Microsoft policy regarding to the return t', 'How many levels of subsidiaries does Blackstone ha', 'How many Telecommunications Companies are from Mal']
+  - `Cypher`: STRING Available options: ['MATCH (p1:Person {{name:""Emil Eifrem""}}), (p2:Pers', 'MATCH (o:Organization {{name:""Google""}})<-[:MENTIO', 'CALL apoc.ml.openai.embedding([""Are there any news', 'CALL apoc.ml.openai.embedding([""What is Microsoft ', 'MATCH p=(o:Organization {name:""Blackstone""})-[:HAS', 'MATCH (o:Organization) WHERE EXISTS {(o)-[:HAS_CAT']
+  - `id`: INTEGER Min: 2, Max: 7
+Relationship properties:
+
+The relationships:
+(:Person)-[:HAS_PARENT]->(:Person)
+(:Person)-[:HAS_CHILD]->(:Person)
+(:Organization)-[:IN_CITY]->(:City)
+(:Organization)-[:HAS_CEO]->(:Person)
+(:Organization)-[:HAS_CATEGORY]->(:IndustryCategory)
+(:Organization)-[:HAS_SUBSIDIARY]->(:Organization)
+(:Organization)-[:HAS_SUPPLIER]->(:Organization)
+(:Organization)-[:HAS_INVESTOR]->(:Organization)
+(:Organization)-[:HAS_INVESTOR]->(:Person)
+(:Organization)-[:HAS_BOARD_MEMBER]->(:Person)
+(:Organization)-[:HAS_COMPETITOR]->(:Organization)
+(:City)-[:IN_COUNTRY]->(:Country)
+(:Article)-[:HAS_CHUNK]->(:Chunk)
+(:Article)-[:MENTIONS]->(:Organization)","MATCH (o:Organization)-[:HAS_SUBSIDIARY]->(sub:Organization) WHERE o.revenue > sub.revenue RETURN o.name AS ParentOrganization, o.revenue AS ParentRevenue,         sub.name AS Subsidiary, sub.revenue AS SubsidiaryRevenue","MATCH (o:Organization)-[:HAS_PARENT]->(parent:Organization)
+WHERE o.revenue < parent.revenue
+RETURN o.name AS Organization, parent.name AS ParentOrganization",medium,960c41a84cdf6c1aadd86cc1867681fdb3b2ae294f673e2e5dc38dc2e8da9e93,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,no_error_identified,error_present,error_present,no_issue_identified,"No syntax error is apparent from text inspection. The supplied schema declares HAS_PARENT between Person nodes, not Organization nodes. The generated query applies that relationship to organisations, so its pattern is unsupported. Organisation parenthood is represented by a parent organisation having a HAS_SUBSIDIARY relationship to its subsidiary. The reference uses that pattern and compares parent and subsidiary revenue appropriately. Its extra output columns are not treated as an error.",Shreya Nair,2026-10-01T14:32:55.796548+00:00,AI-proposed assessments and reasons reviewed and accepted by student. Previously discussed in the AI-assisted flagged-case review.,not_assessed,completed,no_error_identified,error_present,error_present,no_issue_identified,"No syntax error is apparent from text inspection. The supplied schema declares HAS_PARENT between Person nodes, not Organization nodes. The generated query applies that relationship to organisations, so its pattern is unsupported. Organisation parenthood is represented by a parent organisation having a HAS_SUBSIDIARY relationship to its subsidiary. The reference uses that pattern and compares parent and subsidiary revenue appropriately. Its extra output columns are not treated as an error.","AI-assisted inspection of question, supplied schema and query text; no database rerun",2026-10-01T14:31:13.732381+00:00,Previously discussed in the AI-assisted flagged-case review.,verified,2026-10-01T14:32:55.796548+00:00
+2,instance_id_2789,Find all 'Vehicle Crime' crimes,"Node properties are the following: "":Person {surname: STRING, nhs_no: STRING, name: STRING, age: STRING},:Location {latitude: FLOAT, postcode: STRING, longitude: FLOAT, address: STRING},:Phone {phoneNo: STRING},:Email {email_address: STRING},:Officer {badge_no: STRING, rank: STRING, name: STRING, surname: STRING},:PostCode {code: STRING},:Area {areaCode: STRING},:PhoneCall {call_duration: STRING, call_time: STRING, call_date: STRING, call_type: STRING},:Crime {date: STRING, id: STRING, type: STRING, last_outcome: STRING, note: STRING, charge: STRING},:Object {description: STRING, id: STRING, type: STRING},:Vehicle {model: STRING, reg: STRING, make: STRING, year: STRING}"" Relationship properties are the following: "":CURRENT_ADDRESS {},:HAS_PHONE {},:HAS_EMAIL {},:HAS_POSTCODE {},:POSTCODE_IN_AREA {},:LOCATION_IN_AREA {},:KNOWS_SN {},:KNOWS {},:CALLER {},:CALLED {},:KNOWS_PHONE {},:OCCURRED_AT {},:INVESTIGATED_BY {},:INVOLVED_IN {},:PARTY_TO {},:FAMILY_REL {rel_type: STRING},:KNOWS_LW {}"" Relationship point from source to target nodes ""(:Person)-[:FAMILY_REL]->(:Person),(:Person)-[:CURRENT_ADDRESS]->(:Location),(:Person)-[:KNOWS]->(:Person),(:Person)-[:HAS_PHONE]->(:Phone),(:Person)-[:KNOWS_PHONE]->(:Person),(:Person)-[:HAS_EMAIL]->(:Email),(:Person)-[:KNOWS_SN]->(:Person),(:Person)-[:KNOWS_LW]->(:Person),(:Person)-[:PARTY_TO]->(:Crime),(:Location)-[:LOCATION_IN_AREA]->(:Area),(:Location)-[:HAS_POSTCODE]->(:PostCode),(:PostCode)-[:POSTCODE_IN_AREA]->(:Area),(:PhoneCall)-[:CALLED]->(:Phone),(:PhoneCall)-[:CALLER]->(:Phone),(:Crime)-[:INVESTIGATED_BY]->(:Officer),(:Crime)-[:OCCURRED_AT]->(:Location),(:Object)-[:INVOLVED_IN]->(:Crime),(:Vehicle)-[:INVOLVED_IN]->(:Crime)""",MATCH (n:Crime) WHERE toLower(n.type) = toLower('Vehicle Crime') RETURN n,MATCH (c:Crime {type: 'Vehicle Crime'}) RETURN c,simple,ec0d4fd8e35f5864a16b3627e49a402bfb18e3fcac86676a8a4a723bef9f899a,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,no_error_identified,no_error_identified,uncertain,uncertain,Both queries use the declared Crime label and type property. No syntax or schema-name error is apparent. The generated query uses exact string equality; the reference compares lowercased values. The schema does not specify stored crime-type values or whether the question requires case-insensitive matching. A result difference or generated logical error cannot be established from this material alone.,Shreya Nair,2026-10-01T14:33:23.395390+00:00,AI-proposed assessments and reasons reviewed and accepted by student. Case text previously displayed; AI proposal supplied.,not_assessed,completed,no_error_identified,no_error_identified,uncertain,uncertain,Both queries use the declared Crime label and type property. No syntax or schema-name error is apparent. The generated query uses exact string equality; the reference compares lowercased values. The schema does not specify stored crime-type values or whether the question requires case-insensitive matching. A result difference or generated logical error cannot be established from this material alone.,"AI-assisted inspection of question, supplied schema and query text; no database rerun",2026-10-01T14:31:13.732381+00:00,Case text previously displayed; AI proposal supplied.,verified,2026-10-01T14:33:23.395390+00:00
+3,instance_id_5551,"Look for the report_no of the Report that is not related  to the Article with the  comments  19 pages, AMSLatex, references added!","Graph schema: Relevant node labels and their properties (with datatypes) are:
+Report {report_no: STRING}
+Article {comments: STRING}","MATCH (n:Report), (:Article {comments: '19 pages, AMSLatex, references added'}) WHERE NOT (n) --> (:Article) RETURN n.report_no","MATCH (r:Report)
+WHERE NOT (r)-[]-(:Article {comments: '19 pages, AMSLatex, references added!'})
+RETURN r.report_no",complex,5e44fd3f5360e197d65e72cc5324125d3c21a0da0f7ecc590d96e985ed8e45da,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,no_error_identified,no_error_identified,uncertain,issue_identified,"No syntax error is apparent; Report.report_no and Article.comments are declared. The generated query excludes relationships in either direction to articles with the exact comment string including the final exclamation mark. Whether that mark belongs to the stored value or question punctuation is unknown. The reference matches an article with the comment without the mark, but its negative pattern is not bound to that matched article: it excludes outgoing links to any Article. The separate article match can also multiply rows. These reference concerns are identifiable from query structure; the intended generated-query interpretation remains uncertain.",Shreya Nair,2026-10-01T14:33:41.905947+00:00,AI-proposed assessments and reasons reviewed and accepted by student. Case text previously displayed; AI proposal supplied.,not_assessed,completed,no_error_identified,no_error_identified,uncertain,issue_identified,"No syntax error is apparent; Report.report_no and Article.comments are declared. The generated query excludes relationships in either direction to articles with the exact comment string including the final exclamation mark. Whether that mark belongs to the stored value or question punctuation is unknown. The reference matches an article with the comment without the mark, but its negative pattern is not bound to that matched article: it excludes outgoing links to any Article. The separate article match can also multiply rows. These reference concerns are identifiable from query structure; the intended generated-query interpretation remains uncertain.","AI-assisted inspection of question, supplied schema and query text; no database rerun",2026-10-01T14:31:13.732381+00:00,Case text previously displayed; AI proposal supplied.,verified,2026-10-01T14:33:41.905947+00:00
+4,instance_id_29896,Which organization has the most subsidiaries?,"Node properties:
+- **Person**
+  - `name`: STRING Example: ""Julie Spellman Sweet""
+  - `id`: STRING Example: ""Eaf0bpz6NNoqLVUCqNZPAew""
+  - `summary`: STRING Example: ""CEO at Accenture""
+- **Organization**
+  - `revenue`: FLOAT Example: ""1.2E8""
+  - `motto`: STRING Example: """"
+  - `nbrEmployees`: INTEGER Example: ""375""
+  - `isDissolved`: BOOLEAN 
+  - `id`: STRING Example: ""E0ZU8eCc5OaqS1LU9qE3n3w""
+  - `isPublic`: BOOLEAN 
+  - `name`: STRING Example: ""New Energy Group""
+  - `summary`: STRING Example: ""Software company based in Rome, Metropolitan City ""
+- **IndustryCategory**
+  - `name`: STRING Example: ""Electronic Products Manufacturers""
+  - `id`: STRING Example: ""EUNd__O4zMNW81lAXNK2GNw""
+- **City**
+  - `id`: STRING Example: ""EZHWv2xKgN92oYDKSjhJ2gw""
+  - `summary`: STRING Example: ""City in and county seat of King County, Washington""
+  - `name`: STRING Example: ""Seattle""
+- **Country**
+  - `name`: STRING Example: ""United States of America""
+  - `id`: STRING Example: ""E01d4EK33MmCosgI2KXa4-A""
+  - `summary`: STRING Example: ""Country in North America""
+- **Article**
+  - `id`: STRING Example: ""ART176872705964""
+  - `sentiment`: FLOAT Example: ""0.856""
+  - `author`: STRING Example: ""David Correa""
+  - `siteName`: STRING Example: ""MrWeb""
+  - `summary`: STRING Example: ""Boston and Mumbai-based consumer behavior analyses""
+  - `date`: DATE_TIME Example: ""2022-03-10T00:00:00Z""
+  - `title`: STRING Example: ""Funds for Consumer Behavior Specialist Infinite An""
+- **Chunk**
+  - `text`: STRING Example: ""Boston and Mumbai-based consumer behavior analyses""
+- **Fewshot**
+  - `Question`: STRING Available options: ['How is Emil Eifrem connected to Michael Hunger? ', 'What are the latest news regarding Google? ', 'Are there any news regarding return to office poli', 'What is Microsoft policy regarding to the return t', 'How many levels of subsidiaries does Blackstone ha', 'How many Telecommunications Companies are from Mal']
+  - `Cypher`: STRING Available options: ['MATCH (p1:Person {{name:""Emil Eifrem""}}), (p2:Pers', 'MATCH (o:Organization {{name:""Google""}})<-[:MENTIO', 'CALL apoc.ml.openai.embedding([""Are there any news', 'CALL apoc.ml.openai.embedding([""What is Microsoft ', 'MATCH p=(o:Organization {name:""Blackstone""})-[:HAS', 'MATCH (o:Organization) WHERE EXISTS {(o)-[:HAS_CAT']
+  - `id`: INTEGER Min: 2, Max: 7
+Relationship properties:
+
+The relationships:
+(:Person)-[:HAS_PARENT]->(:Person)
+(:Person)-[:HAS_CHILD]->(:Person)
+(:Organization)-[:IN_CITY]->(:City)
+(:Organization)-[:HAS_CEO]->(:Person)
+(:Organization)-[:HAS_CATEGORY]->(:IndustryCategory)
+(:Organization)-[:HAS_SUBSIDIARY]->(:Organization)
+(:Organization)-[:HAS_SUPPLIER]->(:Organization)
+(:Organization)-[:HAS_INVESTOR]->(:Organization)
+(:Organization)-[:HAS_INVESTOR]->(:Person)
+(:Organization)-[:HAS_BOARD_MEMBER]->(:Person)
+(:Organization)-[:HAS_COMPETITOR]->(:Organization)
+(:City)-[:IN_COUNTRY]->(:Country)
+(:Article)-[:HAS_CHUNK]->(:Chunk)
+(:Article)-[:MENTIONS]->(:Organization)","MATCH (o:Organization)-[:HAS_SUBSIDIARY]->(s) WITH o, size(collect(s)) AS subsidiaryCount ORDER BY subsidiaryCount DESC LIMIT 1 RETURN o.name AS organizationName","MATCH (o:Organization)-[:HAS_SUBSIDIARY]->(subsidiary:Organization)
+RETURN o.name AS Organization, count(subsidiary) AS SubsidiaryCount
+ORDER BY SubsidiaryCount DESC
+LIMIT 1",simple,b05eea4cc3c79bbdf7d3e59850eca44ede77357adf9e758451965def8105e688,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,no_error_identified,no_error_identified,uncertain,no_issue_identified,"The labels, properties and relationship endpoints are supported. The generated query groups by organisation name, whereas the reference groups by organisation node identity. Separate organisations with the same name could therefore be combined. Name uniqueness is not established by the supplied schema. Returning an additional count is acceptable. Neither query defines how to select among tied organisations; actual duplicate name effects have not been checked in this assessment.",Shreya Nair,2026-10-01T14:39:14.789900+00:00,AI-proposed assessments and reasons reviewed and accepted by student. Previously discussed in historical or AI-assisted reviews.,not_assessed,completed,no_error_identified,no_error_identified,uncertain,no_issue_identified,"The labels, properties and relationship endpoints are supported. The generated query groups by organisation name, whereas the reference groups by organisation node identity. Separate organisations with the same name could therefore be combined. Name uniqueness is not established by the supplied schema. Returning an additional count is acceptable. Neither query defines how to select among tied organisations; actual duplicate name effects have not been checked in this assessment.",AI-assisted question/schema/query inspection; no database rerun. Null ordering checked against official Neo4j documentation.,2026-10-01T14:38:00.390228+00:00,Previously discussed in historical or AI-assisted reviews.,verified,2026-10-01T14:39:14.789900+00:00
+5,instance_id_16495,Find nodes that share a relationship with both Keyword and Keyword!,"Graph schema: Relevant node labels and their properties  are:
+Keyword
+Keyword",MATCH (c:Keyword)<-[r1]-(n)-[r2]->(d:Keyword) RETURN labels(n),"MATCH (n)--(k1:Keyword), (n)--(k2:Keyword)
+RETURN DISTINCT n",medium,3e28a85e24744a546af93870855aff560a4b031e28b98b257613728a565d25f0,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,no_error_identified,no_error_identified,uncertain,uncertain,"Keyword is declared and neither query invents a relationship type. The generated query returns distinct nodes connected to Keyword nodes in either direction. Neither query explicitly requires the two Keyword nodes to be distinct. The reference uses outgoing relationships from the central node and returns its labels instead of the node. The question does not settle distinctness, direction or whether labels are an adequate answer. The minimal schema cannot establish the intended topology.",Shreya Nair,2026-10-01T14:39:30.425822+00:00,AI-proposed assessments and reasons reviewed and accepted by student. Case text displayed and AI proposal supplied.,not_assessed,completed,no_error_identified,no_error_identified,uncertain,uncertain,"Keyword is declared and neither query invents a relationship type. The generated query returns distinct nodes connected to Keyword nodes in either direction. Neither query explicitly requires the two Keyword nodes to be distinct. The reference uses outgoing relationships from the central node and returns its labels instead of the node. The question does not settle distinctness, direction or whether labels are an adequate answer. The minimal schema cannot establish the intended topology.",AI-assisted question/schema/query inspection; no database rerun. Null ordering checked against official Neo4j documentation.,2026-10-01T14:38:00.390228+00:00,Case text displayed and AI proposal supplied.,verified,2026-10-01T14:39:30.425822+00:00
+6,instance_id_6067,Find nodes that are at the end of a path starting at Keyword where name is log-balanced and traversing through Author with author_id befdd60b44b9cd4d5ffc084ce31d92d4!,"Graph schema: Relevant node labels and their properties (with datatypes) are:
+Keyword {name: STRING}
+Author {author_id: STRING}",MATCH (a:Keyword{name:'log-balanced'})-[*]->(d:Author{author_id:'befdd60b44b9cd4d5ffc084ce31d92d4'})-[*]->(n) RETURN n,MATCH (k:Keyword {name: 'log-balanced'})-->(:Author {author_id: 'befdd60b44b9cd4d5ffc084ce31d92d4'})--(result) RETURN result,complex,c3149510232ceed3446af03401b594eb3e1e9a734ac2b866ca520ce1757d1a75,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,no_error_identified,no_error_identified,uncertain,uncertain,"Keyword.name and Author.author_id are supported. The generated query requires one outgoing hop from Keyword to Author and one undirected hop from Author to the result. The reference allows one or more outgoing hops on both path segments. The wording 'a path ... traversing through Author' does not specify hop counts or all relationship directions. The generated query may miss longer paths or include incoming neighbours, but the intended path rule is not established. The final exclamation mark is treated as question punctuation; stored values are not verified.",Shreya Nair,2026-10-01T14:39:59.001177+00:00,AI-proposed assessments and reasons reviewed and accepted by student. Case text displayed and AI proposal supplied.,not_assessed,completed,no_error_identified,no_error_identified,uncertain,uncertain,"Keyword.name and Author.author_id are supported. The generated query requires one outgoing hop from Keyword to Author and one undirected hop from Author to the result. The reference allows one or more outgoing hops on both path segments. The wording 'a path ... traversing through Author' does not specify hop counts or all relationship directions. The generated query may miss longer paths or include incoming neighbours, but the intended path rule is not established. The final exclamation mark is treated as question punctuation; stored values are not verified.",AI-assisted question/schema/query inspection; no database rerun. Null ordering checked against official Neo4j documentation.,2026-10-01T14:38:00.390228+00:00,Case text displayed and AI proposal supplied.,verified,2026-10-01T14:39:59.001177+00:00
+7,instance_id_24738,Which 3 movies have the highest IMDb votes?,"Node properties:
+- **Movie**
+  - `url`: STRING Example: ""https://themoviedb.org/movie/862""
+  - `runtime`: INTEGER Min: 2, Max: 910
+  - `revenue`: INTEGER Min: 1, Max: 2787965087
+  - `imdbRating`: FLOAT Min: 1.6, Max: 9.6
+  - `released`: STRING Example: ""1995-11-22""
+  - `countries`: LIST Min Size: 1, Max Size: 16
+  - `languages`: LIST Min Size: 1, Max Size: 19
+  - `plot`: STRING Example: ""A cowboy doll is profoundly threatened and jealous""
+  - `imdbVotes`: INTEGER Min: 13, Max: 1626900
+  - `imdbId`: STRING Example: ""0114709""
+  - `year`: INTEGER Min: 1902, Max: 2016
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/uXDf""
+  - `movieId`: STRING Example: ""1""
+  - `tmdbId`: STRING Example: ""862""
+  - `title`: STRING Example: ""Toy Story""
+  - `budget`: INTEGER Min: 1, Max: 380000000
+- **Genre**
+  - `name`: STRING Example: ""Adventure""
+- **User**
+  - `userId`: STRING Example: ""1""
+  - `name`: STRING Example: ""Omar Huffman""
+- **Actor**
+  - `url`: STRING Example: ""https://themoviedb.org/person/1271225""
+  - `name`: STRING Example: ""François Lallement""
+  - `tmdbId`: STRING Example: ""1271225""
+  - `bornIn`: STRING Example: ""France""
+  - `bio`: STRING Example: ""​From Wikipedia, the free encyclopedia  Lillian Di""
+  - `died`: DATE Example: ""1954-01-01""
+  - `born`: DATE Example: ""1877-02-04""
+  - `imdbId`: STRING Example: ""2083046""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/6DCW""
+- **Director**
+  - `url`: STRING Example: ""https://themoviedb.org/person/88953""
+  - `bornIn`: STRING Example: ""Burchard, Nebraska, USA""
+  - `born`: DATE Min: 1861-12-08, Max: 2018-05-01
+  - `died`: DATE Min: 1930-08-26, Max: 2976-09-29
+  - `tmdbId`: STRING Example: ""88953""
+  - `imdbId`: STRING Example: ""0516001""
+  - `name`: STRING Example: ""Harold Lloyd""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/er4Z""
+  - `bio`: STRING Example: ""Harold Lloyd has been called the cinema’s “first m""
+- **Person**
+  - `url`: STRING Example: ""https://themoviedb.org/person/1271225""
+  - `died`: DATE Example: ""1954-01-01""
+  - `bornIn`: STRING Example: ""France""
+  - `born`: DATE Example: ""1877-02-04""
+  - `imdbId`: STRING Example: ""2083046""
+  - `name`: STRING Example: ""François Lallement""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/6DCW""
+  - `tmdbId`: STRING Example: ""1271225""
+  - `bio`: STRING Example: ""​From Wikipedia, the free encyclopedia  Lillian Di""
+Relationship properties:
+- **RATED**
+  - `rating: FLOAT` Example: ""2.0""
+  - `timestamp: INTEGER` Example: ""1260759108""
+- **ACTED_IN**
+  - `role: STRING` Example: ""Officer of the Marines (uncredited)""
+- **DIRECTED**
+  - `role: STRING` 
+The relationships:
+(:Movie)-[:IN_GENRE]->(:Genre)
+(:User)-[:RATED]->(:Movie)
+(:Actor)-[:ACTED_IN]->(:Movie)
+(:Actor)-[:DIRECTED]->(:Movie)
+(:Director)-[:DIRECTED]->(:Movie)
+(:Director)-[:ACTED_IN]->(:Movie)
+(:Person)-[:ACTED_IN]->(:Movie)
+(:Person)-[:DIRECTED]->(:Movie)",MATCH (m:Movie) WHERE m.imdbVotes IS NOT NULL RETURN m ORDER BY m.imdbVotes DESC LIMIT 3,"MATCH (m:Movie)
+RETURN m.title
+ORDER BY m.imdbVotes DESC
+LIMIT 3",simple,63c5625aa0df1ea69acee4add4597c97ec4c7438a9a5a598190fcc3f4099ddef,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,no_error_identified,no_error_identified,error_present,no_issue_identified,"Movie.title and Movie.imdbVotes are supported. Under the rule that highest votes requires a known numeric vote count, the generated query fails to exclude null vote counts. Cypher places nulls first in descending order, so unknown counts can displace the highest known counts. The reference excludes nulls. This identifies a missing-value handling defect, not proof that nulls affected the saved run. Returning titles is acceptable; vote-count ties are unspecified in both queries.",Shreya Nair,2026-10-01T14:40:16.865162+00:00,AI-proposed assessments and reasons reviewed and accepted by student. Previously discussed in historical or AI-assisted reviews.,not_assessed,completed,no_error_identified,no_error_identified,error_present,no_issue_identified,"Movie.title and Movie.imdbVotes are supported. Under the rule that highest votes requires a known numeric vote count, the generated query fails to exclude null vote counts. Cypher places nulls first in descending order, so unknown counts can displace the highest known counts. The reference excludes nulls. This identifies a missing-value handling defect, not proof that nulls affected the saved run. Returning titles is acceptable; vote-count ties are unspecified in both queries.",AI-assisted question/schema/query inspection; no database rerun. Null ordering checked against official Neo4j documentation.,2026-10-01T14:38:00.390228+00:00,Previously discussed in historical or AI-assisted reviews.,verified,2026-10-01T14:40:16.865162+00:00
+8,instance_id_42155,List the top 5 oldest directors in the database.,"Node properties:
+- **Movie**
+  - `url`: STRING Example: ""https://themoviedb.org/movie/862""
+  - `runtime`: INTEGER Min: 2, Max: 910
+  - `revenue`: INTEGER Min: 1, Max: 2787965087
+  - `imdbRating`: FLOAT Min: 1.6, Max: 9.6
+  - `released`: STRING Example: ""1995-11-22""
+  - `countries`: LIST Min Size: 1, Max Size: 16
+  - `languages`: LIST Min Size: 1, Max Size: 19
+  - `plot`: STRING Example: ""A cowboy doll is profoundly threatened and jealous""
+  - `imdbVotes`: INTEGER Min: 13, Max: 1626900
+  - `imdbId`: STRING Example: ""0114709""
+  - `year`: INTEGER Min: 1902, Max: 2016
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/uXDf""
+  - `movieId`: STRING Example: ""1""
+  - `tmdbId`: STRING Example: ""862""
+  - `title`: STRING Example: ""Toy Story""
+  - `budget`: INTEGER Min: 1, Max: 380000000
+- **Genre**
+  - `name`: STRING Example: ""Adventure""
+- **User**
+  - `userId`: STRING Example: ""1""
+  - `name`: STRING Example: ""Omar Huffman""
+- **Actor**
+  - `url`: STRING Example: ""https://themoviedb.org/person/1271225""
+  - `name`: STRING Example: ""François Lallement""
+  - `tmdbId`: STRING Example: ""1271225""
+  - `bornIn`: STRING Example: ""France""
+  - `bio`: STRING Example: ""​From Wikipedia, the free encyclopedia  Lillian Di""
+  - `died`: DATE Example: ""1954-01-01""
+  - `born`: DATE Example: ""1877-02-04""
+  - `imdbId`: STRING Example: ""2083046""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/6DCW""
+- **Director**
+  - `url`: STRING Example: ""https://themoviedb.org/person/88953""
+  - `bornIn`: STRING Example: ""Burchard, Nebraska, USA""
+  - `born`: DATE Min: 1861-12-08, Max: 2018-05-01
+  - `died`: DATE Min: 1930-08-26, Max: 2976-09-29
+  - `tmdbId`: STRING Example: ""88953""
+  - `imdbId`: STRING Example: ""0516001""
+  - `name`: STRING Example: ""Harold Lloyd""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/er4Z""
+  - `bio`: STRING Example: ""Harold Lloyd has been called the cinema’s “first m""
+- **Person**
+  - `url`: STRING Example: ""https://themoviedb.org/person/1271225""
+  - `died`: DATE Example: ""1954-01-01""
+  - `bornIn`: STRING Example: ""France""
+  - `born`: DATE Example: ""1877-02-04""
+  - `imdbId`: STRING Example: ""2083046""
+  - `name`: STRING Example: ""François Lallement""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/6DCW""
+  - `tmdbId`: STRING Example: ""1271225""
+  - `bio`: STRING Example: ""​From Wikipedia, the free encyclopedia  Lillian Di""
+Relationship properties:
+- **RATED**
+  - `rating: FLOAT` Example: ""2.0""
+  - `timestamp: INTEGER` Example: ""1260759108""
+- **ACTED_IN**
+  - `role: STRING` Example: ""Officer of the Marines (uncredited)""
+- **DIRECTED**
+  - `role: STRING` 
+The relationships:
+(:Movie)-[:IN_GENRE]->(:Genre)
+(:User)-[:RATED]->(:Movie)
+(:Actor)-[:ACTED_IN]->(:Movie)
+(:Actor)-[:DIRECTED]->(:Movie)
+(:Director)-[:DIRECTED]->(:Movie)
+(:Director)-[:ACTED_IN]->(:Movie)
+(:Person)-[:ACTED_IN]->(:Movie)
+(:Person)-[:DIRECTED]->(:Movie)","MATCH (d:Director) RETURN d.name, d.born ORDER BY d.born ASC LIMIT 5","MATCH (d:Director)
+WHERE d.born IS NOT NULL
+RETURN d.name, d.born
+ORDER BY d.born ASC
+LIMIT 5",simple,73a251869658b3935b79945ff8dbed7b57b87a504d57a9289b5f946eb59d334c,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Director.name and Director.born are supported. Under the stated interpretation that oldest means earliest known birth date, the generated query filters missing birth dates, sorts ascending and returns five directors. The reference sorts the same way; null dates appear last in ascending order. Its output may differ if fewer than five known birth dates exist. Equal-date ties and whether oldest means oldest living person are unspecified. No error is identified under the earliest-known-birth-date rule; this is not a universal correctness claim.",Shreya Nair,2026-10-01T14:40:33.435043+00:00,AI-proposed assessments and reasons reviewed and accepted by student. Case text displayed and AI proposal supplied.,not_assessed,completed,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Director.name and Director.born are supported. Under the stated interpretation that oldest means earliest known birth date, the generated query filters missing birth dates, sorts ascending and returns five directors. The reference sorts the same way; null dates appear last in ascending order. Its output may differ if fewer than five known birth dates exist. Equal-date ties and whether oldest means oldest living person are unspecified. No error is identified under the earliest-known-birth-date rule; this is not a universal correctness claim.",AI-assisted question/schema/query inspection; no database rerun. Null ordering checked against official Neo4j documentation.,2026-10-01T14:38:00.390228+00:00,Case text displayed and AI proposal supplied.,verified,2026-10-01T14:40:33.435043+00:00
+9,instance_id_30819,What is the average unit price of products in orders shipped to 'Denmark'?,"Node properties:
+- **Product**
+  - `productName`: STRING Example: ""Chai""
+  - `quantityPerUnit`: STRING Example: ""10 boxes x 20 bags""
+  - `unitsOnOrder`: INTEGER Min: 0, Max: 100
+  - `supplierID`: STRING Example: ""1""
+  - `productID`: STRING Example: ""1""
+  - `discontinued`: BOOLEAN 
+  - `categoryID`: STRING Available options: ['1', '2', '7', '6', '8', '4', '3', '5']
+  - `reorderLevel`: INTEGER Min: 0, Max: 30
+  - `unitsInStock`: INTEGER Min: 0, Max: 125
+  - `unitPrice`: FLOAT Min: 2.5, Max: 263.5
+- **Category**
+  - `picture`: STRING Available options: ['0x151C2F00020000000D000E0014002100FFFFFFFF4269746D']
+  - `categoryID`: STRING Available options: ['1', '2', '3', '4', '5', '6', '7', '8']
+  - `description`: STRING Available options: ['Soft drinks, coffees, teas, beers, and ales', 'Sweet and savory sauces, relishes, spreads, and se', 'Desserts, candies, and sweet breads', 'Cheeses', 'Breads, crackers, pasta, and cereal', 'Prepared meats', 'Dried fruit and bean curd', 'Seaweed and fish']
+  - `categoryName`: STRING Available options: ['Beverages', 'Condiments', 'Confections', 'Dairy Products', 'Grains/Cereals', 'Meat/Poultry', 'Produce', 'Seafood']
+- **Supplier**
+  - `companyName`: STRING Example: ""Exotic Liquids""
+  - `contactName`: STRING Example: ""Charlotte Cooper""
+  - `homePage`: STRING Available options: ['NULL', '#CAJUN.HTM#', ""Mayumi's (on the World Wide Web)#http://www.micros"", '(03) 444-6588', 'Plutzer (on the World Wide Web)#http://www.microso', '(0544) 60603', '(1) 03.83.00.62', '(02) 555-4873', '(089) 6547667', '38.76.98.58']
+  - `phone`: STRING Example: ""(171) 555-2222""
+  - `postalCode`: STRING Example: ""EC1 4SD""
+  - `contactTitle`: STRING Example: ""Purchasing Manager""
+  - `region`: STRING Example: ""NULL""
+  - `address`: STRING Example: ""49 Gilbert St.""
+  - `fax`: STRING Example: ""NULL""
+  - `supplierID`: STRING Example: ""1""
+  - `country`: STRING Example: ""UK""
+  - `city`: STRING Example: ""London""
+- **Customer**
+  - `fax`: STRING Example: ""030-0076545""
+  - `companyName`: STRING Example: ""Alfreds Futterkiste""
+  - `customerID`: STRING Example: ""ALFKI""
+  - `phone`: STRING Example: ""030-0074321""
+  - `contactName`: STRING Example: ""Maria Anders""
+  - `contactTitle`: STRING Example: ""Sales Representative""
+  - `region`: STRING Example: ""NULL""
+  - `address`: STRING Example: ""Obere Str. 57""
+  - `postalCode`: STRING Example: ""12209""
+  - `country`: STRING Example: ""Germany""
+  - `city`: STRING Example: ""Berlin""
+- **Order**
+  - `shipName`: STRING Example: ""Vins et alcools Chevalier""
+  - `requiredDate`: STRING Example: ""1996-08-01 00:00:00.000""
+  - `shipCity`: STRING Example: ""Reims""
+  - `employeeID`: STRING Available options: ['5', '6', '4', '3', '9', '1', '8', '2', '7']
+  - `shipPostalCode`: STRING Example: ""51100""
+  - `shippedDate`: STRING Example: ""1996-07-16 00:00:00.000""
+  - `freight`: STRING Example: ""32.38""
+  - `orderDate`: STRING Example: ""1996-07-04 00:00:00.000""
+  - `orderID`: STRING Example: ""10248""
+  - `shipAddress`: STRING Example: ""59 rue de l'Abbaye""
+  - `customerID`: STRING Example: ""VINET""
+  - `shipCountry`: STRING Example: ""France""
+  - `shipVia`: STRING Available options: ['3', '1', '2']
+  - `shipRegion`: STRING Example: ""NULL""
+Relationship properties:
+- **ORDERS**
+  - `orderID: STRING` Example: ""10248""
+  - `unitPrice: STRING` Example: ""34.80""
+  - `productID: STRING` Example: ""72""
+  - `quantity: INTEGER` Min: 1, Max:  130
+  - `discount: STRING` Example: ""0""
+The relationships:
+(:Product)-[:PART_OF]->(:Category)
+(:Supplier)-[:SUPPLIES]->(:Product)
+(:Customer)-[:PURCHASED]->(:Order)
+(:Order)-[:ORDERS]->(:Product)",MATCH (o:Order {shipCountry: 'Denmark'})-[:ORDERS]->(p:Product) WITH avg(toFloat(o.unitPrice)) AS averageUnitPrice RETURN averageUnitPrice,"MATCH (o:Order {shipCountry: 'Denmark'})-[r:ORDERS]->(:Product)
+RETURN avg(toFloat(r.unitPrice))",medium,9f05ff81d6e63969663bff561b104811080d0253bc1bb335db9fbd5a718d4cb0,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,no_error_identified,no_error_identified,uncertain,issue_identified,"The generated query uses declared ORDERS.unitPrice and converts its string value to a number. The reference reads Order.unitPrice, which is not declared. Product.unitPrice is also available, so the question does not unambiguously distinguish catalogue prices from order-line prices or specify weighting. Generated averaging is reasonable under an unweighted order-line-price interpretation.",Shreya Nair,2026-10-01T14:50:31.171690+00:00,AI-proposed assessments reviewed and accepted in a batch. Previously discussed in AI-assisted flagged-case review.,not_assessed,completed,no_error_identified,no_error_identified,uncertain,issue_identified,"The generated query uses declared ORDERS.unitPrice and converts its string value to a number. The reference reads Order.unitPrice, which is not declared. Product.unitPrice is also available, so the question does not unambiguously distinguish catalogue prices from order-line prices or specify weighting. Generated averaging is reasonable under an unweighted order-line-price interpretation.","AI-assisted inspection of question, supplied schema and query text; no database rerun. No-error findings are limited to available evidence.",2026-10-01T14:46:12.577988+00:00,Previously discussed in AI-assisted flagged-case review.,verified,2026-10-01T14:50:31.171690+00:00
+10,instance_id_14059,Find the Keyword for which name is super-population viewpoint!,"Graph schema: Relevant node labels and their properties (with datatypes) are:
+Keyword {name: STRING}",MATCH (n:Keyword {name:'super-population viewpoint'}) RETURN n,MATCH (k:Keyword {name: 'super-population viewpoint'}) RETURN k,medium,41d4b83bb299050255a6fc944f6812f7e9d93acdd003e6a3fb11190a13ce02c7,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,Both queries use Keyword.name to match super-population viewpoint and return the Keyword node. The final exclamation mark is treated as question punctuation. No error is identified under this interpretation; stored-value correctness was not independently checked.,Shreya Nair,2026-10-01T14:50:31.171690+00:00,AI-proposed assessments reviewed and accepted in a batch. Case displayed and AI proposal supplied; other prior exposure unknown.,not_assessed,completed,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,Both queries use Keyword.name to match super-population viewpoint and return the Keyword node. The final exclamation mark is treated as question punctuation. No error is identified under this interpretation; stored-value correctness was not independently checked.,"AI-assisted inspection of question, supplied schema and query text; no database rerun. No-error findings are limited to available evidence.",2026-10-01T14:46:12.577988+00:00,Case displayed and AI proposal supplied; other prior exposure unknown.,verified,2026-10-01T14:50:31.171690+00:00
+11,instance_id_14512,Fetch the Keyword where key_id ends with d8!,"Graph schema: Relevant node labels and their properties (with datatypes) are:
+Keyword {key_id: STRING}",MATCH (n:Keyword) WHERE n.key_id =~'d8.*' RETURN n,MATCH (k:Keyword) WHERE k.key_id ENDS WITH 'd8!' RETURN k,simple,fd347a479f56f8612141f9640626858e6c7023c2aebd3e6e676f25e819e76487,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,no_error_identified,no_error_identified,uncertain,issue_identified,"The generated query tests the suffix d8!, whereas d8 may be the intended suffix with an exclamation mark ending the question. The stored values are unknown, so that interpretation remains uncertain. The reference regex d8.* describes a string starting with d8, not a string ending with d8, and does not implement the explicit ends-with request.",Shreya Nair,2026-10-01T14:50:31.171690+00:00,AI-proposed assessments reviewed and accepted in a batch. Case displayed and AI proposal supplied; other prior exposure unknown.,not_assessed,completed,no_error_identified,no_error_identified,uncertain,issue_identified,"The generated query tests the suffix d8!, whereas d8 may be the intended suffix with an exclamation mark ending the question. The stored values are unknown, so that interpretation remains uncertain. The reference regex d8.* describes a string starting with d8, not a string ending with d8, and does not implement the explicit ends-with request.","AI-assisted inspection of question, supplied schema and query text; no database rerun. No-error findings are limited to available evidence.",2026-10-01T14:46:12.577988+00:00,Case displayed and AI proposal supplied; other prior exposure unknown.,verified,2026-10-01T14:50:31.171690+00:00
+12,instance_id_39698,Show the top 5 oldest movies in the collection with the highest revenue.,"Node properties:
+- **Movie**
+  - `average_vote`: FLOAT Example: ""7.7""
+  - `overview`: STRING Example: ""Led by Woody, Andy's toys live happily in his room""
+  - `revenue`: FLOAT Example: ""3.73554033E8""
+  - `vote_count`: INTEGER Example: ""5415""
+  - `tagline`: STRING Example: ""Roll the dice and unleash the excitement!""
+  - `budget`: INTEGER Example: ""30000000""
+  - `title`: STRING Example: ""Toy Story""
+  - `poster_path`: STRING Example: ""/rhIRbceoE9lR4veEXuwCC2wARtG.jpg""
+  - `imdb_id`: STRING Example: ""tt0114709""
+  - `status`: STRING Example: ""Released""
+  - `runtime`: FLOAT Example: ""81.0""
+  - `popularity`: FLOAT Example: ""21.946943""
+  - `homepage`: STRING Example: ""http://toystory.disney.com/toy-story""
+  - `release_date`: DATE Example: ""1995-10-30""
+  - `id`: INTEGER Min: 862, Max: 31357
+  - `original_title`: STRING Example: ""Toy Story""
+  - `original_language`: STRING Example: ""en""
+- **Language**
+  - `id`: STRING Example: ""en""
+  - `name`: STRING Available options: ['', 'Gaeilge', 'Kiswahili', 'Azərbaycan', 'Somali', 'беларуская мова', 'Fulfulde', 'Hausa']
+- **Country**
+  - `id`: STRING Example: ""US""
+  - `name`: STRING Example: ""United States of America""
+- **Genre**
+  - `id`: INTEGER Min: 12, Max: 10770
+  - `name`: STRING Example: ""Animation""
+- **ProductionCompany**
+  - `id`: INTEGER Min: 3, Max: 10201
+  - `name`: STRING Example: ""Pixar Animation Studios""
+- **Collection**
+  - `name`: STRING Example: ""Toy Story Collection""
+  - `id`: INTEGER Min: 10, Max: 480160
+  - `backdrop_path`: STRING Example: ""/9FBwqcd9IRruEDUrTdcaafOMKUq.jpg""
+  - `poster_path`: STRING Example: ""/7G9915LfUQ2lVfwMEEhDsn3kT4B.jpg""
+- **Person**
+  - `gender`: INTEGER Example: ""2""
+  - `profile_path`: STRING Example: ""/pQFoyx7rp09CJTAb932F2g8Nlho.jpg""
+  - `id`: INTEGER Min: 31, Max: 12900
+  - `name`: STRING Example: ""Tom Hanks""
+- **User**
+  - `id`: INTEGER Min: 27490cf6-22eb-495d-9dd6-902c0f89c627, Max: 4
+- **Keyword**
+  - `id`: INTEGER Min: 931, Max: 9713
+  - `name`: STRING Example: ""jealousy""
+- **Video**
+  - `tagline`: STRING Example: ""Fresh Fish. Mixed Vegetables.""
+  - `average_vote`: FLOAT Min: 0.0, Max: 10.0
+  - `overview`: STRING Example: ""Get ready as Bob the Tomato, Larry the Cucumber an""
+  - `revenue`: FLOAT Min: 0.0, Max: 0.0
+  - `poster_path`: STRING Example: ""/iWahPsY3hsKOizZHgzQcAxv4O3B.jpg""
+  - `vote_count`: INTEGER Min: 0, Max: 115
+  - `title`: STRING Example: ""Jonah: A VeggieTales Movie""
+  - `release_date`: DATE Min: 1973-01-12, Max: 2017-03-17
+  - `status`: STRING Available options: ['Released']
+  - `budget`: INTEGER Min: 0, Max: 2219684
+  - `popularity`: FLOAT Min: 0.0, Max: 9.22546
+  - `imdb_id`: STRING Example: ""tt0298388""
+  - `original_title`: STRING Example: ""Jonah: A VeggieTales Movie""
+  - `id`: INTEGER Min: 13284, Max: 461088
+  - `runtime`: FLOAT Min: 0.0, Max: 583.0
+  - `original_language`: STRING Example: ""en""
+  - `homepage`: STRING Example: ""http://www.loosechange911.com/""
+- **Adult**
+  - `average_vote`: FLOAT Min: 0.0, Max: 6.3
+  - `overview`: STRING Available options: ['A sailor takes an American businessman and his gir', 'The FBI and Texas police make ready to storm the h', 'Electrical Girl centers around a horny young woman', 'Ágata suffers from a psychological disorder which ', ""Shane Ryan's sequel to the disturbing Amateur Porn"", 'Australian film about a fictional sub-par Australi', 'Olaf and his mother run a boarding house and a whi', 'A man who returns home to find his wife cheating o', 'An American scientific research facility opens a p']
+  - `revenue`: FLOAT Min: 0.0, Max: 0.0
+  - `poster_path`: STRING Available options: ['/tzVK7nTnzUiVeFSZhOAIHmrgXUS.jpg', '/1VzwIa8HTykNiCCW8PBaJnyTvO8.jpg', '/yTfqRQlJMTAuTNDG01XjNg5KPPg.jpg', '/oP2WvKIWxqSBVHjfYAizFHOqBLG.jpg', '/zpycBSiBFp5Uib6gWJpgEvfOgdn.jpg', '/e7CAc8OadcUoKNPIX86SEPSX7f.jpg', '/jjncR0vECvXVrBvr0A1vLghL4pN.jpg', '/pJLmZBruOmn2c9mYWe3h1xcXaA0.jpg', '/3uv9oaqOJkkdZiQp6r9lf24tkHW.jpg']
+  - `vote_count`: INTEGER Min: 0, Max: 16
+  - `title`: STRING Available options: ['Erotic Nights of the Living Dead', 'Standoff', 'Electrical Girl', 'Diet of Sex', 'Amateur Porn Star Killer 2', 'The Band', 'The Sinful Dwarf', 'Adulterers', 'Half -Life']
+  - `release_date`: DATE Min: 1973-12-20, Max: 2016-01-05
+  - `status`: STRING Available options: ['Released', 'In Production']
+  - `budget`: INTEGER Min: 0, Max: 750000
+  - `popularity`: FLOAT Min: 0.001803, Max: 6.889832
+  - `imdb_id`: STRING Available options: ['tt0079642', 'tt0119931', 'tt0322232', 'tt3094816', 'tt1161951', 'tt1153101', 'tt0070696', 'tt4044464', 'tt2697688']
+  - `original_title`: STRING Available options: ['Le notti erotiche dei morti viventi', 'Standoff', '發電悄嬌娃', 'Diet of Sex', 'Amateur Porn Star Killer 2', 'The Band', 'Dværgen', 'Adulterers', 'Half -Life']
+  - `id`: INTEGER Min: 5422, Max: 448290
+  - `runtime`: FLOAT Min: 0.0, Max: 112.0
+  - `original_language`: STRING Available options: ['it', 'en', 'cn', 'es', 'da']
+  - `tagline`: STRING Available options: ['Trust Will Get You Killed', 'Comedy, food, drama and sex, a lot of sex', 'Humiliation. Rape. Murder. You know the drill.', ""Sex, drugs and Rock 'n Roll"", 'The Mother of all Dwarfsploitation films!', 'Love. Betrayal. Vengeance']
+  - `homepage`: STRING Available options: ['http://www.imdb.com/title/tt0119931/', 'http://www.dietofsex.com/']
+- **Package**
+  - `price`: FLOAT Min: 0.0, Max: 99.99
+  - `duration`: DURATION 
+  - `id`: INTEGER Min: 0, Max: 6
+  - `name`: STRING Available options: ['Childrens', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Ultimate', 'Free Trial']
+- **Subscription**
+  - `expiresAt`: DATE_TIME Min: 2020-08-23T16:20:52.383Z, Max: 2020-08-23T16:20:52.383Z
+  - `id`: STRING Available options: ['e74f7163-eace-4169-8043-41627f1fe236']
+Relationship properties:
+- **CAST_FOR**
+  - `credit_id: STRING` Example: ""52fe4459c3a36847f8090d7d""
+  - `order: INTEGER` Example: ""0""
+  - `character: STRING` Example: ""Charlie Wilson""
+  - `cast_id: INTEGER` Example: ""12""
+- **CREW_FOR**
+  - `credit_id: STRING` Example: ""55e4f0abc3a368140800047e""
+  - `job: STRING` Example: ""Producer""
+  - `department: STRING` Example: ""Production""
+- **RATED**
+  - `timestamp: DATE_TIME` Example: ""2015-03-09T22:49:42Z""
+  - `rating: FLOAT` Example: ""5.0""
+The relationships:
+(:Movie)-[:ORIGINAL_LANGUAGE]->(:Language)
+(:Movie)-[:SPOKEN_IN_LANGUAGE]->(:Language)
+(:Movie)-[:PRODUCED_IN_COUNTRY]->(:Country)
+(:Movie)-[:IN_GENRE]->(:Genre)
+(:Movie)-[:PRODUCED_BY]->(:ProductionCompany)
+(:Movie)-[:HAS_KEYWORD]->(:Keyword)
+(:Movie)-[:IN_COLLECTION]->(:Collection)
+(:Person)-[:CAST_FOR]->(:Movie)
+(:Person)-[:CREW_FOR]->(:Movie)
+(:Person)-[:CREW_FOR]->(:Video)
+(:User)-[:RATED]->(:Movie)
+(:User)-[:RATED]->(:Video)
+(:Video)-[:ORIGINAL_LANGUAGE]->(:Language)
+(:Video)-[:SPOKEN_IN_LANGUAGE]->(:Language)
+(:Video)-[:PRODUCED_IN_COUNTRY]->(:Country)
+(:Video)-[:IN_GENRE]->(:Genre)
+(:Video)-[:PRODUCED_BY]->(:ProductionCompany)
+(:Video)-[:HAS_KEYWORD]->(:Keyword)
+(:Video)-[:IN_COLLECTION]->(:Collection)
+(:Adult)-[:ORIGINAL_LANGUAGE]->(:Language)
+(:Adult)-[:SPOKEN_IN_LANGUAGE]->(:Language)
+(:Adult)-[:PRODUCED_IN_COUNTRY]->(:Country)
+(:Adult)-[:IN_GENRE]->(:Genre)
+(:Adult)-[:PRODUCED_BY]->(:ProductionCompany)
+(:Adult)-[:HAS_KEYWORD]->(:Keyword)
+(:Package)-[:PROVIDES_ACCESS_TO]->(:Genre)
+(:Subscription)-[:FOR_PACKAGE]->(:Package)","MATCH (m:Movie)-[:IN_COLLECTION]->(c:Collection) WITH m, c ORDER BY m.release_date ASC LIMIT 5 RETURN m.title AS MovieTitle, m.release_date AS ReleaseDate, m.revenue AS Revenue ORDER BY m.revenue DESC LIMIT 5","MATCH (m:Movie)-[:IN_COLLECTION]->(c:Collection)
+WITH c, sum(m.revenue) AS total_revenue
+ORDER BY total_revenue DESC
+LIMIT 1
+MATCH (m:Movie)-[:IN_COLLECTION]->(c)
+RETURN m.title, m.release_date
+ORDER BY m.release_date ASC
+LIMIT 5",medium,97c0c1d3ffe90368b89d23fb6213dd2623c9dc51638a556239977d9f82a1660a,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,no_error_identified,no_error_identified,uncertain,issue_identified,"The generated query interprets collection revenue as the sum of member-movie revenues, selects one highest-total collection, then returns its five oldest movies. This is plausible but the question does not define collection revenue or tie handling. The reference selects five oldest movie-collection matches globally and then reorders them by movie revenue; it does not identify the collection with highest revenue. Duplicate memberships and missing values have not been checked.",Shreya Nair,2026-10-01T14:50:31.171690+00:00,AI-proposed assessments reviewed and accepted in a batch. Previously discussed in AI-assisted flagged-case review.,not_assessed,completed,no_error_identified,no_error_identified,uncertain,issue_identified,"The generated query interprets collection revenue as the sum of member-movie revenues, selects one highest-total collection, then returns its five oldest movies. This is plausible but the question does not define collection revenue or tie handling. The reference selects five oldest movie-collection matches globally and then reorders them by movie revenue; it does not identify the collection with highest revenue. Duplicate memberships and missing values have not been checked.","AI-assisted inspection of question, supplied schema and query text; no database rerun. No-error findings are limited to available evidence.",2026-10-01T14:46:12.577988+00:00,Previously discussed in AI-assisted flagged-case review.,verified,2026-10-01T14:50:31.171690+00:00
+13,instance_id_29243,Find the characters who have 'INTERACTS1' relationships with a 'weight' greater than 10.,"Node properties:
+- **Character**
+  - `centrality`: FLOAT Min: 0.0, Max: 1.0
+  - `book45PageRank`: FLOAT Min: 0.15000000000000002, Max: 11.409916274911177
+  - `fastrf_embedding`: LIST Min Size: 10, Max Size: 10
+  - `book1BetweennessCentrality`: FLOAT Min: 0.0, Max: 4638.53495125504
+  - `book1PageRank`: FLOAT Min: 0.15000000000000002, Max: 8.164174336296284
+  - `louvain`: INTEGER Min: 0, Max: 10
+  - `community`: INTEGER Min: 504, Max: 795
+  - `degree`: FLOAT Min: 0.0, Max: 300.0
+  - `name`: STRING Example: ""Addam-Marbrand""
+  - `pagerank`: FLOAT Min: 0.15000000000000002, Max: 9.473142454730429
+Relationship properties:
+- **INTERACTS**
+  - `weight: INTEGER` Min: 3, Max:  334
+- **INTERACTS1**
+  - `weight: INTEGER` Min: 3, Max:  291
+  - `book: INTEGER` Min: 1, Max:  1
+- **INTERACTS2**
+  - `weight: INTEGER` Min: 3, Max:  92
+  - `book: INTEGER` Min: 2, Max:  2
+- **INTERACTS3**
+  - `weight: INTEGER` Min: 3, Max:  95
+  - `book: INTEGER` Min: 3, Max:  3
+- **INTERACTS45**
+  - `weight: INTEGER` Min: 3, Max:  96
+  - `book: INTEGER` Min: 45, Max:  45
+The relationships:
+(:Character)-[:INTERACTS45]->(:Character)
+(:Character)-[:INTERACTS]->(:Character)
+(:Character)-[:INTERACTS1]->(:Character)
+(:Character)-[:INTERACTS3]->(:Character)
+(:Character)-[:INTERACTS2]->(:Character)",MATCH (c:Character)-[r:INTERACTS1]->() WHERE r.weight > 10 RETURN DISTINCT c.name,"MATCH (c1:Character)-[r:INTERACTS1]->(c2:Character)
+WHERE r.weight > 10
+RETURN DISTINCT c1.name, c2.name",medium,d8b7f23e5d4300e90454cf40b5a34293fba93e073a49794a96589cf841b0051e,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,no_error_identified,no_error_identified,uncertain,uncertain,"The generated query returns distinct source-target name pairs for qualifying INTERACTS1 relationships. The reference returns distinct source-character names only. The question does not explicitly distinguish source characters, both endpoints or interaction pairs. Each query uses declared schema elements, but an agreed answer-unit rule is needed before binary judgement.",Shreya Nair,2026-10-01T14:50:31.171690+00:00,AI-proposed assessments reviewed and accepted in a batch. Previously discussed in AI-assisted flagged-case review.,not_assessed,completed,no_error_identified,no_error_identified,uncertain,uncertain,"The generated query returns distinct source-target name pairs for qualifying INTERACTS1 relationships. The reference returns distinct source-character names only. The question does not explicitly distinguish source characters, both endpoints or interaction pairs. Each query uses declared schema elements, but an agreed answer-unit rule is needed before binary judgement.","AI-assisted inspection of question, supplied schema and query text; no database rerun. No-error findings are limited to available evidence.",2026-10-01T14:46:12.577988+00:00,Previously discussed in AI-assisted flagged-case review.,verified,2026-10-01T14:50:31.171690+00:00
+14,instance_id_27807,"""Who is related to John Snow?""","Node properties:
+Character {centrality: FLOAT, book45PageRank: FLOAT, fastrf_embedding: LIST, book1BetweennessCentrality: FLOAT, book1PageRank: FLOAT, louvain: INTEGER, community: INTEGER, degree: FLOAT, name: STRING, pagerank: FLOAT}
+Relationship properties:
+INTERACTS {weight: INTEGER}
+INTERACTS1 {weight: INTEGER, book: INTEGER}
+INTERACTS2 {weight: INTEGER, book: INTEGER}
+INTERACTS3 {weight: INTEGER, book: INTEGER}
+INTERACTS45 {weight: INTEGER, book: INTEGER}
+The relationships:
+(:Character)-[:INTERACTS45]->(:Character)
+(:Character)-[:INTERACTS]->(:Character)
+(:Character)-[:INTERACTS1]->(:Character)
+(:Character)-[:INTERACTS3]->(:Character)
+(:Character)-[:INTERACTS2]->(:Character)","MATCH (c1:Character {name: ""John Snow""})-[:INTERACTS|:INTERACTS1|:INTERACTS2|:INTERACTS3|:INTERACTS45]-(c2:Character) RETURN c2.name AS RelatedCharacter","MATCH (c1:Character {name: ""John Snow""})-[:INTERACTS]-(c2:Character) RETURN c2.name",simple,aaf32ebb53f0078d5568be46012f410dba9eba583526194f43302d5485d9aab7,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,no_error_identified,no_error_identified,uncertain,no_issue_identified,"The generated query checks only INTERACTS, while the reference checks all five declared interaction types. It is unknown whether INTERACTS includes every connection represented by the other types. The generated query can omit other qualifying connections if that coverage does not hold. Both use the question literal John Snow; stored name values and duplicate neighbours are unchecked.",Shreya Nair,2026-10-01T14:50:31.171690+00:00,AI-proposed assessments reviewed and accepted in a batch. Case displayed and AI proposal supplied; other prior exposure unknown.,not_assessed,completed,no_error_identified,no_error_identified,uncertain,no_issue_identified,"The generated query checks only INTERACTS, while the reference checks all five declared interaction types. It is unknown whether INTERACTS includes every connection represented by the other types. The generated query can omit other qualifying connections if that coverage does not hold. Both use the question literal John Snow; stored name values and duplicate neighbours are unchecked.","AI-assisted inspection of question, supplied schema and query text; no database rerun. No-error findings are limited to available evidence.",2026-10-01T14:46:12.577988+00:00,Case displayed and AI proposal supplied; other prior exposure unknown.,verified,2026-10-01T14:50:31.171690+00:00
+15,instance_id_22532,Show the first 5 reviews with a star rating below 4.0.,"Node properties:
+- **Business**
+  - `address`: STRING Available options: ['301 E Main St', '200 W Pine St', '313 N 1st St W', '1151 W Broadway St', '201 E Front St', '723 California Dr', '121 W Broadway St', '716 N San Mateo Dr', '111 E 5th Ave']
+  - `location`: POINT 
+  - `city`: STRING Available options: ['Missoula', 'Burlingame', 'San Mateo']
+  - `state`: STRING Available options: ['MT', 'CA']
+  - `businessId`: STRING Available options: ['b5', 'b3', 'b1', 'b2', 'b4', 'b7', 'b6', 'b8', 'b9']
+  - `name`: STRING Available options: ['Missoula Public Library', ""Ninja Mike's"", 'KettleHouse Brewing Co.', 'Imagine Nation Brewing', 'Market on Front', 'Hanabi', 'Zootown Brew', ""Ducky's Car Wash"", 'Neo4j']
+- **User**
+  - `name`: STRING Available options: ['Will', 'Bob', 'Jenny', 'Angie']
+  - `userId`: STRING Available options: ['u1', 'u2', 'u3', 'u4']
+- **Review**
+  - `date`: DATE Min: 2015-08-29, Max: 2018-09-10
+  - `text`: STRING Available options: ['Not a great selection of books, but fortunately th', ""Best breakfast sandwich at the Farmer's Market. Al"", 'Great IPA selection!', ""Awesome full-service car wash. Love Ducky's!"", ""The world's leading graph database HQ!""]
+  - `stars`: FLOAT Min: 3.0, Max: 5.0
+  - `reviewId`: STRING Example: ""r7""
+- **Category**
+  - `name`: STRING Example: ""Library""
+Relationship properties:
+
+The relationships:
+(:Business)-[:IN_CATEGORY]->(:Category)
+(:User)-[:WROTE]->(:Review)
+(:Review)-[:REVIEWS]->(:Business)","MATCH (u:User)-[:WROTE]->(r:Review)-[:REVIEWS]->(b:Business) WHERE r.stars < 4.0 RETURN r, u, b ORDER BY r.date LIMIT 5","MATCH (r:Review)
+WHERE r.stars < 4.0
+RETURN r
+LIMIT 5",medium,ec51a17016e7c624a306ceb93b4e0abe0d44d207282f7d4f4848924da17f6e35,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,no_error_identified,no_error_identified,uncertain,uncertain,"The generated query filters Review.stars below 4 and returns five reviews without ordering. The reference orders by date and requires both an author and reviewed business. The question does not define first as earliest by date or require those relationships. The effect of missing links, duplicates and selection order is not established. Returning review nodes is an acceptable format.",Shreya Nair,2026-10-01T14:50:31.171690+00:00,AI-proposed assessments reviewed and accepted in a batch. Previously discussed in AI-assisted flagged-case review.,not_assessed,completed,no_error_identified,no_error_identified,uncertain,uncertain,"The generated query filters Review.stars below 4 and returns five reviews without ordering. The reference orders by date and requires both an author and reviewed business. The question does not define first as earliest by date or require those relationships. The effect of missing links, duplicates and selection order is not established. Returning review nodes is an acceptable format.","AI-assisted inspection of question, supplied schema and query text; no database rerun. No-error findings are limited to available evidence.",2026-10-01T14:46:12.577988+00:00,Previously discussed in AI-assisted flagged-case review.,verified,2026-10-01T14:50:31.171690+00:00
+16,instance_id_5095,Fetch eight samples of the description of the Topic and the label for Topic!,"Graph schema: Relevant node labels and their properties (with datatypes) are:
+Topic {description: STRING}
+Topic {label: STRING}","MATCH (n:Topic) MATCH (m:Topic) RETURN n.description, m.label LIMIT 8","MATCH (t:Topic) RETURN t.description, t.label LIMIT 8",medium,d55a81f795c897c6caeb8ad07f7883715b7085d63ef8248b682adc48c5a119a0,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,no_error_identified,no_error_identified,no_error_identified,issue_identified,"Under the interpretation that each sample contains one Topic description and its label, the generated query returns the requested pair from the same node and limits to eight. The reference independently matches two Topic nodes, creating combinations rather than preserving description-label ownership. Sample ordering is unspecified by the question.",Shreya Nair,2026-10-01T14:50:31.171690+00:00,AI-proposed assessments reviewed and accepted in a batch. Case displayed and AI proposal supplied; other prior exposure unknown.,not_assessed,completed,no_error_identified,no_error_identified,no_error_identified,issue_identified,"Under the interpretation that each sample contains one Topic description and its label, the generated query returns the requested pair from the same node and limits to eight. The reference independently matches two Topic nodes, creating combinations rather than preserving description-label ownership. Sample ordering is unspecified by the question.","AI-assisted inspection of question, supplied schema and query text; no database rerun. No-error findings are limited to available evidence.",2026-10-01T14:46:12.577988+00:00,Case displayed and AI proposal supplied; other prior exposure unknown.,verified,2026-10-01T14:50:31.171690+00:00
+17,instance_id_10719,Find the nodes connected to Topic where cluster is 4 and list their properties!,"Graph schema: Relevant node labels and their properties (with datatypes) are:
+Topic {cluster: INTEGER}","MATCH (a:Topic{cluster:'4'})-[r]->(n) RETURN properties(n), r","MATCH (t:Topic {cluster: 4})--(n) RETURN n, properties(n)",medium,0d7c8190e4f46606ff92a571faf9ad74b78400932c019545d5bedabf94526c63,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,no_error_identified,no_error_identified,no_error_identified,issue_identified,"The generated query matches Topic.cluster using integer 4, as declared, follows connections in either direction and returns the neighbouring nodes with their properties. The question does not restrict direction, so no error is identified under an any-direction interpretation. The reference uses string 4 despite the INTEGER schema and restricts connections to outgoing relationships. The actual graph types were not checked.",Shreya Nair,2026-10-01T14:50:31.171690+00:00,AI-proposed assessments reviewed and accepted in a batch. Case displayed and AI proposal supplied; other prior exposure unknown.,not_assessed,completed,no_error_identified,no_error_identified,no_error_identified,issue_identified,"The generated query matches Topic.cluster using integer 4, as declared, follows connections in either direction and returns the neighbouring nodes with their properties. The question does not restrict direction, so no error is identified under an any-direction interpretation. The reference uses string 4 despite the INTEGER schema and restricts connections to outgoing relationships. The actual graph types were not checked.","AI-assisted inspection of question, supplied schema and query text; no database rerun. No-error findings are limited to available evidence.",2026-10-01T14:46:12.577988+00:00,Case displayed and AI proposal supplied; other prior exposure unknown.,verified,2026-10-01T14:50:31.171690+00:00
+18,instance_id_19058,"Fetch the distinct values of the label from Topic where either description is Studies eigenvalues and eigenvectors of operators, analyzing how structures behave under various conditions in mathematics and physics. or label is not null!","Graph schema: Relevant node labels and their properties (with datatypes) are:
+Topic {description: STRING}
+Topic {label: STRING}","MATCH (n:Topic) WHERE n.description = 'Studies eigenvalues and eigenvectors of operators, analyzing how structures behave under various conditions in mathematics and physics.' OR n.label IS NOT NULL RETURN DISTINCT n.label AS label","MATCH (t:Topic)
+WHERE t.description = 'Studies eigenvalues and eigenvectors of operators, analyzing how structures behave under various conditions in mathematics and physics.' 
+   OR t.label IS NOT NULL
+RETURN DISTINCT t.label",complex,27b7cca40eb36cb4326ee472fe57fbff2f05d4640cd94384a53daa06751b56c7,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,Both queries apply the stated description-equality OR non-null label condition and return distinct Topic.label values. The alias difference does not change the answer. A null label can qualify through the description condition; this follows the stated OR rule rather than establishing an error.,Shreya Nair,2026-10-01T14:50:31.171690+00:00,AI-proposed assessments reviewed and accepted in a batch. Case displayed and AI proposal supplied; other prior exposure unknown.,not_assessed,completed,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,Both queries apply the stated description-equality OR non-null label condition and return distinct Topic.label values. The alias difference does not change the answer. A null label can qualify through the description condition; this follows the stated OR rule rather than establishing an error.,"AI-assisted inspection of question, supplied schema and query text; no database rerun. No-error findings are limited to available evidence.",2026-10-01T14:46:12.577988+00:00,Case displayed and AI proposal supplied; other prior exposure unknown.,verified,2026-10-01T14:50:31.171690+00:00
+19,instance_id_10822,Find all nodes directly connected to the Categories that has category_id 088fbf884bd7c6533956a45531b362b7!,"Graph schema: Relevant node labels and their properties (with datatypes) are:
+Categories {category_id: STRING}",MATCH path=(:Categories {category_id:'088fbf884bd7c6533956a45531b362b7'})-->() RETURN path,MATCH (c:Categories {category_id: '088fbf884bd7c6533956a45531b362b7'})--(n) RETURN n,complex,948a5b83893cb8ce285db412f96adcdbe1f68e5015ef7dd6d545e25b6e24f33d,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,
+20,instance_id_39266,Find the first 5 businesses that have a category of 'Brewery'.,"Node properties:
+- **Business**
+  - `address`: STRING Available options: ['301 E Main St', '200 W Pine St', '313 N 1st St W', '1151 W Broadway St', '201 E Front St', '723 California Dr', '121 W Broadway St', '716 N San Mateo Dr', '111 E 5th Ave']
+  - `location`: POINT 
+  - `city`: STRING Available options: ['Missoula', 'Burlingame', 'San Mateo']
+  - `state`: STRING Available options: ['MT', 'CA']
+  - `businessId`: STRING Available options: ['b5', 'b3', 'b1', 'b2', 'b4', 'b7', 'b6', 'b8', 'b9']
+  - `name`: STRING Available options: ['Missoula Public Library', ""Ninja Mike's"", 'KettleHouse Brewing Co.', 'Imagine Nation Brewing', 'Market on Front', 'Hanabi', 'Zootown Brew', ""Ducky's Car Wash"", 'Neo4j']
+- **User**
+  - `name`: STRING Available options: ['Will', 'Bob', 'Jenny', 'Angie']
+  - `userId`: STRING Available options: ['u1', 'u2', 'u3', 'u4']
+- **Review**
+  - `date`: DATE Min: 2015-08-29, Max: 2018-09-10
+  - `text`: STRING Available options: ['Not a great selection of books, but fortunately th', ""Best breakfast sandwich at the Farmer's Market. Al"", 'Great IPA selection!', ""Awesome full-service car wash. Love Ducky's!"", ""The world's leading graph database HQ!""]
+  - `stars`: FLOAT Min: 3.0, Max: 5.0
+  - `reviewId`: STRING Example: ""r7""
+- **Category**
+  - `name`: STRING Example: ""Library""
+Relationship properties:
+
+The relationships:
+(:Business)-[:IN_CATEGORY]->(:Category)
+(:User)-[:WROTE]->(:Review)
+(:Review)-[:REVIEWS]->(:Business)","MATCH (b:Business)-[:IN_CATEGORY]->(c:Category {name: 'Brewery'}) RETURN b.name, b.address, b.city, b.state, b.businessId LIMIT 5","MATCH (b:Business)-[:IN_CATEGORY]->(c:Category {name: 'Brewery'})
+RETURN b
+LIMIT 5",medium,720a7d77cf5153c0eec9c7a5b53565f8212998a089b4bc5d541061e015a2be38,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,
+21,instance_id_1170,What are the names of rooms that have either king or queen bed?,"{""Room"": {""count"": 10, ""labels"": [], ""properties"": {""decor"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""beds"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""RoomId"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""roomName"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""bedType"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""maxOccupancy"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""basePrice"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}}, ""type"": ""node"", ""relationships"": {""BOOKED_IN"": {""count"": 600, ""direction"": ""in"", ""labels"": [""Reservation""], ""properties"": {}}}}, ""Reservation"": {""count"": 600, ""labels"": [], ""properties"": {""CheckIn"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""Room"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""Kids"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""FirstName"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""CheckOut"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""Adults"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""LastName"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""Code"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""Rate"": {""unique"": false, ""indexed"": false, ""type"": ""FLOAT"", ""existence"": false}}, ""type"": ""node"", ""relationships"": {""BOOKED_IN"": {""count"": 0, ""direction"": ""out"", ""labels"": [""Room""], ""properties"": {}}}}, ""BOOKED_IN"": {""count"": 600, ""properties"": {}, ""type"": ""relationship""}}","MATCH (r:Room) WHERE r.bedType = ""King"" OR r.bedType = ""Queen"" RETURN r.roomName",MATCH (r:Room) WHERE r.bedType = 'king' OR r.bedType = 'queen' RETURN r.roomName,medium,c0c25ea7a2c4ecc06477be8ec8e2114a4ab174e881593d7d5923c818dc5aac12,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,
+22,instance_id_40923,Find all users who asked a question with the word 'error' in the text.,"Node properties:
+- **Question**
+  - `favorites`: INTEGER Example: ""0""
+  - `answered`: BOOLEAN 
+  - `text`: STRING Example: ""### This is:  Bug    ### Specifications  OS: Win10""
+  - `link`: STRING Example: ""https://stackoverflow.com/questions/62224586/playg""
+  - `createdAt`: DATE_TIME Min: 2020-06-05T16:57:19Z, Max: 2020-06-05T21:49:16Z
+  - `title`: STRING Example: ""Playground is not loading with apollo-server-lambd""
+  - `id`: INTEGER Min: 62220505, Max: 62224586
+  - `upVotes`: INTEGER Example: ""0""
+  - `score`: INTEGER Example: ""-1""
+  - `downVotes`: INTEGER Example: ""1""
+- **Tag**
+  - `name`: STRING Example: ""aws-lambda""
+- **User**
+  - `image`: STRING Example: ""https://lh3.googleusercontent.com/-NcFYSuXU0nk/AAA""
+  - `link`: STRING Example: ""https://stackoverflow.com/users/10251021/alexandre""
+  - `id`: INTEGER Min: 751, Max: 13681006
+  - `reputation`: INTEGER Min: 1, Max: 420137
+  - `display_name`: STRING Example: ""Alexandre Le""
+Relationship properties:
+
+The relationships:
+(:Question)-[:TAGGED]->(:Tag)
+(:User)-[:ASKED]->(:Question)","MATCH (u:User)-[:ASKED]->(q:Question) WHERE q.text CONTAINS 'error' RETURN u.display_name, u.id, u.link","MATCH (u:User)-[:ASKED]->(q:Question)
+WHERE q.text CONTAINS 'error'
+RETURN DISTINCT u",medium,fa7a637194258f8c33ef32cb7f0b23f2b6fbf94e106ad6d1fe8ceec25d566e15,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,
+23,instance_id_32158,List the `companyName` of suppliers who supply products with a `reorderLevel` of 0.,"Node properties:
+- **Product**
+  - `productName`: STRING Example: ""Chai""
+  - `quantityPerUnit`: STRING Example: ""10 boxes x 20 bags""
+  - `unitsOnOrder`: INTEGER Min: 0, Max: 100
+  - `supplierID`: STRING Example: ""1""
+  - `productID`: STRING Example: ""1""
+  - `discontinued`: BOOLEAN 
+  - `categoryID`: STRING Available options: ['1', '2', '7', '6', '8', '4', '3', '5']
+  - `reorderLevel`: INTEGER Min: 0, Max: 30
+  - `unitsInStock`: INTEGER Min: 0, Max: 125
+  - `unitPrice`: FLOAT Min: 2.5, Max: 263.5
+- **Category**
+  - `picture`: STRING Available options: ['0x151C2F00020000000D000E0014002100FFFFFFFF4269746D']
+  - `categoryID`: STRING Available options: ['1', '2', '3', '4', '5', '6', '7', '8']
+  - `description`: STRING Available options: ['Soft drinks, coffees, teas, beers, and ales', 'Sweet and savory sauces, relishes, spreads, and se', 'Desserts, candies, and sweet breads', 'Cheeses', 'Breads, crackers, pasta, and cereal', 'Prepared meats', 'Dried fruit and bean curd', 'Seaweed and fish']
+  - `categoryName`: STRING Available options: ['Beverages', 'Condiments', 'Confections', 'Dairy Products', 'Grains/Cereals', 'Meat/Poultry', 'Produce', 'Seafood']
+- **Supplier**
+  - `companyName`: STRING Example: ""Exotic Liquids""
+  - `contactName`: STRING Example: ""Charlotte Cooper""
+  - `homePage`: STRING Available options: ['NULL', '#CAJUN.HTM#', ""Mayumi's (on the World Wide Web)#http://www.micros"", '(03) 444-6588', 'Plutzer (on the World Wide Web)#http://www.microso', '(0544) 60603', '(1) 03.83.00.62', '(02) 555-4873', '(089) 6547667', '38.76.98.58']
+  - `phone`: STRING Example: ""(171) 555-2222""
+  - `postalCode`: STRING Example: ""EC1 4SD""
+  - `contactTitle`: STRING Example: ""Purchasing Manager""
+  - `region`: STRING Example: ""NULL""
+  - `address`: STRING Example: ""49 Gilbert St.""
+  - `fax`: STRING Example: ""NULL""
+  - `supplierID`: STRING Example: ""1""
+  - `country`: STRING Example: ""UK""
+  - `city`: STRING Example: ""London""
+- **Customer**
+  - `fax`: STRING Example: ""030-0076545""
+  - `companyName`: STRING Example: ""Alfreds Futterkiste""
+  - `customerID`: STRING Example: ""ALFKI""
+  - `phone`: STRING Example: ""030-0074321""
+  - `contactName`: STRING Example: ""Maria Anders""
+  - `contactTitle`: STRING Example: ""Sales Representative""
+  - `region`: STRING Example: ""NULL""
+  - `address`: STRING Example: ""Obere Str. 57""
+  - `postalCode`: STRING Example: ""12209""
+  - `country`: STRING Example: ""Germany""
+  - `city`: STRING Example: ""Berlin""
+- **Order**
+  - `shipName`: STRING Example: ""Vins et alcools Chevalier""
+  - `requiredDate`: STRING Example: ""1996-08-01 00:00:00.000""
+  - `shipCity`: STRING Example: ""Reims""
+  - `employeeID`: STRING Available options: ['5', '6', '4', '3', '9', '1', '8', '2', '7']
+  - `shipPostalCode`: STRING Example: ""51100""
+  - `shippedDate`: STRING Example: ""1996-07-16 00:00:00.000""
+  - `freight`: STRING Example: ""32.38""
+  - `orderDate`: STRING Example: ""1996-07-04 00:00:00.000""
+  - `orderID`: STRING Example: ""10248""
+  - `shipAddress`: STRING Example: ""59 rue de l'Abbaye""
+  - `customerID`: STRING Example: ""VINET""
+  - `shipCountry`: STRING Example: ""France""
+  - `shipVia`: STRING Available options: ['3', '1', '2']
+  - `shipRegion`: STRING Example: ""NULL""
+Relationship properties:
+- **ORDERS**
+  - `orderID: STRING` Example: ""10248""
+  - `unitPrice: STRING` Example: ""34.80""
+  - `productID: STRING` Example: ""72""
+  - `quantity: INTEGER` Min: 1, Max:  130
+  - `discount: STRING` Example: ""0""
+The relationships:
+(:Product)-[:PART_OF]->(:Category)
+(:Supplier)-[:SUPPLIES]->(:Product)
+(:Customer)-[:PURCHASED]->(:Order)
+(:Order)-[:ORDERS]->(:Product)",MATCH (p:Product {reorderLevel: 0})<-[:SUPPLIES]-(s:Supplier) RETURN DISTINCT s.companyName,"MATCH (s:Supplier)-[:SUPPLIES]->(p:Product)
+WHERE p.reorderLevel = 0
+RETURN DISTINCT s.companyName",medium,5adbf0820527842f275c7d692cb43ebe1679bed247e92ca8fc6770c075d1446d,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,
+24,instance_id_28212,Which country has the highest number of entities that filed filings with an amount greater than 1000000?,"Node properties:
+- **Country**
+  - `location`: POINT 
+  - `code`: STRING Example: ""AFG""
+  - `name`: STRING Example: ""Afghanistan""
+  - `tld`: STRING Example: ""AF""
+- **Filing**
+  - `begin`: DATE_TIME Min: 2000-02-08T00:00:00Z, Max: 2017-09-05T00:00:00Z
+  - `end`: DATE_TIME Min: 2000-02-08T00:00:00Z, Max: 2017-11-03T00:00:00Z
+  - `originator_bank_id`: STRING Example: ""cimb-bank-berhad""
+  - `sar_id`: STRING Example: ""3297""
+  - `beneficiary_bank`: STRING Example: ""Barclays Bank Plc""
+  - `filer_org_name_id`: STRING Example: ""the-bank-of-new-york-mellon-corp""
+  - `originator_bank_country`: STRING Example: ""Singapore""
+  - `beneficiary_bank_country`: STRING Example: ""United Kingdom""
+  - `filer_org_name`: STRING Example: ""The Bank of New York Mellon Corp.""
+  - `originator_iso`: STRING Example: ""SGP""
+  - `beneficiary_bank_id`: STRING Example: ""barclays-bank-plc-london-england-gbr""
+  - `origin_lat`: STRING Example: ""1.3667""
+  - `origin_lng`: STRING Example: ""103.8""
+  - `end_date_format`: STRING Example: ""2015-09-25T00:00:00Z""
+  - `begin_date_format`: STRING Example: ""2015-03-25T00:00:00Z""
+  - `originator_bank`: STRING Example: ""CIMB Bank Berhad""
+  - `beneficiary_lat`: STRING Example: ""54""
+  - `beneficiary_iso`: STRING Example: ""GBR""
+  - `beneficiary_lng`: STRING Example: ""-2""
+  - `begin_date`: STRING Example: ""Mar 25, 2015""
+  - `id`: STRING Example: ""223254""
+  - `end_date`: STRING Example: ""Sep 25, 2015""
+  - `amount`: INTEGER Min: 1.18, Max: 2721000000
+  - `number`: INTEGER Min: 1, Max: 174
+- **Entity**
+  - `id`: STRING Example: ""the-bank-of-new-york-mellon-corp""
+  - `location`: POINT 
+  - `name`: STRING Example: ""The Bank of New York Mellon Corp.""
+  - `country`: STRING Example: ""CHN""
+Relationship properties:
+
+The relationships:
+(:Filing)-[:BENEFITS]->(:Entity)
+(:Filing)-[:CONCERNS]->(:Entity)
+(:Filing)-[:ORIGINATOR]->(:Entity)
+(:Entity)-[:FILED]->(:Filing)
+(:Entity)-[:COUNTRY]->(:Country)","MATCH (f:Filing) WHERE f.amount > 1000000 WITH f MATCH (f)<-[:FILED]-(e:Entity)-[:COUNTRY]->(c:Country) WITH c, count(DISTINCT e) AS entityCount ORDER BY entityCount DESC RETURN c.name AS countryName, entityCount LIMIT 1","MATCH (f:Filing)-[:CONCERNS|ORIGINATOR|BENEFITS]->(e:Entity)-[:COUNTRY]->(c:Country)
+WHERE f.amount > 1000000
+RETURN c.name, COUNT(DISTINCT e) AS entity_count
+ORDER BY entity_count DESC
+LIMIT 1",complex,6590c3f67edff7d6353c87bef2a9c21571b0a991bdd5d189a64fbbe267cd4abb,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,
+25,instance_id_25174,List all actors who have a poster URL that includes 'smile' in it.,"Node properties:
+- **Movie**
+  - `url`: STRING Example: ""https://themoviedb.org/movie/862""
+  - `runtime`: INTEGER Min: 2, Max: 910
+  - `revenue`: INTEGER Min: 1, Max: 2787965087
+  - `imdbRating`: FLOAT Min: 1.6, Max: 9.6
+  - `released`: STRING Example: ""1995-11-22""
+  - `countries`: LIST Min Size: 1, Max Size: 16
+  - `languages`: LIST Min Size: 1, Max Size: 19
+  - `plot`: STRING Example: ""A cowboy doll is profoundly threatened and jealous""
+  - `imdbVotes`: INTEGER Min: 13, Max: 1626900
+  - `imdbId`: STRING Example: ""0114709""
+  - `year`: INTEGER Min: 1902, Max: 2016
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/uXDf""
+  - `movieId`: STRING Example: ""1""
+  - `tmdbId`: STRING Example: ""862""
+  - `title`: STRING Example: ""Toy Story""
+  - `budget`: INTEGER Min: 1, Max: 380000000
+- **Genre**
+  - `name`: STRING Example: ""Adventure""
+- **User**
+  - `userId`: STRING Example: ""1""
+  - `name`: STRING Example: ""Omar Huffman""
+- **Actor**
+  - `url`: STRING Example: ""https://themoviedb.org/person/1271225""
+  - `name`: STRING Example: ""François Lallement""
+  - `tmdbId`: STRING Example: ""1271225""
+  - `bornIn`: STRING Example: ""France""
+  - `bio`: STRING Example: ""​From Wikipedia, the free encyclopedia  Lillian Di""
+  - `died`: DATE Example: ""1954-01-01""
+  - `born`: DATE Example: ""1877-02-04""
+  - `imdbId`: STRING Example: ""2083046""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/6DCW""
+- **Director**
+  - `url`: STRING Example: ""https://themoviedb.org/person/88953""
+  - `bornIn`: STRING Example: ""Burchard, Nebraska, USA""
+  - `born`: DATE Min: 1861-12-08, Max: 2018-05-01
+  - `died`: DATE Min: 1930-08-26, Max: 2976-09-29
+  - `tmdbId`: STRING Example: ""88953""
+  - `imdbId`: STRING Example: ""0516001""
+  - `name`: STRING Example: ""Harold Lloyd""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/er4Z""
+  - `bio`: STRING Example: ""Harold Lloyd has been called the cinema’s “first m""
+- **Person**
+  - `url`: STRING Example: ""https://themoviedb.org/person/1271225""
+  - `died`: DATE Example: ""1954-01-01""
+  - `bornIn`: STRING Example: ""France""
+  - `born`: DATE Example: ""1877-02-04""
+  - `imdbId`: STRING Example: ""2083046""
+  - `name`: STRING Example: ""François Lallement""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/6DCW""
+  - `tmdbId`: STRING Example: ""1271225""
+  - `bio`: STRING Example: ""​From Wikipedia, the free encyclopedia  Lillian Di""
+Relationship properties:
+- **RATED**
+  - `rating: FLOAT` Example: ""2.0""
+  - `timestamp: INTEGER` Example: ""1260759108""
+- **ACTED_IN**
+  - `role: STRING` Example: ""Officer of the Marines (uncredited)""
+- **DIRECTED**
+  - `role: STRING` 
+The relationships:
+(:Movie)-[:IN_GENRE]->(:Genre)
+(:User)-[:RATED]->(:Movie)
+(:Actor)-[:ACTED_IN]->(:Movie)
+(:Actor)-[:DIRECTED]->(:Movie)
+(:Director)-[:DIRECTED]->(:Movie)
+(:Director)-[:ACTED_IN]->(:Movie)
+(:Person)-[:ACTED_IN]->(:Movie)
+(:Person)-[:DIRECTED]->(:Movie)",MATCH (a:Actor) WHERE a.poster CONTAINS 'smile' RETURN a,"MATCH (a:Actor)
+WHERE a.poster CONTAINS 'smile'
+RETURN a.name, a.poster",medium,cd8f5676919d1828c91372336664dc89517fbe29033a039226b103c6c4a02c41,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,
+26,instance_id_2654,How many people have worked as a project manager in London?,"(:Person{label:'Person',id:string,role:string,description:string})-[:HAS_POSITION{}]->(:Position{label:'Position',id:string,title:string,location:string,startDate:string,endDate:string,url:string})
+(:Position{label:'Position',id:string,title:string,location:string,startDate:string,endDate:string,url:string})-[:AT_COMPANY{}]->(:Company{label:'Company',id:string,name:string})
+(:Person{label:'Person',id:string,role:string,description:string})-[:HAS_SKILL{}]->(:Skill{label:'Skill',id:string,name:string,level:string})
+(:Person{label:'Person',id:string,role:string,description:string})-[:HAS_EDUCATION{}]->(:Education{label:'Education',id:string,degree:string,university:string,graduation_date:string,score:string,url:string})",MATCH (p:Person)-[:HAS_POSITION]->(pos:Position) WHERE toLower(pos.title) CONTAINS 'project manager' AND toLower(pos.location) CONTAINS 'london' RETURN COUNT(p),"MATCH (p:Person)-[:HAS_POSITION]->(pos:Position)
+WHERE pos.title = 'project manager' AND pos.location = 'London'
+RETURN count(DISTINCT p)",medium,04eb1539fe3ebd1fd971fc1d79aadbcab3146b310a917d5f2db4f0b0cf695db4,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,
+27,instance_id_25306,Which movies have a director who was born after 1960 and have generated over 100 million in revenue?,"Node properties:
+- **Movie**
+  - `url`: STRING Example: ""https://themoviedb.org/movie/862""
+  - `runtime`: INTEGER Min: 2, Max: 910
+  - `revenue`: INTEGER Min: 1, Max: 2787965087
+  - `imdbRating`: FLOAT Min: 1.6, Max: 9.6
+  - `released`: STRING Example: ""1995-11-22""
+  - `countries`: LIST Min Size: 1, Max Size: 16
+  - `languages`: LIST Min Size: 1, Max Size: 19
+  - `plot`: STRING Example: ""A cowboy doll is profoundly threatened and jealous""
+  - `imdbVotes`: INTEGER Min: 13, Max: 1626900
+  - `imdbId`: STRING Example: ""0114709""
+  - `year`: INTEGER Min: 1902, Max: 2016
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/uXDf""
+  - `movieId`: STRING Example: ""1""
+  - `tmdbId`: STRING Example: ""862""
+  - `title`: STRING Example: ""Toy Story""
+  - `budget`: INTEGER Min: 1, Max: 380000000
+- **Genre**
+  - `name`: STRING Example: ""Adventure""
+- **User**
+  - `userId`: STRING Example: ""1""
+  - `name`: STRING Example: ""Omar Huffman""
+- **Actor**
+  - `url`: STRING Example: ""https://themoviedb.org/person/1271225""
+  - `name`: STRING Example: ""François Lallement""
+  - `tmdbId`: STRING Example: ""1271225""
+  - `bornIn`: STRING Example: ""France""
+  - `bio`: STRING Example: ""​From Wikipedia, the free encyclopedia  Lillian Di""
+  - `died`: DATE Example: ""1954-01-01""
+  - `born`: DATE Example: ""1877-02-04""
+  - `imdbId`: STRING Example: ""2083046""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/6DCW""
+- **Director**
+  - `url`: STRING Example: ""https://themoviedb.org/person/88953""
+  - `bornIn`: STRING Example: ""Burchard, Nebraska, USA""
+  - `born`: DATE Min: 1861-12-08, Max: 2018-05-01
+  - `died`: DATE Min: 1930-08-26, Max: 2976-09-29
+  - `tmdbId`: STRING Example: ""88953""
+  - `imdbId`: STRING Example: ""0516001""
+  - `name`: STRING Example: ""Harold Lloyd""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/er4Z""
+  - `bio`: STRING Example: ""Harold Lloyd has been called the cinema’s “first m""
+- **Person**
+  - `url`: STRING Example: ""https://themoviedb.org/person/1271225""
+  - `died`: DATE Example: ""1954-01-01""
+  - `bornIn`: STRING Example: ""France""
+  - `born`: DATE Example: ""1877-02-04""
+  - `imdbId`: STRING Example: ""2083046""
+  - `name`: STRING Example: ""François Lallement""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/6DCW""
+  - `tmdbId`: STRING Example: ""1271225""
+  - `bio`: STRING Example: ""​From Wikipedia, the free encyclopedia  Lillian Di""
+Relationship properties:
+- **RATED**
+  - `rating: FLOAT` Example: ""2.0""
+  - `timestamp: INTEGER` Example: ""1260759108""
+- **ACTED_IN**
+  - `role: STRING` Example: ""Officer of the Marines (uncredited)""
+- **DIRECTED**
+  - `role: STRING` 
+The relationships:
+(:Movie)-[:IN_GENRE]->(:Genre)
+(:User)-[:RATED]->(:Movie)
+(:Actor)-[:ACTED_IN]->(:Movie)
+(:Actor)-[:DIRECTED]->(:Movie)
+(:Director)-[:DIRECTED]->(:Movie)
+(:Director)-[:ACTED_IN]->(:Movie)
+(:Person)-[:ACTED_IN]->(:Movie)
+(:Person)-[:DIRECTED]->(:Movie)","MATCH (m:Movie)<-[:DIRECTED]-(d:Director) WHERE d.born > date('1960-01-01') AND m.revenue > 100000000 RETURN m.title, m.revenue, d.name, d.born","MATCH (d:Director)-[:DIRECTED]->(m:Movie)
+WHERE d.born > date(""1960-12-31"") AND m.revenue > 100000000
+RETURN m.title",complex,5f210cc8d689b6d763d6afdc5ea935bcee42a71f0012973c1a417f9076e8f857,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,
+28,instance_id_33128,List the summaries of reviews for movies with a rating lower than 60.,"Node properties:
+- **Movie**
+  - `title`: STRING Example: ""The Matrix""
+  - `votes`: INTEGER Min: 1, Max: 5259
+  - `tagline`: STRING Example: ""Welcome to the Real World""
+  - `released`: INTEGER Min: 1975, Max: 2012
+- **Person**
+  - `born`: INTEGER Min: 1929, Max: 1996
+  - `name`: STRING Example: ""Keanu Reeves""
+Relationship properties:
+- **ACTED_IN**
+  - `roles: LIST` Min Size: 1, Max Size: 6
+- **REVIEWED**
+  - `summary: STRING` Available options: ['Pretty funny at times', 'A solid romp', 'Silly, but fun', 'You had me at Jerry', 'An amazing journey', 'Slapstick redeemed only by the Robin Williams and ', 'Dark, but compelling', 'The coolest football movie ever', 'Fun, but a little far fetched']
+  - `rating: INTEGER` Min: 45, Max:  100
+The relationships:
+(:Person)-[:ACTED_IN]->(:Movie)
+(:Person)-[:DIRECTED]->(:Movie)
+(:Person)-[:PRODUCED]->(:Movie)
+(:Person)-[:WROTE]->(:Movie)
+(:Person)-[:FOLLOWS]->(:Person)
+(:Person)-[:REVIEWED]->(:Movie)",MATCH (p:Person)-[r:REVIEWED]->(m:Movie) WHERE r.rating < 60 RETURN r.summary,"MATCH (p:Person)-[r:REVIEWED]->(m:Movie)
+WHERE r.rating < 60
+RETURN r.summary",medium,83524c1114ed521a90e4fc40a17224a3f18a341622a0ea32a33e823d075a2f56,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,
+29,instance_id_32549,What is the average freight of orders made by the customer with customerID equal to 'ERNSH'?,"Node properties:
+- **Product**
+  - `productName`: STRING Example: ""Chai""
+  - `quantityPerUnit`: STRING Example: ""10 boxes x 20 bags""
+  - `unitsOnOrder`: INTEGER Min: 0, Max: 100
+  - `supplierID`: STRING Example: ""1""
+  - `productID`: STRING Example: ""1""
+  - `discontinued`: BOOLEAN 
+  - `categoryID`: STRING Available options: ['1', '2', '7', '6', '8', '4', '3', '5']
+  - `reorderLevel`: INTEGER Min: 0, Max: 30
+  - `unitsInStock`: INTEGER Min: 0, Max: 125
+  - `unitPrice`: FLOAT Min: 2.5, Max: 263.5
+- **Category**
+  - `picture`: STRING Available options: ['0x151C2F00020000000D000E0014002100FFFFFFFF4269746D']
+  - `categoryID`: STRING Available options: ['1', '2', '3', '4', '5', '6', '7', '8']
+  - `description`: STRING Available options: ['Soft drinks, coffees, teas, beers, and ales', 'Sweet and savory sauces, relishes, spreads, and se', 'Desserts, candies, and sweet breads', 'Cheeses', 'Breads, crackers, pasta, and cereal', 'Prepared meats', 'Dried fruit and bean curd', 'Seaweed and fish']
+  - `categoryName`: STRING Available options: ['Beverages', 'Condiments', 'Confections', 'Dairy Products', 'Grains/Cereals', 'Meat/Poultry', 'Produce', 'Seafood']
+- **Supplier**
+  - `companyName`: STRING Example: ""Exotic Liquids""
+  - `contactName`: STRING Example: ""Charlotte Cooper""
+  - `homePage`: STRING Available options: ['NULL', '#CAJUN.HTM#', ""Mayumi's (on the World Wide Web)#http://www.micros"", '(03) 444-6588', 'Plutzer (on the World Wide Web)#http://www.microso', '(0544) 60603', '(1) 03.83.00.62', '(02) 555-4873', '(089) 6547667', '38.76.98.58']
+  - `phone`: STRING Example: ""(171) 555-2222""
+  - `postalCode`: STRING Example: ""EC1 4SD""
+  - `contactTitle`: STRING Example: ""Purchasing Manager""
+  - `region`: STRING Example: ""NULL""
+  - `address`: STRING Example: ""49 Gilbert St.""
+  - `fax`: STRING Example: ""NULL""
+  - `supplierID`: STRING Example: ""1""
+  - `country`: STRING Example: ""UK""
+  - `city`: STRING Example: ""London""
+- **Customer**
+  - `fax`: STRING Example: ""030-0076545""
+  - `companyName`: STRING Example: ""Alfreds Futterkiste""
+  - `customerID`: STRING Example: ""ALFKI""
+  - `phone`: STRING Example: ""030-0074321""
+  - `contactName`: STRING Example: ""Maria Anders""
+  - `contactTitle`: STRING Example: ""Sales Representative""
+  - `region`: STRING Example: ""NULL""
+  - `address`: STRING Example: ""Obere Str. 57""
+  - `postalCode`: STRING Example: ""12209""
+  - `country`: STRING Example: ""Germany""
+  - `city`: STRING Example: ""Berlin""
+- **Order**
+  - `shipName`: STRING Example: ""Vins et alcools Chevalier""
+  - `requiredDate`: STRING Example: ""1996-08-01 00:00:00.000""
+  - `shipCity`: STRING Example: ""Reims""
+  - `employeeID`: STRING Available options: ['5', '6', '4', '3', '9', '1', '8', '2', '7']
+  - `shipPostalCode`: STRING Example: ""51100""
+  - `shippedDate`: STRING Example: ""1996-07-16 00:00:00.000""
+  - `freight`: STRING Example: ""32.38""
+  - `orderDate`: STRING Example: ""1996-07-04 00:00:00.000""
+  - `orderID`: STRING Example: ""10248""
+  - `shipAddress`: STRING Example: ""59 rue de l'Abbaye""
+  - `customerID`: STRING Example: ""VINET""
+  - `shipCountry`: STRING Example: ""France""
+  - `shipVia`: STRING Available options: ['3', '1', '2']
+  - `shipRegion`: STRING Example: ""NULL""
+Relationship properties:
+- **ORDERS**
+  - `orderID: STRING` Example: ""10248""
+  - `unitPrice: STRING` Example: ""34.80""
+  - `productID: STRING` Example: ""72""
+  - `quantity: INTEGER` Min: 1, Max:  130
+  - `discount: STRING` Example: ""0""
+The relationships:
+(:Product)-[:PART_OF]->(:Category)
+(:Supplier)-[:SUPPLIES]->(:Product)
+(:Customer)-[:PURCHASED]->(:Order)
+(:Order)-[:ORDERS]->(:Product)",MATCH (c:Customer {customerID: 'ERNSH'})-[:PURCHASED]->(o:Order) WITH avg(toFloat(o.freight)) AS averageFreight RETURN averageFreight,"MATCH (c:Customer {customerID: 'ERNSH'})-[:PURCHASED]->(o:Order)
+RETURN avg(toFloat(o.freight)) AS averageFreight",medium,72dc5a7e54977009dde366459153d390bd0ba888935cbd41d7bf9d1e9d95fa48,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,
+30,instance_id_34335,List the first 5 movies released in 1995.,"Node properties:
+- **Movie**
+  - `average_vote`: FLOAT Example: ""7.7""
+  - `overview`: STRING Example: ""Led by Woody, Andy's toys live happily in his room""
+  - `revenue`: FLOAT Example: ""3.73554033E8""
+  - `vote_count`: INTEGER Example: ""5415""
+  - `tagline`: STRING Example: ""Roll the dice and unleash the excitement!""
+  - `budget`: INTEGER Example: ""30000000""
+  - `title`: STRING Example: ""Toy Story""
+  - `poster_path`: STRING Example: ""/rhIRbceoE9lR4veEXuwCC2wARtG.jpg""
+  - `imdb_id`: STRING Example: ""tt0114709""
+  - `status`: STRING Example: ""Released""
+  - `runtime`: FLOAT Example: ""81.0""
+  - `popularity`: FLOAT Example: ""21.946943""
+  - `homepage`: STRING Example: ""http://toystory.disney.com/toy-story""
+  - `release_date`: DATE Example: ""1995-10-30""
+  - `id`: INTEGER Min: 862, Max: 31357
+  - `original_title`: STRING Example: ""Toy Story""
+  - `original_language`: STRING Example: ""en""
+- **Language**
+  - `id`: STRING Example: ""en""
+  - `name`: STRING Available options: ['', 'Gaeilge', 'Kiswahili', 'Azərbaycan', 'Somali', 'беларуская мова', 'Fulfulde', 'Hausa']
+- **Country**
+  - `id`: STRING Example: ""US""
+  - `name`: STRING Example: ""United States of America""
+- **Genre**
+  - `id`: INTEGER Min: 12, Max: 10770
+  - `name`: STRING Example: ""Animation""
+- **ProductionCompany**
+  - `id`: INTEGER Min: 3, Max: 10201
+  - `name`: STRING Example: ""Pixar Animation Studios""
+- **Collection**
+  - `name`: STRING Example: ""Toy Story Collection""
+  - `id`: INTEGER Min: 10, Max: 480160
+  - `backdrop_path`: STRING Example: ""/9FBwqcd9IRruEDUrTdcaafOMKUq.jpg""
+  - `poster_path`: STRING Example: ""/7G9915LfUQ2lVfwMEEhDsn3kT4B.jpg""
+- **Person**
+  - `gender`: INTEGER Example: ""2""
+  - `profile_path`: STRING Example: ""/pQFoyx7rp09CJTAb932F2g8Nlho.jpg""
+  - `id`: INTEGER Min: 31, Max: 12900
+  - `name`: STRING Example: ""Tom Hanks""
+- **User**
+  - `id`: INTEGER Min: 27490cf6-22eb-495d-9dd6-902c0f89c627, Max: 4
+- **Keyword**
+  - `id`: INTEGER Min: 931, Max: 9713
+  - `name`: STRING Example: ""jealousy""
+- **Video**
+  - `tagline`: STRING Example: ""Fresh Fish. Mixed Vegetables.""
+  - `average_vote`: FLOAT Min: 0.0, Max: 10.0
+  - `overview`: STRING Example: ""Get ready as Bob the Tomato, Larry the Cucumber an""
+  - `revenue`: FLOAT Min: 0.0, Max: 0.0
+  - `poster_path`: STRING Example: ""/iWahPsY3hsKOizZHgzQcAxv4O3B.jpg""
+  - `vote_count`: INTEGER Min: 0, Max: 115
+  - `title`: STRING Example: ""Jonah: A VeggieTales Movie""
+  - `release_date`: DATE Min: 1973-01-12, Max: 2017-03-17
+  - `status`: STRING Available options: ['Released']
+  - `budget`: INTEGER Min: 0, Max: 2219684
+  - `popularity`: FLOAT Min: 0.0, Max: 9.22546
+  - `imdb_id`: STRING Example: ""tt0298388""
+  - `original_title`: STRING Example: ""Jonah: A VeggieTales Movie""
+  - `id`: INTEGER Min: 13284, Max: 461088
+  - `runtime`: FLOAT Min: 0.0, Max: 583.0
+  - `original_language`: STRING Example: ""en""
+  - `homepage`: STRING Example: ""http://www.loosechange911.com/""
+- **Adult**
+  - `average_vote`: FLOAT Min: 0.0, Max: 6.3
+  - `overview`: STRING Available options: ['A sailor takes an American businessman and his gir', 'The FBI and Texas police make ready to storm the h', 'Electrical Girl centers around a horny young woman', 'Ágata suffers from a psychological disorder which ', ""Shane Ryan's sequel to the disturbing Amateur Porn"", 'Australian film about a fictional sub-par Australi', 'Olaf and his mother run a boarding house and a whi', 'A man who returns home to find his wife cheating o', 'An American scientific research facility opens a p']
+  - `revenue`: FLOAT Min: 0.0, Max: 0.0
+  - `poster_path`: STRING Available options: ['/tzVK7nTnzUiVeFSZhOAIHmrgXUS.jpg', '/1VzwIa8HTykNiCCW8PBaJnyTvO8.jpg', '/yTfqRQlJMTAuTNDG01XjNg5KPPg.jpg', '/oP2WvKIWxqSBVHjfYAizFHOqBLG.jpg', '/zpycBSiBFp5Uib6gWJpgEvfOgdn.jpg', '/e7CAc8OadcUoKNPIX86SEPSX7f.jpg', '/jjncR0vECvXVrBvr0A1vLghL4pN.jpg', '/pJLmZBruOmn2c9mYWe3h1xcXaA0.jpg', '/3uv9oaqOJkkdZiQp6r9lf24tkHW.jpg']
+  - `vote_count`: INTEGER Min: 0, Max: 16
+  - `title`: STRING Available options: ['Erotic Nights of the Living Dead', 'Standoff', 'Electrical Girl', 'Diet of Sex', 'Amateur Porn Star Killer 2', 'The Band', 'The Sinful Dwarf', 'Adulterers', 'Half -Life']
+  - `release_date`: DATE Min: 1973-12-20, Max: 2016-01-05
+  - `status`: STRING Available options: ['Released', 'In Production']
+  - `budget`: INTEGER Min: 0, Max: 750000
+  - `popularity`: FLOAT Min: 0.001803, Max: 6.889832
+  - `imdb_id`: STRING Available options: ['tt0079642', 'tt0119931', 'tt0322232', 'tt3094816', 'tt1161951', 'tt1153101', 'tt0070696', 'tt4044464', 'tt2697688']
+  - `original_title`: STRING Available options: ['Le notti erotiche dei morti viventi', 'Standoff', '發電悄嬌娃', 'Diet of Sex', 'Amateur Porn Star Killer 2', 'The Band', 'Dværgen', 'Adulterers', 'Half -Life']
+  - `id`: INTEGER Min: 5422, Max: 448290
+  - `runtime`: FLOAT Min: 0.0, Max: 112.0
+  - `original_language`: STRING Available options: ['it', 'en', 'cn', 'es', 'da']
+  - `tagline`: STRING Available options: ['Trust Will Get You Killed', 'Comedy, food, drama and sex, a lot of sex', 'Humiliation. Rape. Murder. You know the drill.', ""Sex, drugs and Rock 'n Roll"", 'The Mother of all Dwarfsploitation films!', 'Love. Betrayal. Vengeance']
+  - `homepage`: STRING Available options: ['http://www.imdb.com/title/tt0119931/', 'http://www.dietofsex.com/']
+- **Package**
+  - `price`: FLOAT Min: 0.0, Max: 99.99
+  - `duration`: DURATION 
+  - `id`: INTEGER Min: 0, Max: 6
+  - `name`: STRING Available options: ['Childrens', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Ultimate', 'Free Trial']
+- **Subscription**
+  - `expiresAt`: DATE_TIME Min: 2020-08-23T16:20:52.383Z, Max: 2020-08-23T16:20:52.383Z
+  - `id`: STRING Available options: ['e74f7163-eace-4169-8043-41627f1fe236']
+Relationship properties:
+- **CAST_FOR**
+  - `credit_id: STRING` Example: ""52fe4459c3a36847f8090d7d""
+  - `order: INTEGER` Example: ""0""
+  - `character: STRING` Example: ""Charlie Wilson""
+  - `cast_id: INTEGER` Example: ""12""
+- **CREW_FOR**
+  - `credit_id: STRING` Example: ""55e4f0abc3a368140800047e""
+  - `job: STRING` Example: ""Producer""
+  - `department: STRING` Example: ""Production""
+- **RATED**
+  - `timestamp: DATE_TIME` Example: ""2015-03-09T22:49:42Z""
+  - `rating: FLOAT` Example: ""5.0""
+The relationships:
+(:Movie)-[:ORIGINAL_LANGUAGE]->(:Language)
+(:Movie)-[:SPOKEN_IN_LANGUAGE]->(:Language)
+(:Movie)-[:PRODUCED_IN_COUNTRY]->(:Country)
+(:Movie)-[:IN_GENRE]->(:Genre)
+(:Movie)-[:PRODUCED_BY]->(:ProductionCompany)
+(:Movie)-[:HAS_KEYWORD]->(:Keyword)
+(:Movie)-[:IN_COLLECTION]->(:Collection)
+(:Person)-[:CAST_FOR]->(:Movie)
+(:Person)-[:CREW_FOR]->(:Movie)
+(:Person)-[:CREW_FOR]->(:Video)
+(:User)-[:RATED]->(:Movie)
+(:User)-[:RATED]->(:Video)
+(:Video)-[:ORIGINAL_LANGUAGE]->(:Language)
+(:Video)-[:SPOKEN_IN_LANGUAGE]->(:Language)
+(:Video)-[:PRODUCED_IN_COUNTRY]->(:Country)
+(:Video)-[:IN_GENRE]->(:Genre)
+(:Video)-[:PRODUCED_BY]->(:ProductionCompany)
+(:Video)-[:HAS_KEYWORD]->(:Keyword)
+(:Video)-[:IN_COLLECTION]->(:Collection)
+(:Adult)-[:ORIGINAL_LANGUAGE]->(:Language)
+(:Adult)-[:SPOKEN_IN_LANGUAGE]->(:Language)
+(:Adult)-[:PRODUCED_IN_COUNTRY]->(:Country)
+(:Adult)-[:IN_GENRE]->(:Genre)
+(:Adult)-[:PRODUCED_BY]->(:ProductionCompany)
+(:Adult)-[:HAS_KEYWORD]->(:Keyword)
+(:Package)-[:PROVIDES_ACCESS_TO]->(:Genre)
+(:Subscription)-[:FOR_PACKAGE]->(:Package)",MATCH (m:Movie) WHERE m.release_date.year = 1995 WITH m ORDER by m.release_date RETURN m.title LIMIT 5,"MATCH (m:Movie)
+WHERE m.release_date >= '1995-01-01' AND m.release_date <= '1995-12-31'
+RETURN m.title
+LIMIT 5",simple,47c0194453a92efbe6158bcc9894ed0eb2d2ff35b76df5ac257532d8a7c26f48,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,
+31,instance_id_467,What are the different majors?,"{""HasAllergy"": {""count"": 59, ""labels"": [], ""properties"": {""StuID"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""Allergy"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}}, ""type"": ""node"", ""relationships"": {}}, ""Student"": {""count"": 34, ""labels"": [], ""properties"": {""StuID"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""Major"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""Age"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""Fname"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""city_code"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""Advisor"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""LName"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""Sex"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}}, ""type"": ""node"", ""relationships"": {}}, ""AllergyType"": {""count"": 14, ""labels"": [], ""properties"": {""Allergy"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""AllergyType"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}}, ""type"": ""node"", ""relationships"": {}}}",MATCH (s:Student) RETURN DISTINCT s.Major,MATCH (s:Student) RETURN DISTINCT s.Major,simple,6aefedc927f39c5e7fa53d7f8e629a4cb783ed4b91611391e7b6f064241f1fe0,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,
+32,instance_id_25423,Retrieve the top 3 highest viewed questions that have been answered by users with less than 3 answers in total.,"Node properties:
+- **Question**
+  - `link`: STRING Example: ""https://stackoverflow.com/q/65697972""
+  - `accepted_answer_id`: INTEGER Min: 61447621, Max: 69272967
+  - `creation_date`: INTEGER Min: 1587746198, Max: 1632249176
+  - `view_count`: INTEGER Min: 4, Max: 1851
+  - `answer_count`: INTEGER Min: 0, Max: 4
+  - `body_markdown`: STRING Example: ""I want to create a graph from my recursive JSON fi""
+  - `uuid`: INTEGER Min: 61413144, Max: 69273945
+  - `title`: STRING Example: ""Create graph from recursive JSON data using apoc.l""
+- **User**
+  - `uuid`: INTEGER Min: deleted, Max: 16922964
+  - `display_name`: STRING Example: ""schernichkin""
+- **Tag**
+  - `name`: STRING Example: ""neo4j""
+  - `link`: STRING Example: ""https://stackoverflow.com/questions/tagged/neo4j""
+- **Answer**
+  - `link`: STRING Example: ""https://stackoverflow.com/a/69272967""
+  - `title`: STRING Example: ""Return &#39;biggest fan of a tag&#39; neo4j""
+  - `is_accepted`: BOOLEAN 
+  - `body_markdown`: STRING Example: ""The error is here:    ```  WHERE COUNT(posted) &lt""
+  - `score`: INTEGER Min: -2, Max: 6
+  - `uuid`: INTEGER Min: 61445468, Max: 69273049
+- **Comment**
+  - `score`: INTEGER Min: 0, Max: 3
+  - `uuid`: INTEGER Min: 108645245, Max: 122427099
+  - `link`: STRING Example: ""https://stackoverflow.com/questions/69208813/confi""
+Relationship properties:
+
+The relationships:
+(:Question)-[:TAGGED]->(:Tag)
+(:User)-[:ASKED]->(:Question)
+(:User)-[:COMMENTED]->(:Comment)
+(:User)-[:PROVIDED]->(:Answer)
+(:Answer)-[:ANSWERED]->(:Question)
+(:Comment)-[:COMMENTED_ON]->(:Question)","MATCH (u:User)-[:PROVIDED]->(a:Answer)-[:ANSWERED]->(q:Question) WITH u, count(a) AS totalAnswers, q WHERE totalAnswers < 3 MATCH (q) RETURN q ORDER BY q.view_count DESC LIMIT 3","MATCH (q:Question)<-[:ANSWERED]-(a:Answer)<-[:PROVIDED]-(u:User)
+WITH u, q, q.view_count AS views
+MATCH (u)-[:PROVIDED]->(other_answers:Answer)
+WITH q, views, count(other_answers) AS total_user_answers
+WHERE total_user_answers < 3
+RETURN DISTINCT q
+ORDER BY views DESC
+LIMIT 3",complex,347d92727d08371c4866d378d10ec71bc47747723da3a8d12c304fe7e4dd907f,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,
+33,instance_id_15256,Find the Journal where journal_id is 99571eecaa5c5d622bb0d1f855752d5f!,"Graph schema: Relevant node labels and their properties (with datatypes) are:
+Journal {journal_id: STRING}",MATCH (n:Journal) WHERE n.journal_id = '99571eecaa5c5d622bb0d1f855752d5f' RETURN n,MATCH (j:Journal {journal_id: '99571eecaa5c5d622bb0d1f855752d5f'}) RETURN j,medium,6051b7368f1fa46471e293ee2204ec764760eb975cd1b59a80c1791f5a16fcf4,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,
+34,instance_id_15868,Find eight instances of Article where either article_id exceeds 1010 or article_id is less than 1048!,"Graph schema: Relevant node labels and their properties (with datatypes) are:
+Article {article_id: INTEGER}
+Article {article_id: INTEGER}",MATCH (n:Article) WHERE n.article_id > 1010 OR n.article_id < 1048 RETURN n LIMIT 8,MATCH (a:Article) WHERE a.article_id > 1010 OR a.article_id < 1048 RETURN a LIMIT 8,complex,7a9f1a533faa3abc2c868bf39db18c7f984791b335d65f6a467718a84bd112b5,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,
+35,instance_id_41904,Who are the CEOs of the first 3 public companies?,"Node properties:
+- **Person**
+  - `name`: STRING Example: ""Julie Spellman Sweet""
+  - `id`: STRING Example: ""Eaf0bpz6NNoqLVUCqNZPAew""
+  - `summary`: STRING Example: ""CEO at Accenture""
+- **Organization**
+  - `revenue`: FLOAT Example: ""1.2E8""
+  - `motto`: STRING Example: """"
+  - `nbrEmployees`: INTEGER Example: ""375""
+  - `isDissolved`: BOOLEAN 
+  - `id`: STRING Example: ""E0ZU8eCc5OaqS1LU9qE3n3w""
+  - `isPublic`: BOOLEAN 
+  - `name`: STRING Example: ""New Energy Group""
+  - `summary`: STRING Example: ""Software company based in Rome, Metropolitan City ""
+- **IndustryCategory**
+  - `name`: STRING Example: ""Electronic Products Manufacturers""
+  - `id`: STRING Example: ""EUNd__O4zMNW81lAXNK2GNw""
+- **City**
+  - `id`: STRING Example: ""EZHWv2xKgN92oYDKSjhJ2gw""
+  - `summary`: STRING Example: ""City in and county seat of King County, Washington""
+  - `name`: STRING Example: ""Seattle""
+- **Country**
+  - `name`: STRING Example: ""United States of America""
+  - `id`: STRING Example: ""E01d4EK33MmCosgI2KXa4-A""
+  - `summary`: STRING Example: ""Country in North America""
+- **Article**
+  - `id`: STRING Example: ""ART176872705964""
+  - `sentiment`: FLOAT Example: ""0.856""
+  - `author`: STRING Example: ""David Correa""
+  - `siteName`: STRING Example: ""MrWeb""
+  - `summary`: STRING Example: ""Boston and Mumbai-based consumer behavior analyses""
+  - `date`: DATE_TIME Example: ""2022-03-10T00:00:00Z""
+  - `title`: STRING Example: ""Funds for Consumer Behavior Specialist Infinite An""
+- **Chunk**
+  - `text`: STRING Example: ""Boston and Mumbai-based consumer behavior analyses""
+- **Fewshot**
+  - `Question`: STRING Available options: ['How is Emil Eifrem connected to Michael Hunger? ', 'What are the latest news regarding Google? ', 'Are there any news regarding return to office poli', 'What is Microsoft policy regarding to the return t', 'How many levels of subsidiaries does Blackstone ha', 'How many Telecommunications Companies are from Mal']
+  - `Cypher`: STRING Available options: ['MATCH (p1:Person {{name:""Emil Eifrem""}}), (p2:Pers', 'MATCH (o:Organization {{name:""Google""}})<-[:MENTIO', 'CALL apoc.ml.openai.embedding([""Are there any news', 'CALL apoc.ml.openai.embedding([""What is Microsoft ', 'MATCH p=(o:Organization {name:""Blackstone""})-[:HAS', 'MATCH (o:Organization) WHERE EXISTS {(o)-[:HAS_CAT']
+  - `id`: INTEGER Min: 2, Max: 7
+Relationship properties:
+
+The relationships:
+(:Person)-[:HAS_PARENT]->(:Person)
+(:Person)-[:HAS_CHILD]->(:Person)
+(:Organization)-[:IN_CITY]->(:City)
+(:Organization)-[:HAS_CEO]->(:Person)
+(:Organization)-[:HAS_CATEGORY]->(:IndustryCategory)
+(:Organization)-[:HAS_SUBSIDIARY]->(:Organization)
+(:Organization)-[:HAS_SUPPLIER]->(:Organization)
+(:Organization)-[:HAS_INVESTOR]->(:Organization)
+(:Organization)-[:HAS_INVESTOR]->(:Person)
+(:Organization)-[:HAS_BOARD_MEMBER]->(:Person)
+(:Organization)-[:HAS_COMPETITOR]->(:Organization)
+(:City)-[:IN_COUNTRY]->(:Country)
+(:Article)-[:HAS_CHUNK]->(:Chunk)
+(:Article)-[:MENTIONS]->(:Organization)","MATCH (o:Organization {isPublic: true})-[:HAS_CEO]->(ceo:Person) RETURN ceo.name AS CEO, o.name AS Company ORDER BY o.name LIMIT 3","MATCH (o:Organization {isPublic: true})<-[:HAS_CEO]-(p:Person)
+RETURN p.name, o.name
+LIMIT 3",simple,3ad864e9de3b96e36c1eff744243bba985bfee31cb3a84e41291f83cba5b208e,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,
+36,instance_id_40421,List the first 5 organizations that have a CEO with a summary mentioning 'Leader'.,"Node properties:
+- **Person**
+  - `name`: STRING Example: ""Julie Spellman Sweet""
+  - `id`: STRING Example: ""Eaf0bpz6NNoqLVUCqNZPAew""
+  - `summary`: STRING Example: ""CEO at Accenture""
+- **Organization**
+  - `revenue`: FLOAT Example: ""1.2E8""
+  - `motto`: STRING Example: """"
+  - `nbrEmployees`: INTEGER Example: ""375""
+  - `isDissolved`: BOOLEAN 
+  - `id`: STRING Example: ""E0ZU8eCc5OaqS1LU9qE3n3w""
+  - `isPublic`: BOOLEAN 
+  - `name`: STRING Example: ""New Energy Group""
+  - `summary`: STRING Example: ""Software company based in Rome, Metropolitan City ""
+- **IndustryCategory**
+  - `name`: STRING Example: ""Electronic Products Manufacturers""
+  - `id`: STRING Example: ""EUNd__O4zMNW81lAXNK2GNw""
+- **City**
+  - `id`: STRING Example: ""EZHWv2xKgN92oYDKSjhJ2gw""
+  - `summary`: STRING Example: ""City in and county seat of King County, Washington""
+  - `name`: STRING Example: ""Seattle""
+- **Country**
+  - `name`: STRING Example: ""United States of America""
+  - `id`: STRING Example: ""E01d4EK33MmCosgI2KXa4-A""
+  - `summary`: STRING Example: ""Country in North America""
+- **Article**
+  - `id`: STRING Example: ""ART176872705964""
+  - `sentiment`: FLOAT Example: ""0.856""
+  - `author`: STRING Example: ""David Correa""
+  - `siteName`: STRING Example: ""MrWeb""
+  - `summary`: STRING Example: ""Boston and Mumbai-based consumer behavior analyses""
+  - `date`: DATE_TIME Example: ""2022-03-10T00:00:00Z""
+  - `title`: STRING Example: ""Funds for Consumer Behavior Specialist Infinite An""
+- **Chunk**
+  - `text`: STRING Example: ""Boston and Mumbai-based consumer behavior analyses""
+- **Fewshot**
+  - `Question`: STRING Available options: ['How is Emil Eifrem connected to Michael Hunger? ', 'What are the latest news regarding Google? ', 'Are there any news regarding return to office poli', 'What is Microsoft policy regarding to the return t', 'How many levels of subsidiaries does Blackstone ha', 'How many Telecommunications Companies are from Mal']
+  - `Cypher`: STRING Available options: ['MATCH (p1:Person {{name:""Emil Eifrem""}}), (p2:Pers', 'MATCH (o:Organization {{name:""Google""}})<-[:MENTIO', 'CALL apoc.ml.openai.embedding([""Are there any news', 'CALL apoc.ml.openai.embedding([""What is Microsoft ', 'MATCH p=(o:Organization {name:""Blackstone""})-[:HAS', 'MATCH (o:Organization) WHERE EXISTS {(o)-[:HAS_CAT']
+  - `id`: INTEGER Min: 2, Max: 7
+Relationship properties:
+
+The relationships:
+(:Person)-[:HAS_PARENT]->(:Person)
+(:Person)-[:HAS_CHILD]->(:Person)
+(:Organization)-[:IN_CITY]->(:City)
+(:Organization)-[:HAS_CEO]->(:Person)
+(:Organization)-[:HAS_CATEGORY]->(:IndustryCategory)
+(:Organization)-[:HAS_SUBSIDIARY]->(:Organization)
+(:Organization)-[:HAS_SUPPLIER]->(:Organization)
+(:Organization)-[:HAS_INVESTOR]->(:Organization)
+(:Organization)-[:HAS_INVESTOR]->(:Person)
+(:Organization)-[:HAS_BOARD_MEMBER]->(:Person)
+(:Organization)-[:HAS_COMPETITOR]->(:Organization)
+(:City)-[:IN_COUNTRY]->(:Country)
+(:Article)-[:HAS_CHUNK]->(:Chunk)
+(:Article)-[:MENTIONS]->(:Organization)","MATCH (o:Organization)-[:HAS_CEO]->(p:Person) WHERE p.summary CONTAINS 'Leader' RETURN o.name AS organizationName, p.name AS ceoName, p.summary AS ceoSummary LIMIT 5","MATCH (o:Organization)-[:HAS_CEO]->(p:Person)
+WHERE p.summary CONTAINS 'Leader'
+RETURN o
+LIMIT 5",medium,29293dbb5e2cd3387b72001a9475f8138e7841087b429d73864ec2b31bf75d4b,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,
+37,instance_id_30995,What is the sourceID of the entity with internal_id '1001256'?,"Node properties:
+- **Entity**
+  - `countries`: STRING Example: ""Hong Kong""
+  - `ibcRUC`: STRING Example: ""25221""
+  - `valid_until`: STRING Example: ""The Panama Papers data is current through 2015""
+  - `country_codes`: STRING Example: ""HKG""
+  - `service_provider`: STRING Available options: ['Appleby', 'Portcullis Trustnet', 'Mossack Fonseca', 'Commonwealth Trust Limited']
+  - `address`: STRING Example: ""ORION HOUSE SERVICES (HK) LIMITED ROOM 1401; 14/F.""
+  - `inactivation_date`: STRING Example: ""18-FEB-2013""
+  - `struck_off_date`: STRING Example: ""15-FEB-2013""
+  - `status`: STRING Example: ""Defaulted""
+  - `jurisdiction_description`: STRING Example: ""Samoa""
+  - `incorporation_date`: STRING Example: ""23-MAR-2006""
+  - `original_name`: STRING Example: ""TIANSHENG INDUSTRY AND TRADING CO., LTD.""
+  - `jurisdiction`: STRING Example: ""SAM""
+  - `name`: STRING Example: ""TIANSHENG INDUSTRY AND TRADING CO., LTD.""
+  - `internal_id`: STRING Example: ""1001256""
+  - `lastEditTimestamp`: STRING Example: ""1638311020926""
+  - `node_id`: INTEGER Min: 10000001, Max: 10000005
+  - `sourceID`: STRING Example: ""Panama Papers""
+  - `former_name`: STRING 
+  - `company_type`: STRING 
+  - `tax_stat_description`: STRING 
+  - `note`: STRING 
+  - `dorm_date`: STRING 
+  - `type`: STRING 
+  - `closed_date`: STRING 
+  - `company_number`: STRING 
+  - `comments`: STRING 
+  - `entity_number`: STRING 
+- **Intermediary**
+  - `countries`: STRING Example: ""South Africa""
+  - `lastEditTimestamp`: STRING Example: ""1638311034131""
+  - `address`: STRING Example: ""MICHAEL PAPAGEORGE; MR. 106 NICHOLSON STREET BROOK""
+  - `valid_until`: STRING Example: ""The Panama Papers  data is current through 2015""
+  - `country_codes`: STRING Example: ""ZAF""
+  - `name`: STRING Example: ""MICHAEL PAPAGEORGE, MR.""
+  - `status`: STRING Available options: ['UNRECOVERABLE ACCOUNTS', 'CLIENT IN REPRESENTATIVE TERRITORY', 'ACTIVE', 'INACTIVE', 'SUSPENDED', 'DELINQUENT', 'PROSPECT', 'SUSPENDED LEGAL', 'ACTIVE LEGAL']
+  - `node_id`: INTEGER Min: 11000001, Max: 11000005
+  - `sourceID`: STRING Available options: ['Pandora Papers - Alemán, Cordero, Galindo & Lee (Alcogal)', 'Paradise Papers - Appleby', 'Paradise Papers - Barbados corporate registry', 'Bahamas Leaks', 'Panama Papers', 'Paradise Papers - Nevis corporate registry', 'Paradise Papers - Bahamas corporate registry', 'Offshore Leaks', 'Paradise Papers - Aruba corporate registry']
+  - `internal_id`: STRING Example: ""10001""
+  - `registered_office`: STRING 
+- **Officer**
+  - `valid_until`: STRING Example: ""The Panama Papers data is current through 2015""
+  - `name`: STRING Example: ""KIM SOO IN""
+  - `sourceID`: STRING Example: ""Panama Papers""
+  - `icij_id`: STRING Example: ""E72326DEA50F1A9C2876E112AAEB42BC""
+  - `node_id`: INTEGER Min: 12000001, Max: 12000005
+  - `lastEditTimestamp`: STRING Example: ""1638311034062""
+  - `country_codes`: STRING Example: ""KOR""
+  - `countries`: STRING Example: ""South Korea""
+  - `note`: STRING 
+- **Address**
+  - `original_address`: STRING Example: ""ANNEX FREDERICK & SHIRLEY STS, P. O. BOX N-4805 NA""
+  - `lastEditTimestamp`: STRING Example: ""1638311020926""
+  - `countries`: STRING Example: ""Bahamas""
+  - `address`: STRING Example: ""ANNEX FREDERICK & SHIRLEY STS, P.O. BOX N-4805, NA""
+  - `valid_until`: STRING Example: ""The Bahamas Leaks data is current through early 20""
+  - `icij_id`: STRING Example: ""7C1AAD6896EFDED57D680B82E7ADF7AB""
+  - `node_id`: INTEGER Min: 24000001, Max: 24000005
+  - `sourceID`: STRING Example: ""Bahamas Leaks""
+  - `country_codes`: STRING Example: ""BHS""
+  - `name`: STRING 
+  - `addressID`: STRING 
+  - `country_code`: STRING 
+  - `country`: STRING 
+- **Other**
+  - `lastEditTimestamp`: STRING Available options: ['1638311068329', '1638311074502', '1638311074946', '1638311075268', '1638311075503']
+  - `incorporation_date`: STRING Example: ""18-MAY-1983""
+  - `struck_off_date`: STRING Example: ""31-DEC-2002""
+  - `jurisdiction`: STRING Available options: ['AW']
+  - `jurisdiction_description`: STRING Available options: ['Aruba']
+  - `valid_until`: STRING Available options: ['Aruba corporate registry data is current through 2', 'Appleby data is current through 2014']
+  - `sourceID`: STRING Available options: ['Paradise Papers - Aruba corporate registry', 'Paradise Papers - Appleby']
+  - `name`: STRING Example: ""ANTAM ENTERPRISES N.V.""
+  - `type`: STRING Available options: ['LIMITED LIABILITY COMPANY', 'SOLE OWNERSHIP', 'FOREIGN FORMED CORPORATION']
+  - `node_id`: INTEGER Min: 80000012, Max: 85050056
+  - `closed_date`: STRING Example: ""28-NOV-2012""
+  - `note`: STRING Available options: ['Closed date stands for Cancelled date.', 'Closed date stands for Liquidation date.']
+  - `countries`: STRING Example: ""Bermuda;Isle of Man""
+  - `country_codes`: STRING Example: ""BMU;IMN""
+Relationship properties:
+- **registered_address**
+  - `link: STRING` Example: ""registered address""
+  - `sourceID: STRING` Example: ""Panama Papers""
+  - `valid_until: STRING` 
+- **intermediary_of**
+  - `valid_until: STRING` Example: ""The Panama Papers data is current through 2015""
+  - `sourceID: STRING` Example: ""Panama Papers""
+  - `link: STRING` Example: ""intermediary of""
+  - `end_date: STRING` 
+  - `start_date: STRING` 
+- **officer_of**
+  - `link: STRING` Example: ""shareholder of""
+  - `valid_until: STRING` Example: ""The Panama Papers data is current through 2015""
+  - `sourceID: STRING` Example: ""Panama Papers""
+  - `start_date: STRING` Example: ""19-NOV-1999""
+  - `end_date: STRING` Example: ""04-JUL-2000""
+  - `status: STRING` 
+- **similar**
+  - `link: STRING` Example: ""similar name and address as""
+- **same_as**
+  - `link: STRING` Available options: ['same name and registration date as', 'same address as', 'same as']
+- **same_name_as**
+  - `sourceID: STRING` Example: ""Bahamas Leaks""
+  - `link: STRING` Example: ""same name as""
+  - `valid_until: STRING` Example: ""The Bahamas Leaks data is current through early 20""
+- **same_company_as**
+  - `valid_until: STRING` Example: ""The Bahamas Leaks data is current through early 20""
+  - `sourceID: STRING` Example: ""Bahamas Leaks""
+  - `link: STRING` Example: ""same company as""
+- **same_id_as**
+  - `sourceID: STRING` Available options: ['Paradise Papers - Malta corporate registry']
+  - `link: STRING` Available options: ['same id as']
+  - `valid_until: STRING` Available options: ['Malta corporate registry data is current through 2']
+- **connected_to**
+  - `valid_until: STRING` Example: ""Aruba corporate registry data is current through 2""
+  - `link: STRING` Example: ""connected to""
+  - `sourceID: STRING` Example: ""Paradise Papers - Aruba corporate registry""
+The relationships:
+(:Entity)-[:same_as]->(:Entity)
+(:Entity)-[:registered_address]->(:Address)
+(:Entity)-[:same_company_as]->(:Entity)
+(:Entity)-[:same_name_as]->(:Other)
+(:Entity)-[:same_name_as]->(:Entity)
+(:Intermediary)-[:intermediary_of]->(:Entity)
+(:Intermediary)-[:registered_address]->(:Address)
+(:Intermediary)-[:officer_of]->(:Entity)
+(:Intermediary)-[:similar]->(:Officer)
+(:Intermediary)-[:same_name_as]->(:Intermediary)
+(:Intermediary)-[:same_name_as]->(:Officer)
+(:Intermediary)-[:same_as]->(:Officer)
+(:Officer)-[:officer_of]->(:Entity)
+(:Officer)-[:officer_of]->(:Other)
+(:Officer)-[:registered_address]->(:Address)
+(:Officer)-[:similar]->(:Officer)
+(:Officer)-[:similar]->(:Intermediary)
+(:Officer)-[:same_name_as]->(:Officer)
+(:Officer)-[:connected_to]->(:Entity)
+(:Officer)-[:same_id_as]->(:Officer)
+(:Address)-[:same_as]->(:Address)
+(:Other)-[:registered_address]->(:Address)
+(:Other)-[:connected_to]->(:Entity)
+(:Other)-[:same_name_as]->(:Entity)
+(:Other)-[:same_name_as]->(:Officer)
+(:Other)-[:same_name_as]->(:Other)",MATCH (e:Entity {internal_id: '1001256'}) RETURN e.sourceID,MATCH (e:Entity {internal_id: '1001256'}) RETURN e.sourceID,medium,614ce1a201914a1c3d6c2577e6684b9d5449fe831902a1abff3e4d215a418083,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,
+38,instance_id_1947,What are the names of all songs in English?,"{""CREATED_BY"": {""count"": 12, ""properties"": {}, ""type"": ""relationship""}, ""Song"": {""count"": 6, ""labels"": [], ""properties"": {""languages"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""artist_name"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""song_name"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""f_id"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""releasedate"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""rating"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""resolution"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""genre_is"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""country"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}}, ""type"": ""node"", ""relationships"": {""CREATED_BY"": {""count"": 0, ""direction"": ""out"", ""labels"": [""Artist""], ""properties"": {}}, ""ASSOCIATED_WITH"": {""count"": 0, ""direction"": ""out"", ""labels"": [""Genre""], ""properties"": {}}, ""STORED_IN"": {""count"": 0, ""direction"": ""out"", ""labels"": [""File""], ""properties"": {}}}}, ""ASSOCIATED_WITH"": {""count"": 12, ""properties"": {}, ""type"": ""relationship""}, ""File"": {""count"": 6, ""labels"": [], ""properties"": {""duration"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""file_size"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""artist_name"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""f_id"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""formats"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}}, ""type"": ""node"", ""relationships"": {""CREATED_BY"": {""count"": 0, ""direction"": ""out"", ""labels"": [""Artist""], ""properties"": {}}, ""STORED_IN"": {""count"": 6, ""direction"": ""in"", ""labels"": [""Song""], ""properties"": {}}}}, ""Genre"": {""count"": 6, ""labels"": [], ""properties"": {""g_name"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""most_popular_in"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""rating"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}}, ""type"": ""node"", ""relationships"": {""ASSOCIATED_WITH"": {""count"": 6, ""direction"": ""in"", ""labels"": [""Song"", ""Artist""], ""properties"": {}}}}, ""STORED_IN"": {""count"": 6, ""properties"": {}, ""type"": ""relationship""}, ""Artist"": {""count"": 6, ""labels"": [], ""properties"": {""preferred_genre"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""artist_name"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""gender"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""country"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}}, ""type"": ""node"", ""relationships"": {""CREATED_BY"": {""count"": 6, ""direction"": ""in"", ""labels"": [""Song"", ""File""], ""properties"": {}}, ""ASSOCIATED_WITH"": {""count"": 0, ""direction"": ""out"", ""labels"": [""Genre""], ""properties"": {}}}}}","MATCH (s:Song)-[:ASSOCIATED_WITH]->(g:Genre) WHERE s.languages = ""english"" RETURN s.Song_name",MATCH (s:Song) WHERE s.languages = 'English' RETURN s.song_name,simple,f080a974127c40111c54ef6847c012bddfa800ec0661ba107416ab56ee182bc3,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,
+39,instance_id_29249,Find the characters who interacted with 'Aemon-Targaryen-(Dragonknight)' in 'INTERACTS3' relationship.,"Node properties:
+- **Character**
+  - `centrality`: FLOAT Min: 0.0, Max: 1.0
+  - `book45PageRank`: FLOAT Min: 0.15000000000000002, Max: 11.409916274911177
+  - `fastrf_embedding`: LIST Min Size: 10, Max Size: 10
+  - `book1BetweennessCentrality`: FLOAT Min: 0.0, Max: 4638.53495125504
+  - `book1PageRank`: FLOAT Min: 0.15000000000000002, Max: 8.164174336296284
+  - `louvain`: INTEGER Min: 0, Max: 10
+  - `community`: INTEGER Min: 504, Max: 795
+  - `degree`: FLOAT Min: 0.0, Max: 300.0
+  - `name`: STRING Example: ""Addam-Marbrand""
+  - `pagerank`: FLOAT Min: 0.15000000000000002, Max: 9.473142454730429
+Relationship properties:
+- **INTERACTS**
+  - `weight: INTEGER` Min: 3, Max:  334
+- **INTERACTS1**
+  - `weight: INTEGER` Min: 3, Max:  291
+  - `book: INTEGER` Min: 1, Max:  1
+- **INTERACTS2**
+  - `weight: INTEGER` Min: 3, Max:  92
+  - `book: INTEGER` Min: 2, Max:  2
+- **INTERACTS3**
+  - `weight: INTEGER` Min: 3, Max:  95
+  - `book: INTEGER` Min: 3, Max:  3
+- **INTERACTS45**
+  - `weight: INTEGER` Min: 3, Max:  96
+  - `book: INTEGER` Min: 45, Max:  45
+The relationships:
+(:Character)-[:INTERACTS45]->(:Character)
+(:Character)-[:INTERACTS]->(:Character)
+(:Character)-[:INTERACTS1]->(:Character)
+(:Character)-[:INTERACTS3]->(:Character)
+(:Character)-[:INTERACTS2]->(:Character)",MATCH (a:Character {name: 'Aemon-Targaryen-(Dragonknight)'})-[r:INTERACTS3]-(b:Character) RETURN b.name,"MATCH (c1:Character {name: 'Aemon-Targaryen-(Dragonknight)'})-[:INTERACTS3]-(c2:Character)
+RETURN c2.name",complex,cf3c430ff535a87e9ed09ae2a952a71d04fc8ac55a91232fe5abbffe10c17dc9,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,
+40,instance_id_7850,"Find the Journal with a journal_id starting with J, and linked with an Article through PUBLISHED_IN relationship. The Article must have title: Classification of Subsystems for Local Nets with Trivial Superselection
+  Structure and be PUBLISHED_IN with meta recorded!","Relevant node labels and their properties (with datatypes) are:
+Article {title: STRING}
+Journal {journal_id: STRING}
+
+Relevant relationships are:
+{'start': Article, 'type': PUBLISHED_IN, 'end': Journal }
+
+
+Relevant relationship properties (with datatypes) are:
+PUBLISHED_IN {meta: STRING}",MATCH (n:Article {title: 'Classification of Subsystems for Local Nets with Trivial Superselection   Structure'}) -[r:PUBLISHED_IN]- (m:Journal) WHERE m.journal_id STARTS WITH 'J' AND r.meta IS NOT NULL RETURN n.journal_id,"MATCH (a:Article {title: ""Classification of Subsystems for Local Nets with Trivial Superselection Structure""})-[r:PUBLISHED_IN]->(j:Journal)
+WHERE j.journal_id STARTS WITH 'J' AND r.meta IS NOT NULL
+RETURN j",complex,15cec50a3d8979776407a2509758e3c4977e903e857a51c5639da60a24350ef5,3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005,20261002,20261003,,,,,,,,,not_assessed,pending,,,,,,,,,,

@@ -1,113 +1,142 @@
 """
-spearman_correlation.py
-Phase 5 — Spearman Rank Correlation Analysis
-Robustness Testing for LLM-Based Text-to-Cypher Systems
+Descriptive associations between text metrics and revised evidence.
 
-Computes Spearman rank correlation between standard evaluation
-metrics (BLEU, Exact Match) and each error type classification.
-Addresses RQ2: whether standard metrics reflect actual error patterns.
-
+Does not use historical classifier flags or treat uncertainty as no error.
+Reviewed comparisons are a selected, AI-assisted subset, not ground truth.
 """
 
+from pathlib import Path
 import pandas as pd
-from scipy import stats
-import os
+from scipy.stats import spearmanr
 
-# ─────────────────────────────────────────
-# LOAD DATA
-# ─────────────────────────────────────────
+PROJECT = Path(__file__).resolve().parents[1]
+INPUT = PROJECT / "outputs/evaluation_results.csv"
+OUTPUT = PROJECT / "outputs/spearman_results.csv"
 
-def load_data():
-    df = pd.read_csv("data/generated_queries.csv")
-    df['bleu_score'] = df['bleu_score'].fillna(0).astype(float)
-    df['exact_match'] = df['exact_match'].fillna(0).astype(int)
-    df['syntax_error'] = df['syntax_error'].fillna(0).astype(int)
-    df['schema_hallucination'] = df['schema_hallucination'].fillna(0).astype(int)
-    df['logical_error'] = df['logical_error'].fillna(0).astype(int)
-    df['performance_error'] = df['performance_error'].fillna(0).astype(int)
-    return df
+METRICS = [
+    "bleu_score",
+    "exact_match",
+    "case_sensitive_trimmed_exact_match",
+]
 
-
-# ─────────────────────────────────────────
-# SPEARMAN CORRELATION
-# ─────────────────────────────────────────
-
-def compute_correlations(df):
-    metrics = ['bleu_score', 'exact_match']
-    error_types = [
-        'syntax_error',
-        'schema_hallucination',
-        'logical_error',
-        'performance_error'
-    ]
-
-    results = []
-
-    for metric in metrics:
-        for error in error_types:
-            corr, pvalue = stats.spearmanr(df[metric], df[error])
-            significant = "Yes" if pvalue < 0.05 else "No"
-            results.append({
-                'Metric': metric,
-                'Error Type': error,
-                'Spearman r': round(corr, 4),
-                'P-value': round(pvalue, 4),
-                'Significant (p<0.05)': significant
-            })
-
-    return pd.DataFrame(results)
-
-
-# ─────────────────────────────────────────
-# MAIN
-# ─────────────────────────────────────────
 
 def run_spearman_correlation():
-    df = load_data()
+    df = pd.read_csv(INPUT, dtype=str).fillna("")
 
-    print("Spearman Rank Correlation Analysis")
-    print("="*60)
-    print("Metric vs Error Type Correlations")
-    print("="*60)
+    required = {
+        "instance_id", "syntax_generated_status",
+        "manual_logical_review_status", *METRICS,
+    }
+    missing = required - set(df.columns)
+    if missing:
+        raise SystemExit(f"Missing columns: {sorted(missing)}")
 
-    results_df = compute_correlations(df)
+    if df["instance_id"].str.strip().eq("").any():
+        raise SystemExit("Missing instance IDs.")
+    if df["instance_id"].duplicated().any():
+        raise SystemExit("Duplicate instance IDs.")
 
-    # Print formatted table
-    print(f"\n{'Metric':<15} {'Error Type':<25} {'r':>8} {'p-value':>10} {'Sig?':>8}")
-    print("-"*70)
-    for _, row in results_df.iterrows():
-        print(f"{row['Metric']:<15} {row['Error Type']:<25} "
-              f"{row['Spearman r']:>8.4f} {row['P-value']:>10.4f} "
-              f"{row['Significant (p<0.05)']:>8}")
+    for metric in METRICS:
+        raw = df[metric]
+        numeric = pd.to_numeric(raw, errors="coerce")
 
-    print("\n" + "="*60)
-    print("Interpretation:")
-    print("r close to -1 = high metric score = fewer errors")
-    print("r close to 0  = metric has no correlation with errors")
-    print("r close to +1 = high metric score = more errors")
-    print("="*60)
+        if (raw.ne("") & numeric.isna()).any():
+            raise SystemExit(f"Invalid numeric values in {metric}.")
 
-    # Also compute overall any-error correlation
-    df['any_error'] = (
-        (df['syntax_error'] == 1) |
-        (df['schema_hallucination'] == 1) |
-        (df['logical_error'] == 1) |
-        (df['performance_error'] == 1)
-    ).astype(int)
+        valid_values = numeric.dropna()
+        if metric == "bleu_score":
+            if not valid_values.between(0, 100).all():
+                raise SystemExit("BLEU values outside 0–100.")
+        elif not valid_values.isin([0, 1]).all():
+            raise SystemExit(f"Invalid binary values in {metric}.")
 
-    print("\nCorrelation with ANY error present:")
-    print(f"\n{'Metric':<15} {'r':>8} {'p-value':>10} {'Sig?':>8}")
-    print("-"*45)
-    for metric in ['bleu_score', 'exact_match']:
-        corr, pvalue = stats.spearmanr(df[metric], df['any_error'])
-        sig = "Yes" if pvalue < 0.05 else "No"
-        print(f"{metric:<15} {corr:>8.4f} {pvalue:>10.4f} {sig:>8}")
+        df[metric] = numeric
 
-    # Save results
-    results_df.to_csv("outputs/spearman_results.csv", index=False)
-    print("\nSaved → outputs/spearman_results.csv")
+    # Unknown outcomes remain missing, rather than becoming zero.
+    targets = {
+        "neo4j_syntax_error": (
+            df["syntax_generated_status"].map({
+                "accepted": 0,
+                "syntax_error": 1,
+            }),
+            "All records with accepted or syntax_error status",
+            "Only two syntax errors were observed; association is fragile.",
+        ),
+        "reviewed_error_vs_acceptable_alternative": (
+            df["manual_logical_review_status"].map({
+                "confirmed_generated_error_under_recorded_rules": 1,
+                "acceptable_output_alternative": 0,
+            }),
+            "Selected flagged cases with a binary review decision",
+            "AI-assisted review; 0 means acceptable output alternative, "
+            "not universally proven correct. Uncertain and unreviewed "
+            "cases are excluded. Results cannot be generalised to all 200.",
+        ),
+    }
+
+    rows = []
+
+    for target_name, (target, scope, limitation) in targets.items():
+        for metric in METRICS:
+            pairs = pd.DataFrame({
+                "metric": df[metric],
+                "target": target,
+            }).dropna()
+
+            rho = None
+            if len(pairs) < 3:
+                status = "not_computed_insufficient_pairs"
+            elif pairs["metric"].nunique() < 2:
+                status = "not_computed_constant_metric"
+            elif pairs["target"].nunique() < 2:
+                status = "not_computed_constant_target"
+            else:
+                rho = float(
+                    spearmanr(pairs["metric"], pairs["target"]).statistic
+                )
+                status = "descriptive_only"
+
+            rows.append({
+                "metric": metric,
+                "target": target_name,
+                "paired_records": len(pairs),
+                "excluded_records": len(df) - len(pairs),
+                "target_1_records": int(pairs["target"].eq(1).sum()),
+                "target_0_records": int(pairs["target"].eq(0).sum()),
+                "spearman_rho": rho,
+                "analysis_status": status,
+                "scope": scope,
+                "limitation": limitation,
+                "inference": "No significance or accuracy claim",
+            })
+
+    results = pd.DataFrame(rows)
+
+    print("DESCRIPTIVE SPEARMAN ASSOCIATIONS")
+    print(results[[
+        "metric", "target", "paired_records",
+        "target_1_records", "target_0_records",
+        "spearman_rho", "analysis_status",
+    ]].round(4).to_string(index=False))
+
+    print("\nINTERPRETATION")
+    print("Negative rho: higher text scores tend to accompany target 0.")
+    print("Positive rho: higher text scores tend to accompany target 1.")
+    print("Rho near zero indicates weak rank association in this subset.")
+    print("Association does not establish causation or metric reliability.")
+    print("Constant variables have no defined Spearman correlation.")
+    print("Schema and performance are not complete binary error labels.")
+    print("No overall any-error correlation is calculated.")
+    print("No p-values are presented as population-wide evidence.")
+
+    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    temporary = OUTPUT.with_suffix(".csv.tmp")
+    results.to_csv(temporary, index=False)
+    temporary.replace(OUTPUT)
+
+    print(f"\nSaved: {OUTPUT}")
+    print("Original queries, reviews and diagnostic files were not changed.")
 
 
 if __name__ == "__main__":
-    os.makedirs("outputs", exist_ok=True)
     run_spearman_correlation()

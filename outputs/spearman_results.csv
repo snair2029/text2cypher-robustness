@@ -1,9 +1,7 @@
-Metric,Error Type,Spearman r,P-value,Significant (p<0.05)
-bleu_score,syntax_error,,,No
-bleu_score,schema_hallucination,-0.1553,0.0281,Yes
-bleu_score,logical_error,-0.0955,0.1785,No
-bleu_score,performance_error,0.0944,0.1836,No
-exact_match,syntax_error,,,No
-exact_match,schema_hallucination,-0.0662,0.3518,No
-exact_match,logical_error,-0.0444,0.5321,No
-exact_match,performance_error,0.2697,0.0001,Yes
+metric,target,paired_records,excluded_records,target_1_records,target_0_records,spearman_rho,analysis_status,scope,limitation,inference
+bleu_score,neo4j_syntax_error,200,0,2,198,-0.13501469143037167,descriptive_only,All records with accepted or syntax_error status,Only two syntax errors were observed; association is fragile.,No significance or accuracy claim
+exact_match,neo4j_syntax_error,200,0,2,198,-0.027573376341531487,descriptive_only,All records with accepted or syntax_error status,Only two syntax errors were observed; association is fragile.,No significance or accuracy claim
+case_sensitive_trimmed_exact_match,neo4j_syntax_error,200,0,2,198,-0.026499231278642614,descriptive_only,All records with accepted or syntax_error status,Only two syntax errors were observed; association is fragile.,No significance or accuracy claim
+bleu_score,reviewed_error_vs_acceptable_alternative,20,180,10,10,-0.399020621941256,descriptive_only,Selected flagged cases with a binary review decision,"AI-assisted review; 0 means acceptable output alternative, not universally proven correct. Uncertain and unreviewed cases are excluded. Results cannot be generalised to all 200.",No significance or accuracy claim
+exact_match,reviewed_error_vs_acceptable_alternative,20,180,10,10,,not_computed_constant_metric,Selected flagged cases with a binary review decision,"AI-assisted review; 0 means acceptable output alternative, not universally proven correct. Uncertain and unreviewed cases are excluded. Results cannot be generalised to all 200.",No significance or accuracy claim
+case_sensitive_trimmed_exact_match,reviewed_error_vs_acceptable_alternative,20,180,10,10,,not_computed_constant_metric,Selected flagged cases with a binary review decision,"AI-assisted review; 0 means acceptable output alternative, not universally proven correct. Uncertain and unreviewed cases are excluded. Results cannot be generalised to all 200.",No significance or accuracy claim

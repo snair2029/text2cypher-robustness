@@ -1,114 +1,178 @@
 """
-validate_classifier.py
-Phase 5 — Classifier Validation Against Manual Labels
-Robustness Testing for LLM-Based Text-to-Cypher Systems
+Audit the 40-case student-verified, AI-assisted validation sample.
 
-Compares automated pipeline classifications against
-41 manually labelled queries to assess classifier accuracy.
-Calculates precision, recall and agreement rate.
-
+Checks that reviewed question/query/schema text matches the source.
+Reports assessment coverage and comparisons with automatic evidence.
+Syntax agreement metrics apply only to determinate paired assessments.
+No overall correctness or independent validation claim is made.
 """
-
+from pathlib import Path
 import pandas as pd
-from sklearn.metrics import classification_report, confusion_matrix
-import os
 
-# ─────────────────────────────────────────
-# LOAD DATA
-# ─────────────────────────────────────────
-
-def load_labelled_data():
-    df = pd.read_csv("data/generated_queries.csv")
-    df['manual_label'] = df['manual_label'].fillna('').astype(str).str.strip()
-    df['syntax_error'] = df['syntax_error'].fillna(0).astype(int)
-    df['schema_hallucination'] = df['schema_hallucination'].fillna(0).astype(int)
-    df['logical_error'] = df['logical_error'].fillna(0).astype(int)
-    df['performance_error'] = df['performance_error'].fillna(0).astype(int)
-
-    # Only rows that have been manually labelled
-    labelled = df[df['manual_label'] != ''].copy()
-    return df, labelled
+PROJECT = Path(__file__).resolve().parents[1]
+OUTPUTS = PROJECT / "outputs"
+CATEGORIES = ("syntax", "schema", "logical", "reference")
 
 
-# ─────────────────────────────────────────
-# MAP MANUAL LABELS TO PIPELINE COLUMNS
-# ─────────────────────────────────────────
+def read_checked(path):
+    frame = pd.read_csv(path, keep_default_na=False)
+    if "instance_id" not in frame:
+        raise ValueError(f"Missing instance_id: {path.name}")
+    if frame["instance_id"].eq("").any():
+        raise ValueError(f"Missing ID: {path.name}")
+    if frame["instance_id"].duplicated().any():
+        raise ValueError(f"Duplicate ID: {path.name}")
+    return frame
 
-def get_pipeline_label(row):
-    """
-    Convert pipeline binary columns to a single label
-    matching the manual label format.
-    """
-    errors = []
-    if row['syntax_error'] == 1:
-        errors.append('syntax_error')
-    if row['schema_hallucination'] == 1:
-        errors.append('schema_hallucination')
-    if row['logical_error'] == 1:
-        errors.append('logical_error')
-    if row['performance_error'] == 1:
-        errors.append('performance_issue')
-
-    if len(errors) == 0:
-        return 'no_error'
-    elif len(errors) == 1:
-        return errors[0]
-    else:
-        return 'multiple_errors'
-
-
-# ─────────────────────────────────────────
-# VALIDATION
-# ─────────────────────────────────────────
 
 def run_validation():
-    df, labelled = load_labelled_data()
+    reviews = read_checked(OUTPUTS / "human_validation.csv")
+    queries = read_checked(PROJECT / "data/generated_queries.csv")
+    syntax = read_checked(OUTPUTS / "neo4j_syntax_validation.csv")
+    schema = read_checked(OUTPUTS / "schema_inventory.csv")
+    logical = read_checked(OUTPUTS / "logical_validation.csv")
 
-    print("Classifier Validation Report")
-    print("="*60)
-    print(f"Total manually labelled queries: {len(labelled)}")
-    print(f"Total queries in dataset: {len(df)}")
-    print("="*60)
+    if len(reviews) != 40:
+        raise ValueError(f"Expected 40 selected cases; found {len(reviews)}.")
 
-    # Get pipeline label for each manually labelled row
-    labelled = labelled.copy()
-    labelled['pipeline_label'] = labelled.apply(get_pipeline_label, axis=1)
+    assessment_fields = [f"{category}_assessment" for category in CATEGORIES]
+    required = assessment_fields + ["review_reason", "reviewer"]
+    for column in required:
+        if column not in reviews or reviews[column].str.strip().eq("").any():
+            raise ValueError(f"Incomplete review field: {column}")
 
-    print("\nManual Label Distribution:")
-    print(labelled['manual_label'].value_counts().to_string())
+    allowed = {
+        "syntax": {"no_error_identified", "error_present", "uncertain"},
+        "schema": {"no_error_identified", "error_present", "uncertain"},
+        "logical": {"no_error_identified", "error_present", "uncertain"},
+        "reference": {"no_issue_identified", "issue_identified", "uncertain"},
+    }
+    for category in CATEGORIES:
+        invalid = set(reviews[f"{category}_assessment"]) - allowed[category]
+        if invalid:
+            raise ValueError(f"Unexpected {category} values: {sorted(invalid)}")
 
-    print("\nPipeline Label Distribution (for same 41 queries):")
-    print(labelled['pipeline_label'].value_counts().to_string())
+    expected_groups = {"simple": 10, "medium": 20, "complex": 10}
+    if reviews["complexity"].value_counts().to_dict() != expected_groups:
+        raise ValueError("Review group counts do not match the selected sample.")
 
-    # Agreement — where manual and pipeline agree on error vs no error
-    labelled['manual_has_error'] = labelled['manual_label'] != 'no_error'
-    labelled['pipeline_has_error'] = labelled['pipeline_label'] != 'no_error'
+    # Verify the reviewed material, rather than relying on IDs alone.
+    original = queries.set_index("instance_id")
+    if not set(reviews["instance_id"]).issubset(original.index):
+        raise ValueError("A reviewed ID is missing from the source queries.")
 
-    agreement = (labelled['manual_has_error'] == labelled['pipeline_has_error']).sum()
-    agreement_rate = agreement / len(labelled) * 100
+    for _, row in reviews.iterrows():
+        source = original.loc[row["instance_id"]]
+        for review_column, source_column in (
+            ("question", "question"),
+            ("schema", "schema"),
+            ("reference_cypher", "cypher"),
+            ("generated_cypher", "generated_cypher"),
+            ("complexity", "complexity"),
+        ):
+            if str(row[review_column]) != str(source[source_column]):
+                raise ValueError(
+                    f"Reviewed material changed: {row['instance_id']} "
+                    f"({review_column})."
+                )
 
-    print(f"\nOverall agreement rate: {agreement}/{len(labelled)} ({agreement_rate:.1f}%)")
-
-    # Breakdown
-    print("\nDetailed comparison:")
-    print(f"{'Query':>6} {'Manual Label':<25} {'Pipeline Label':<25} {'Match'}")
-    print("-"*75)
-    for i, row in labelled.iterrows():
-        match = "✓" if row['manual_has_error'] == row['pipeline_has_error'] else "✗"
-        print(f"{i+1:>6} {row['manual_label']:<25} {row['pipeline_label']:<25} {match}")
-
-    # Save results
-    labelled[['question', 'manual_label', 'pipeline_label',
-              'bleu_score', 'exact_match']].to_csv(
-        "outputs/classifier_validation.csv", index=False
+    result = reviews.copy()
+    evidence = (
+        (syntax, ["generated_status"], "automatic_syntax_"),
+        (schema, [
+            "generated_name_coverage_status",
+            "generated_property_name_status",
+        ], "automatic_schema_"),
+        (logical, ["logical_status"], "automatic_"),
     )
 
-    print("\n" + "="*60)
-    print(f"Agreement rate: {agreement_rate:.1f}%")
-    print("Saved → outputs/classifier_validation.csv")
-    print("="*60)
+    for frame, columns, prefix in evidence:
+        if set(frame["instance_id"]) != set(queries["instance_id"]):
+            raise ValueError("Automatic evidence does not cover the source IDs.")
+        selected = frame[["instance_id"] + columns].rename(
+            columns={column: prefix + column for column in columns}
+        )
+        result = result.merge(
+            selected, on="instance_id", validate="one_to_one", how="left"
+        )
+
+    print("40-CASE VALIDATION AUDIT")
+    print("Reviewed material matches the source queries and schemas.")
+    print("\nREVIEW COVERAGE")
+    print(result["complexity"].value_counts().to_string())
+
+    for category in CATEGORIES:
+        print(f"\n{category.upper()} ASSESSMENTS")
+        print(result[f"{category}_assessment"].value_counts().to_string())
+
+    print("\nSYNTAX COMPARISON")
+    print(pd.crosstab(
+        result["syntax_assessment"],
+        result["automatic_syntax_generated_status"],
+    ).to_string())
+
+    human = result["syntax_assessment"].map({
+        "no_error_identified": 0, "error_present": 1,
+    })
+    automatic = result["automatic_syntax_generated_status"].map({
+        "accepted": 0, "syntax_error": 1,
+    })
+    paired = human.notna() & automatic.notna()
+    truth = human[paired]
+    prediction = automatic[paired]
+
+    tp = int(((truth == 1) & (prediction == 1)).sum())
+    tn = int(((truth == 0) & (prediction == 0)).sum())
+    fp = int(((truth == 0) & (prediction == 1)).sum())
+    fn = int(((truth == 1) & (prediction == 0)).sum())
+
+    def ratio(numerator, denominator):
+        return f"{numerator / denominator:.3f}" if denominator else "undefined"
+
+    print(f"\nDeterminate syntax pairs: {int(paired.sum())}/40")
+    print(f"TP={tp}, TN={tn}, FP={fp}, FN={fn}")
+    print("Agreement:", ratio(tp + tn, int(paired.sum())))
+    print("Precision:", ratio(tp, tp + fp))
+    print("Recall:", ratio(tp, tp + fn))
+    print("These are descriptive agreement metrics against the recorded "
+          "assessments, not independent accuracy estimates.")
+
+    print("\nSCHEMA NAME CHECK VS STUDENT SCHEMA ASSESSMENT")
+    print(pd.crosstab(
+        result["schema_assessment"],
+        result["automatic_schema_generated_name_coverage_status"],
+    ).to_string())
+
+    print("\nLOGICAL EVIDENCE VS STUDENT LOGICAL ASSESSMENT")
+    print(pd.crosstab(
+        result["logical_assessment"],
+        result["automatic_logical_status"],
+    ).to_string())
+
+    result["validation_method"] = (
+        "Student-verified AI-assisted review; not independent blinded validation"
+    )
+
+    target = OUTPUTS / "classifier_validation.csv"
+    backup = OUTPUTS / "classifier_validation.historical_audit.csv"
+    if target.exists() and not backup.exists():
+        backup.write_bytes(target.read_bytes())
+
+    temporary = target.with_name(target.name + ".tmp")
+    result.to_csv(temporary, index=False)
+    temporary.replace(target)
+
+    print("\nINTERPRETATION")
+    print("Uncertain assessments remain separate from binary outcomes.")
+    print("No error identified is limited to the stated review rules.")
+    print("Schema-name coverage cannot detect every endpoint or type defect.")
+    print("Logical result disagreement is not automatically a generated error.")
+    print("Unavailable graphs are not treated as correct predictions.")
+    print("Reviews used AI assistance and some prior evaluation evidence.")
+    print("Performance was not assessed by this human review.")
+    print(f"\nSaved: {target}")
+    print("Original queries, review decisions and diagnostics were not changed.")
 
 
 if __name__ == "__main__":
-    os.makedirs("outputs", exist_ok=True)
     run_validation()

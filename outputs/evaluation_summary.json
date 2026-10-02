@@ -1,0 +1,93 @@
+{
+  "assembled_at_utc": "2026-10-02T02:11:15.500316+00:00",
+  "mode": "assemble_saved_evaluations",
+  "manual_logical_review": {
+    "register_records": 48,
+    "flagged_comparison_cases": 48,
+    "flagged_comparison_cases_reviewed": 48,
+    "flagged_comparison_cases_without_review": 0,
+    "confirmed_generated_errors_under_recorded_rules": 10,
+    "acceptable_output_alternatives": 8,
+    "without_final_binary_label": 30,
+    "decision_counts": {
+      "unresolved": 24,
+      "confirmed_generated_logical_error": 10,
+      "acceptable_output_alternative": 8,
+      "observed_answer_agreement_with_structural_concern": 2,
+      "reference_defect_with_generated_grouping_concern": 1,
+      "reference_defect_with_price_interpretation_concern": 1,
+      "observed_numeric_agreement_with_identity_concern": 1,
+      "reference_defect_with_date_and_duplicate_concerns": 1
+    },
+    "method": "AI-assisted inspection of queries, supplied schemas and saved previews; independent adjudication has not been established.",
+    "interpretation": "Review counts describe the reviewed subset. They are not an overall correctness or logical-error rate for the full dataset.",
+    "register_sha256": "56ae2f040059573f242b462c6711eaebdc2e0faad3d69c97b33759da154c7282"
+  },
+  "total_records": 200,
+  "records_with_source_graph_alias": 109,
+  "records_without_source_graph_alias": 91,
+  "generated_syntax_status": {
+    "accepted": 198,
+    "syntax_error": 2
+  },
+  "reference_syntax_status": {
+    "accepted": 200
+  },
+  "generated_schema_name_status": {
+    "detected_names_covered": 195,
+    "partial_check_relationship_schema_unavailable": 4,
+    "no_explicit_names_detected": 1
+  },
+  "generated_property_name_status": {
+    "detected_names_present_somewhere_in_schema": 189,
+    "no_static_property_names_detected": 11
+  },
+  "logical_status": {
+    "source_graph_unavailable": 89,
+    "observed_result_match": 52,
+    "output_shape_differs_needs_review": 25,
+    "observed_result_difference": 23,
+    "result_limit_inconclusive": 3,
+    "both_empty_inconclusive": 3,
+    "reference_defect_needs_review": 2,
+    "generated_syntax_error": 2,
+    "timeout_inconclusive": 1
+  },
+  "performance_status": {
+    "plan_inspected_no_cartesian_product": 108,
+    "source_graph_unavailable": 90,
+    "generated_syntax_error": 2
+  },
+  "case_sensitive_trimmed_exact_match_count": 13,
+  "exact_match_assessable_records": 200,
+  "input_sha256": "3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005",
+  "diagnostic_sha256": {
+    "syntax": "c08b75d9da6280ef4512fef2de9482a19d165c007d75d751453ca5a257419e27",
+    "schema": "464561f5b6e116873e8f2e2c411cf7047c776ee4194641c7e845435d1fa9802c",
+    "logical": "ba6d5d27dc5bf0db8551eb5e8d4be6c4a4020762703e245c71bd92cf9ba81364",
+    "performance": "3991555c28fe96c0154f1f0550c72a2768066f0c68630a2fc65738ada2ec13b1"
+  },
+  "limitations": [
+    "Matching IDs establish coverage, not freshness of evaluations.",
+    "Hashes identify the files assembled in this run; they do not prove which inputs produced earlier diagnostic outputs.",
+    "Schema checks are preliminary and do not fully resolve property ownership, scope or dynamic expressions.",
+    "Observed execution agreement applies to current live graphs and is not proof of correctness.",
+    "Automatic logical review categories remain preliminary.",
+    "Manual decisions are AI-assisted review findings; independent adjudication has not been established.",
+    "Unresolved and unreviewed cases are not counted as correct.",
+    "Review records are linked by ID; their original query versions were not fingerprinted when the decisions were recorded.",
+    "EXPLAIN does not measure runtime or database work.",
+    "Legacy classifier labels are retained as historical evidence and are not used as validated error counts."
+  ],
+  "logical_review_categories": {
+    "not_recorded": 152,
+    "pattern_filter_or_cardinality_needs_review": 13,
+    "projection_difference_needs_review": 12,
+    "reference_or_question_interpretation_needs_review": 8,
+    "ordering_filter_or_limit_needs_review": 6,
+    "aggregation_identity_needs_review": 3,
+    "year_boundary_interpretation_needs_review": 3,
+    "projection_and_duplicate_handling_needs_review": 2,
+    "numeric_rounding_difference": 1
+  }
+}
