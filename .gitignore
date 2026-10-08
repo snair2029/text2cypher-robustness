@@ -17,3 +17,7 @@ node_modules/
 .ruff_cache/
 .DS_Store
 *.zip
+
+# Local backups and extracted project copy
+archive/cleanup_backups/
+/text2cypher_research/
