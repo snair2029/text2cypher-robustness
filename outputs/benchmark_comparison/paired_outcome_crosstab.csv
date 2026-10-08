@@ -1,0 +1,10 @@
+logical_status_gemini,both_empty_inconclusive,generated_execution_failed,generated_syntax_error,observed_result_difference,observed_result_match,output_shape_differs_needs_review,reference_defect_needs_review,result_limit_inconclusive,source_graph_unavailable
+both_empty_inconclusive,3,0,0,0,0,0,0,0,0
+generated_syntax_error,0,0,0,1,0,0,0,0,1
+observed_result_difference,0,0,4,13,3,3,0,0,0
+observed_result_match,0,2,10,2,34,4,0,0,0
+output_shape_differs_needs_review,0,0,2,2,1,20,0,0,0
+reference_defect_needs_review,0,0,0,0,0,0,2,0,0
+result_limit_inconclusive,0,0,0,0,0,0,0,3,0
+source_graph_unavailable,0,0,1,0,0,0,0,0,88
+timeout_inconclusive,0,0,0,0,0,0,0,1,0

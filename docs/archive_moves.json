@@ -1,0 +1,13 @@
+{
+  "app.before_final_results_20261002_122658.py": "archive/source_snapshots/app.before_final_results_20261002_122658.py",
+  "app.before_final_wording_20261002_130631.py": "archive/source_snapshots/app.before_final_wording_20261002_130631.py",
+  "analysis/validate_classifier.before_final_audit.py": "archive/source_snapshots/analysis/validate_classifier.before_final_audit.py",
+  "analysis/spearman_correlation.before_final_figures.py": "archive/source_snapshots/analysis/spearman_correlation.before_final_figures.py",
+  "analysis/visualisations.before_revision.py": "archive/source_snapshots/analysis/visualisations.before_revision.py",
+  "analysis/cross_tabulation.before_final_figures.py": "archive/source_snapshots/analysis/cross_tabulation.before_final_figures.py",
+  "pipeline/performance_classifier.before_summary_20261002_130322.py": "archive/source_snapshots/pipeline/performance_classifier.before_summary_20261002_130322.py",
+  "pipeline/run_pipeline.before_reconciled_labels.py": "archive/source_snapshots/pipeline/run_pipeline.before_reconciled_labels.py",
+  "pipeline/schema_classifier.before_revision.py": "archive/source_snapshots/pipeline/schema_classifier.before_revision.py",
+  "pipeline/schema_classifier.before_endpoints.py": "archive/source_snapshots/pipeline/schema_classifier.before_endpoints.py",
+  "pipeline/performance_classifier.before_profile.py": "archive/source_snapshots/pipeline/performance_classifier.before_profile.py"
+}

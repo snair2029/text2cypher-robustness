@@ -1,0 +1,9 @@
+{
+  "inputs": {
+    "outputs/human_validation.csv": "b4f3a957a11b9a7916f4aaa205704068a7badd24667a6015b0deb851fc4a97cc",
+    "outputs/gemma_40_review/gemma_40_human_validation.csv": "fef65ecab227a969957b47f88bfbd835b540da193138a51aa95df1201f074d6f"
+  },
+  "same_selection_and_order": true,
+  "student_verified_per_model": 40,
+  "method": "Retained source review methods; no independent adjudication"
+}

@@ -1,0 +1,15 @@
+{
+  "inputs": {
+    "outputs/gemini_benchmark_logical_reconciled.csv": "85e82f91ad01c047fd2f96ce6b264e03f0e925edcd1d5210b0e69cb5ed4abc15",
+    "outputs/gemma_26b_logical_validation.csv": "f9e584f146d163d5acdf9c51143cf614ae3386b99d5ece03929c056071991c8e"
+  },
+  "paired_records": 200,
+  "graph_alias_matches": 200,
+  "both_source_graph_unavailable": 88,
+  "notes": [
+    "Automatic outcomes retained; manual reviews not merged.",
+    "Syntax failures may be recorded before source graph availability checks.",
+    "Public source graphs were not immutable snapshots.",
+    "These files do not verify generation prompts or settings; consult generation records."
+  ]
+}

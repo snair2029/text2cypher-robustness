@@ -7,6 +7,7 @@ Preserves existing review notes and original queries.
 
 This is a conservative text check, not a complete Cypher parser.
 """
+
 import json
 import re
 from pathlib import Path
@@ -52,15 +53,12 @@ def detected_names(query):
 
     # Conventional explicit node patterns, including multiple labels.
     node = re.compile(
-        rf"\(\s*(?:{IDENTIFIER}\s*)?"
-        rf"(?P<labels>(?::\s*{IDENTIFIER}\s*)+)"
+        rf"\(\s*(?:{IDENTIFIER}\s*)?" rf"(?P<labels>(?::\s*{IDENTIFIER}\s*)+)"
     )
     for match in node.finditer(text):
         labels.update(
             clean_name(name)
-            for name in re.findall(
-                rf":\s*({IDENTIFIER})", match.group("labels")
-            )
+            for name in re.findall(rf":\s*({IDENTIFIER})", match.group("labels"))
         )
 
     # Conventional relationship patterns, including type alternatives.
@@ -71,8 +69,7 @@ def detected_names(query):
     )
     for match in relationship.finditer(text):
         types.update(
-            clean_name(name)
-            for name in re.findall(IDENTIFIER, match.group("types"))
+            clean_name(name) for name in re.findall(IDENTIFIER, match.group("types"))
         )
 
     # Exclude namespaced function calls such as duration.inDays(...).
@@ -81,10 +78,9 @@ def detected_names(query):
         rf"(?<![A-Za-z0-9_`])({IDENTIFIER})\s*\.\s*({IDENTIFIER})",
         text,
     ):
-        following = text[match.end():].lstrip()
+        following = text[match.end() :].lstrip()
         if not following.startswith("("):
             properties.add(clean_name(match.group(2)))
-
 
     # Include static property keys inside node/relationship pattern maps.
     pattern_maps = re.compile(
@@ -115,7 +111,6 @@ def read_checked(path):
     if frame["instance_id"].duplicated().any():
         raise ValueError(f"Duplicate instance ID: {path.name}")
     return frame
-
 
 
 def supplied_endpoints(schema_text):
@@ -181,8 +176,7 @@ def add_endpoint_checks(result, queries):
         head = fragment.split("{", 1)[0].strip()
         variable = re.match(rf"^({IDENTIFIER})", head)
         labels = {
-            clean_name(value)
-            for value in re.findall(rf":\s*({IDENTIFIER})", head)
+            clean_name(value) for value in re.findall(rf":\s*({IDENTIFIER})", head)
         }
         return (
             clean_name(variable.group(1)) if variable else "",
@@ -190,12 +184,8 @@ def add_endpoint_checks(result, queries):
         )
 
     for index, row in result.iterrows():
-        supplied = supplied_endpoints(
-            queries.loc[row["instance_id"], "schema"]
-        )
-        text = visible_query(
-            queries.loc[row["instance_id"], "generated_cypher"]
-        )
+        supplied = supplied_endpoints(queries.loc[row["instance_id"], "schema"])
+        text = visible_query(queries.loc[row["instance_id"], "generated_cypher"])
 
         # Collect conventional explicit node bindings.
         bindings = {}
@@ -228,10 +218,14 @@ def add_endpoint_checks(result, queries):
             right_labels = right_labels or bindings.get(right_var, set())
 
             if (
-                complex_scope or "*" in relationship
-                or len(left_labels) != 1 or len(right_labels) != 1
+                complex_scope
+                or "*" in relationship
+                or len(left_labels) != 1
+                or len(right_labels) != 1
             ):
-                unresolved.append(text[match.start("left") - 1:match.end("right") + 1])
+                unresolved.append(
+                    text[match.start("left") - 1 : match.end("right") + 1]
+                )
                 continue
 
             left = next(iter(left_labels))
@@ -241,7 +235,8 @@ def add_endpoint_checks(result, queries):
 
             for relationship_type in types:
                 definitions = {
-                    endpoint for endpoint in supplied
+                    endpoint
+                    for endpoint in supplied
                     if endpoint[1] == relationship_type
                 }
                 if not definitions:
@@ -257,18 +252,32 @@ def add_endpoint_checks(result, queries):
                     compatible |= forward or reverse
 
             if not has_definition:
-                unresolved.append(text[match.start("left") - 1:match.end("right") + 1])
+                unresolved.append(
+                    text[match.start("left") - 1 : match.end("right") + 1]
+                )
             elif compatible:
-                checks.append(text[match.start("left") - 1:match.end("right") + 1])
+                checks.append(text[match.start("left") - 1 : match.end("right") + 1])
             else:
-                candidates.append(text[match.start("left") - 1:match.end("right") + 1])
+                candidates.append(
+                    text[match.start("left") - 1 : match.end("right") + 1]
+                )
 
         status = (
-            "candidate_endpoint_mismatch_needs_review" if candidates
-            else "no_explicit_typed_pattern_detected" if not typed_count
-            else "endpoint_schema_unavailable" if not supplied
-            else "partial_endpoint_check" if unresolved
-            else "detected_simple_endpoints_supported"
+            "candidate_endpoint_mismatch_needs_review"
+            if candidates
+            else (
+                "no_explicit_typed_pattern_detected"
+                if not typed_count
+                else (
+                    "endpoint_schema_unavailable"
+                    if not supplied
+                    else (
+                        "partial_endpoint_check"
+                        if unresolved
+                        else "detected_simple_endpoints_supported"
+                    )
+                )
+            )
         )
         result.at[index, "generated_endpoint_status"] = status
         result.at[index, "generated_endpoint_candidates"] = json.dumps(
@@ -288,9 +297,11 @@ def add_endpoint_checks(result, queries):
     ]
     if not flagged.empty:
         print("\nENDPOINT CANDIDATES")
-        print(flagged[[
-            "instance_id", "generated_endpoint_candidates"
-        ]].to_string(index=False))
+        print(
+            flagged[["instance_id", "generated_endpoint_candidates"]].to_string(
+                index=False
+            )
+        )
     return result
 
 
@@ -328,9 +339,7 @@ def run_schema_classifier():
             result.at[index, f"{prefix}_labels_not_in_inventory"] = encode(
                 missing_labels
             )
-            result.at[index, f"{prefix}_types_not_in_inventory"] = encode(
-                missing_types
-            )
+            result.at[index, f"{prefix}_types_not_in_inventory"] = encode(missing_types)
 
             if not labels and not types:
                 status = "no_explicit_names_detected"
@@ -361,18 +370,18 @@ def run_schema_classifier():
                     else "detected_type_names_checked"
                 )
                 missing_properties = properties - known_properties
-                result.at[index, "generated_static_property_names"] = encode(
-                    properties
+                result.at[index, "generated_static_property_names"] = encode(properties)
+                result.at[index, "generated_properties_not_in_inventory"] = encode(
+                    missing_properties
                 )
-                result.at[
-                    index, "generated_properties_not_in_inventory"
-                ] = encode(missing_properties)
                 result.at[index, "generated_property_name_status"] = (
                     "no_static_property_names_detected"
                     if not properties
-                    else "candidate_property_mismatch_needs_review"
-                    if missing_properties
-                    else "detected_names_present_somewhere_in_schema"
+                    else (
+                        "candidate_property_mismatch_needs_review"
+                        if missing_properties
+                        else "detected_names_present_somewhere_in_schema"
+                    )
                 )
 
     result = add_endpoint_checks(result, queries)
@@ -401,18 +410,24 @@ def run_schema_classifier():
     ]
     print(f"\nName/property candidates requiring review: {len(candidates)}")
     if not candidates.empty:
-        print(candidates[[
-            "instance_id",
-            "generated_labels_not_in_inventory",
-            "generated_types_not_in_inventory",
-            "generated_properties_not_in_inventory",
-        ]].to_string(index=False))
+        print(
+            candidates[
+                [
+                    "instance_id",
+                    "generated_labels_not_in_inventory",
+                    "generated_types_not_in_inventory",
+                    "generated_properties_not_in_inventory",
+                ]
+            ].to_string(index=False)
+        )
 
     print(f"\nRecords checked: {len(result)}")
     print("Existing review notes were retained.")
     print("Original queries and database data were not changed.")
-    print("Simple pattern-map keys are checked. Property ownership, "
-          "scope, dynamic expressions and direction are not fully checked.")
+    print(
+        "Simple pattern-map keys are checked. Property ownership, "
+        "scope, dynamic expressions and direction are not fully checked."
+    )
 
 
 if __name__ == "__main__":

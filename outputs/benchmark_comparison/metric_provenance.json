@@ -1,0 +1,12 @@
+{
+  "inputs": {
+    "data/generated_queries.csv": "3142002e4bd2e7fe50beb87524bfde264fe99ff5f15e5286bc95bc4f4c6a7005",
+    "outputs/benchmark_gemma_26b.csv": "f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c",
+    "outputs/neo4j_syntax_validation.csv": "c08b75d9da6280ef4512fef2de9482a19d165c007d75d751453ca5a257419e27",
+    "outputs/gemma_26b_syntax_validation.csv": "f3dae7133e801fabc1bf870b461ac468a5ba91df3271dc34123d3106532cfafd"
+  },
+  "same_question_schema_reference": true,
+  "bleu_method": "Mean of saved sentence BLEU scores, including zeros; BLEU not regenerated",
+  "gemini_model_evidence": "Journal/script; no per-query model metadata",
+  "gemma_model": "gemma-4-26b-a4b-it"
+}

@@ -24,9 +24,7 @@ PREFIX = "neo4jlabs_demo_db_"
 
 def inspect_plan(session, query):
     try:
-        summary = session.run(
-            Query("EXPLAIN " + query, timeout=30)
-        ).consume()
+        summary = session.run(Query("EXPLAIN " + query, timeout=30)).consume()
 
         if summary.query_type != "r":
             raise ValueError("Statement is not classified as read-only.")
@@ -44,10 +42,12 @@ def inspect_plan(session, query):
             arguments = plan.get("args", {})
             estimate = arguments.get("EstimatedRows")
             if estimate is not None:
-                estimates.append({
-                    "operator": operator,
-                    "estimated_rows": estimate,
-                })
+                estimates.append(
+                    {
+                        "operator": operator,
+                        "estimated_rows": estimate,
+                    }
+                )
 
             for child in plan.get("children", []):
                 walk(child)
@@ -55,21 +55,13 @@ def inspect_plan(session, query):
         walk(summary.plan)
 
         # Operator names can contain planner suffixes.
-        base_names = {
-            operator.split("@", 1)[0] for operator in operators
-        }
+        base_names = {operator.split("@", 1)[0] for operator in operators}
 
-        scans = sorted(
-            operator for operator in base_names
-            if "Scan" in operator
-        )
+        scans = sorted(operator for operator in base_names if "Scan" in operator)
         index_operators = sorted(
-            operator for operator in base_names
-            if "Index" in operator
+            operator for operator in base_names if "Index" in operator
         )
-        cartesian = any(
-            "CartesianProduct" in operator for operator in base_names
-        )
+        cartesian = any("CartesianProduct" in operator for operator in base_names)
 
         return {
             "status": "plan_available",
@@ -86,9 +78,9 @@ def inspect_plan(session, query):
     except Exception as error:
         return {
             "status": "plan_failed",
-            "error": (
-                f"{getattr(error, 'code', type(error).__name__)}: {error}"
-            )[:1000],
+            "error": (f"{getattr(error, 'code', type(error).__name__)}: {error}")[
+                :1000
+            ],
         }
 
 
@@ -101,9 +93,7 @@ def save_results(records):
 
 def run_performance_classifier():
     queries = pd.read_csv(PROJECT / "data/generated_queries.csv")
-    syntax = pd.read_csv(
-        PROJECT / "outputs/neo4j_syntax_validation.csv"
-    )
+    syntax = pd.read_csv(PROJECT / "outputs/neo4j_syntax_validation.csv")
     logical = pd.read_csv(PROJECT / "outputs/logical_validation.csv")
 
     for name, frame in (
@@ -127,16 +117,14 @@ def run_performance_classifier():
             instance_id = row["instance_id"]
             alias = row.get("database_reference_alias")
             query = (
-                "" if pd.isna(row["generated_cypher"])
-                else str(row["generated_cypher"])
+                "" if pd.isna(row["generated_cypher"]) else str(row["generated_cypher"])
             )
-            reference = (
-                "" if pd.isna(row["cypher"]) else str(row["cypher"])
-            )
+            reference = "" if pd.isna(row["cypher"]) else str(row["cypher"])
 
             logical_status = (
                 logical.loc[instance_id, "logical_status"]
-                if instance_id in logical.index else "unavailable"
+                if instance_id in logical.index
+                else "unavailable"
             )
 
             record = {
@@ -172,11 +160,9 @@ def run_performance_classifier():
                 "graph_names_need_review",
                 "schema_inventory_unavailable",
             }:
-                record["performance_status"] = (
-                    "source_graph_not_ready_for_plan_review"
-                )
+                record["performance_status"] = "source_graph_not_ready_for_plan_review"
             else:
-                database = str(alias)[len(PREFIX):]
+                database = str(alias)[len(PREFIX) :]
                 if database == "eoflix":
                     database = "neoflix"
                 record["database"] = database
@@ -219,9 +205,9 @@ def run_performance_classifier():
 
                 except Exception as error:
                     record["performance_status"] = "graph_connection_failed"
-                    record["generated_error"] = (
-                        f"{type(error).__name__}: {error}"
-                    )[:1000]
+                    record["generated_error"] = (f"{type(error).__name__}: {error}")[
+                        :1000
+                    ]
 
             records.append(record)
             save_results(records)
@@ -241,7 +227,6 @@ def run_performance_classifier():
     print(f"\nSaved: {OUTPUT}")
     print("Measured inefficiency: not assessed by EXPLAIN.")
     print("Original queries and classifications were not changed.")
-
 
 
 # Bounded PROFILE measurements
@@ -264,12 +249,8 @@ def run_profile_measurements():
 
     project = Path(__file__).resolve().parents[1]
     outputs = project / "outputs"
-    queries = pd.read_csv(
-        project / "data/generated_queries.csv", keep_default_na=False
-    )
-    logical = pd.read_csv(
-        outputs / "logical_validation.csv", keep_default_na=False
-    )
+    queries = pd.read_csv(project / "data/generated_queries.csv", keep_default_na=False)
+    logical = pd.read_csv(outputs / "logical_validation.csv", keep_default_na=False)
 
     for frame in (queries, logical):
         if frame["instance_id"].eq("").any():
@@ -291,9 +272,9 @@ def run_profile_measurements():
     target = outputs / "performance_profile.csv"
     if target.exists():
         stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-        target.with_name(
-            f"performance_profile.{stamp}.csv"
-        ).write_bytes(target.read_bytes())
+        target.with_name(f"performance_profile.{stamp}.csv").write_bytes(
+            target.read_bytes()
+        )
 
     def digest(value):
         return hashlib.sha256(value.encode("utf-8")).hexdigest()
@@ -338,6 +319,7 @@ def run_profile_measurements():
         }
 
     records = []
+
     def checkpoint():
         temporary = target.with_name(target.name + ".tmp")
         pd.DataFrame(records).to_csv(temporary, index=False)
@@ -380,9 +362,7 @@ def run_profile_measurements():
                             "repetition": repetition,
                             "query_kind": kind,
                             "query_sha256": digest(query),
-                            "evaluated_at_utc": datetime.now(
-                                timezone.utc
-                            ).isoformat(),
+                            "evaluated_at_utc": datetime.now(timezone.utc).isoformat(),
                             "execution_node": socket.gethostname(),
                             "comparison_mode": mode,
                             "profile_status": "",
@@ -392,10 +372,13 @@ def run_profile_measurements():
                         try:
                             measured = session.execute_read(measure, query)
                             successful[kind] = measured
-                            record.update({
-                                key: value for key, value in measured.items()
-                                if key != "values"
-                            })
+                            record.update(
+                                {
+                                    key: value
+                                    for key, value in measured.items()
+                                    if key != "values"
+                                }
+                            )
                             record["profile_status"] = "measured"
                         except Exception as error:
                             record["profile_status"] = "inconclusive"
@@ -408,17 +391,13 @@ def run_profile_measurements():
                         reference = successful["reference"]
                         generated = successful["generated"]
                         same_shape = (
-                            reference["column_count"]
-                            == generated["column_count"]
+                            reference["column_count"] == generated["column_count"]
                         )
                         if mode == "ordered_rows":
-                            same_values = (
-                                reference["values"] == generated["values"]
-                            )
+                            same_values = reference["values"] == generated["values"]
                         else:
-                            same_values = (
-                                Counter(reference["values"])
-                                == Counter(generated["values"])
+                            same_values = Counter(reference["values"]) == Counter(
+                                generated["values"]
                             )
                         for record in pair_records:
                             record["current_pair_result_match"] = int(
@@ -429,13 +408,15 @@ def run_profile_measurements():
                     checkpoint()
 
         except Exception as error:
-            records.append({
-                "instance_id": row["instance_id"],
-                "database": database,
-                "phase": "connection",
-                "profile_status": "inconclusive",
-                "error": (type(error).__name__ + ": " + str(error))[:1000],
-            })
+            records.append(
+                {
+                    "instance_id": row["instance_id"],
+                    "database": database,
+                    "phase": "connection",
+                    "profile_status": "inconclusive",
+                    "error": (type(error).__name__ + ": " + str(error))[:1000],
+                }
+            )
             checkpoint()
         finally:
             if driver is not None:
@@ -456,7 +437,6 @@ def run_profile_measurements():
     print("Original queries and EXPLAIN evidence were not changed.")
 
 
-
 def summarise_profile_measurements():
     """Validate saved PROFILE runs and summarise measured repetitions."""
     import hashlib
@@ -470,9 +450,17 @@ def summarise_profile_measurements():
     queries = pd.read_csv(query_path, keep_default_na=False)
 
     required = {
-        "instance_id", "database", "phase", "repetition", "query_kind",
-        "query_sha256", "profile_status", "current_pair_result_match",
-        "returned_rows", "db_hits", "client_elapsed_profile_ms",
+        "instance_id",
+        "database",
+        "phase",
+        "repetition",
+        "query_kind",
+        "query_sha256",
+        "profile_status",
+        "current_pair_result_match",
+        "returned_rows",
+        "db_hits",
+        "client_elapsed_profile_ms",
     }
     missing = required - set(runs.columns)
     if missing:
@@ -488,9 +476,7 @@ def summarise_profile_measurements():
         raise ValueError("No saved measurements.")
 
     if not runs["profile_status"].eq("measured").all():
-        raise ValueError(
-            "Some runs are inconclusive. Review them before summarising."
-        )
+        raise ValueError("Some runs are inconclusive. Review them before summarising.")
 
     if not runs["phase"].isin(["warmup", "measurement"]).all():
         raise ValueError("Unexpected measurement phase.")
@@ -498,8 +484,11 @@ def summarise_profile_measurements():
         raise ValueError("Unexpected query kind.")
 
     for column in (
-        "repetition", "current_pair_result_match", "returned_rows",
-        "db_hits", "client_elapsed_profile_ms",
+        "repetition",
+        "current_pair_result_match",
+        "returned_rows",
+        "db_hits",
+        "client_elapsed_profile_ms",
     ):
         runs[column] = pd.to_numeric(runs[column], errors="raise")
         if not np.isfinite(runs[column]).all():
@@ -509,8 +498,11 @@ def summarise_profile_measurements():
         if not runs[column].mod(1).eq(0).all():
             raise ValueError(f"Non-integer values in {column}.")
 
-    if (runs[["returned_rows", "db_hits",
-              "client_elapsed_profile_ms"]] < 0).any().any():
+    if (
+        (runs[["returned_rows", "db_hits", "client_elapsed_profile_ms"]] < 0)
+        .any()
+        .any()
+    ):
         raise ValueError("Negative measurement values.")
 
     keys = ["instance_id", "query_kind", "phase", "repetition"]
@@ -519,17 +511,13 @@ def summarise_profile_measurements():
 
     # Verify that the saved measurements refer to the current query text.
     source_queries = queries.set_index("instance_id")
-    for (instance_id, kind), group in runs.groupby(
-        ["instance_id", "query_kind"]
-    ):
+    for (instance_id, kind), group in runs.groupby(["instance_id", "query_kind"]):
         if instance_id not in source_queries.index:
             raise ValueError(f"Unknown query ID: {instance_id}")
 
         column = "cypher" if kind == "reference" else "generated_cypher"
         query = str(source_queries.loc[instance_id, column])
-        expected_hash = hashlib.sha256(
-            query.encode("utf-8")
-        ).hexdigest()
+        expected_hash = hashlib.sha256(query.encode("utf-8")).hexdigest()
 
         if not group["query_sha256"].eq(expected_hash).all():
             raise ValueError(
@@ -548,21 +536,15 @@ def summarise_profile_measurements():
     }
 
     for instance_id, group in runs.groupby("instance_id"):
-        actual_runs = set(zip(
-            group["query_kind"], group["phase"], group["repetition"]
-        ))
+        actual_runs = set(zip(group["query_kind"], group["phase"], group["repetition"]))
         if actual_runs != expected_runs:
-            raise ValueError(
-                f"Incomplete repetition schedule: {instance_id}"
-            )
+            raise ValueError(f"Incomplete repetition schedule: {instance_id}")
         if group["database"].nunique() != 1 or group["database"].eq("").any():
             raise ValueError(f"Inconsistent database: {instance_id}")
 
         for column in ("server_version", "execution_node", "comparison_mode"):
             if column in group.columns and group[column].nunique() != 1:
-                raise ValueError(
-                    f"Inconsistent {column} within pair: {instance_id}"
-                )
+                raise ValueError(f"Inconsistent {column} within pair: {instance_id}")
 
     measured = runs.loc[runs["phase"].eq("measurement")].copy()
     pair_agreement = measured.groupby("instance_id").apply(
@@ -586,12 +568,10 @@ def summarise_profile_measurements():
         client_elapsed_profile_ms_max=("client_elapsed_profile_ms", "max"),
     )
 
-    summary["all_repetitions_nonempty_result_match"] = (
-        summary["instance_id"].map(pair_agreement)
+    summary["all_repetitions_nonempty_result_match"] = summary["instance_id"].map(
+        pair_agreement
     )
-    summary = summary.sort_values(
-        ["instance_id", "query_kind"]
-    ).reset_index(drop=True)
+    summary = summary.sort_values(["instance_id", "query_kind"]).reset_index(drop=True)
 
     # Preserve the previous summary before replacing it.
     if target.exists():
@@ -611,8 +591,10 @@ def summarise_profile_measurements():
     print("Measured runs:", len(measured))
     print("Query pairs:", measured["instance_id"].nunique())
     print("Summary rows:", len(summary))
-    print("Pairs matching with non-empty results in every measured repetition:",
-          int(pair_agreement.sum()))
+    print(
+        "Pairs matching with non-empty results in every measured repetition:",
+        int(pair_agreement.sum()),
+    )
     print("Other pairs:", int((~pair_agreement).sum()))
     print("PASS: query hashes and repetition schedules verified.")
     print("Saved:", target)

@@ -1,0 +1,24 @@
+{
+  "records": 40,
+  "student_verified": 0,
+  "assessment_counts": {
+    "proposed_syntax_assessment": {
+      "no_error_identified": 38,
+      "error_present": 2
+    },
+    "proposed_schema_assessment": {
+      "no_error_identified": 40
+    },
+    "proposed_logical_assessment": {
+      "uncertain": 22,
+      "no_error_identified": 16,
+      "error_present": 2
+    },
+    "proposed_reference_assessment": {
+      "no_issue_identified": 17,
+      "uncertain": 14,
+      "issue_identified": 9
+    }
+  },
+  "limits": "Static inspection with saved evidence; no independent adjudication or rerun; not overall correctness."
+}

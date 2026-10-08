@@ -6,6 +6,7 @@ Reports assessment coverage and comparisons with automatic evidence.
 Syntax agreement metrics apply only to determinate paired assessments.
 No overall correctness or independent validation claim is made.
 """
+
 from pathlib import Path
 import pandas as pd
 
@@ -79,10 +80,14 @@ def run_validation():
     result = reviews.copy()
     evidence = (
         (syntax, ["generated_status"], "automatic_syntax_"),
-        (schema, [
-            "generated_name_coverage_status",
-            "generated_property_name_status",
-        ], "automatic_schema_"),
+        (
+            schema,
+            [
+                "generated_name_coverage_status",
+                "generated_property_name_status",
+            ],
+            "automatic_schema_",
+        ),
         (logical, ["logical_status"], "automatic_"),
     )
 
@@ -106,17 +111,25 @@ def run_validation():
         print(result[f"{category}_assessment"].value_counts().to_string())
 
     print("\nSYNTAX COMPARISON")
-    print(pd.crosstab(
-        result["syntax_assessment"],
-        result["automatic_syntax_generated_status"],
-    ).to_string())
+    print(
+        pd.crosstab(
+            result["syntax_assessment"],
+            result["automatic_syntax_generated_status"],
+        ).to_string()
+    )
 
-    human = result["syntax_assessment"].map({
-        "no_error_identified": 0, "error_present": 1,
-    })
-    automatic = result["automatic_syntax_generated_status"].map({
-        "accepted": 0, "syntax_error": 1,
-    })
+    human = result["syntax_assessment"].map(
+        {
+            "no_error_identified": 0,
+            "error_present": 1,
+        }
+    )
+    automatic = result["automatic_syntax_generated_status"].map(
+        {
+            "accepted": 0,
+            "syntax_error": 1,
+        }
+    )
     paired = human.notna() & automatic.notna()
     truth = human[paired]
     prediction = automatic[paired]
@@ -134,20 +147,26 @@ def run_validation():
     print("Agreement:", ratio(tp + tn, int(paired.sum())))
     print("Precision:", ratio(tp, tp + fp))
     print("Recall:", ratio(tp, tp + fn))
-    print("These are descriptive agreement metrics against the recorded "
-          "assessments, not independent accuracy estimates.")
+    print(
+        "These are descriptive agreement metrics against the recorded "
+        "assessments, not independent accuracy estimates."
+    )
 
     print("\nSCHEMA NAME CHECK VS STUDENT SCHEMA ASSESSMENT")
-    print(pd.crosstab(
-        result["schema_assessment"],
-        result["automatic_schema_generated_name_coverage_status"],
-    ).to_string())
+    print(
+        pd.crosstab(
+            result["schema_assessment"],
+            result["automatic_schema_generated_name_coverage_status"],
+        ).to_string()
+    )
 
     print("\nLOGICAL EVIDENCE VS STUDENT LOGICAL ASSESSMENT")
-    print(pd.crosstab(
-        result["logical_assessment"],
-        result["automatic_logical_status"],
-    ).to_string())
+    print(
+        pd.crosstab(
+            result["logical_assessment"],
+            result["automatic_logical_status"],
+        ).to_string()
+    )
 
     result["validation_method"] = (
         "Student-verified AI-assisted review; not independent blinded validation"

@@ -4,9 +4,11 @@ Create report figures from revised evaluation evidence.
 Exports 300 dpi PNGs, vector PDFs and figure captions.
 Historical classifier flags are not used.
 """
+
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
@@ -24,23 +26,25 @@ RUST = "#A46B55"
 GREY = "#ADB4BA"
 INK = "#28343D"
 
-plt.rcParams.update({
-    "font.family": "DejaVu Sans",
-    "font.size": 10,
-    "axes.titlesize": 12,
-    "axes.labelsize": 10,
-    "axes.edgecolor": "#BCC3C8",
-    "axes.labelcolor": INK,
-    "text.color": INK,
-    "xtick.color": INK,
-    "ytick.color": INK,
-    "axes.spines.top": False,
-    "axes.spines.right": False,
-    "figure.facecolor": "white",
-    "axes.facecolor": "white",
-    "pdf.fonttype": 42,
-    "ps.fonttype": 42,
-})
+plt.rcParams.update(
+    {
+        "font.family": "DejaVu Sans",
+        "font.size": 10,
+        "axes.titlesize": 12,
+        "axes.labelsize": 10,
+        "axes.edgecolor": "#BCC3C8",
+        "axes.labelcolor": INK,
+        "text.color": INK,
+        "xtick.color": INK,
+        "ytick.color": INK,
+        "axes.spines.top": False,
+        "axes.spines.right": False,
+        "figure.facecolor": "white",
+        "axes.facecolor": "white",
+        "pdf.fonttype": 42,
+        "ps.fonttype": 42,
+    }
+)
 
 captions = []
 
@@ -67,8 +71,7 @@ def horizontal_counts(ax, series, labels, title):
     counts = series.value_counts().reindex(labels, fill_value=0)
     positions = np.arange(len(counts))
     colours = [
-        RUST if "error" in name or "mismatch" in name else BLUE
-        for name in counts.index
+        RUST if "error" in name or "mismatch" in name else BLUE for name in counts.index
     ]
     ax.barh(positions, counts.values, color=colours, height=0.65)
     ax.set_yticks(positions)
@@ -80,8 +83,7 @@ def horizontal_counts(ax, series, labels, title):
     ax.grid(axis="x", color="#E6EAED", linewidth=0.6)
     ax.set_axisbelow(True)
     for position, count in zip(positions, counts.values):
-        ax.text(count + max(1, counts.max()) * 0.02,
-                position, str(count), va="center")
+        ax.text(count + max(1, counts.max()) * 0.02, position, str(count), va="center")
 
 
 def boxplot_with_points(ax, values, labels, colours):
@@ -102,9 +104,13 @@ def boxplot_with_points(ax, values, labels, colours):
     for position, group in enumerate(values, 1):
         jitter = random.uniform(-0.11, 0.11, len(group))
         ax.scatter(
-            position + jitter, group,
-            s=16, color=colours[position - 1],
-            alpha=0.55, edgecolors="none", zorder=3,
+            position + jitter,
+            group,
+            s=16,
+            color=colours[position - 1],
+            alpha=0.55,
+            edgecolors="none",
+            zorder=3,
         )
 
     ax.set_xticks(range(1, len(labels) + 1))
@@ -118,7 +124,8 @@ def boxplot_with_points(ax, values, labels, colours):
 def plot_evaluation_coverage(df):
     fig, axes = plt.subplots(3, 1, figsize=(9, 12))
     horizontal_counts(
-        axes[0], df["syntax_generated_status"],
+        axes[0],
+        df["syntax_generated_status"],
         {
             "accepted": "Accepted",
             "syntax_error": "Syntax error",
@@ -126,7 +133,8 @@ def plot_evaluation_coverage(df):
         "A. Neo4j syntax validation",
     )
     horizontal_counts(
-        axes[1], df["logical_status"],
+        axes[1],
+        df["logical_status"],
         {
             "source_graph_unavailable": "Source graph unavailable",
             "observed_result_match": "Observed result match",
@@ -141,7 +149,8 @@ def plot_evaluation_coverage(df):
         "B. Logical comparison outcomes",
     )
     horizontal_counts(
-        axes[2], df["schema_generated_endpoint_status"],
+        axes[2],
+        df["schema_generated_endpoint_status"],
         {
             "no_explicit_typed_pattern_detected": "No explicit typed pattern detected",
             "detected_simple_endpoints_supported": "Detected simple endpoints supported",
@@ -151,11 +160,13 @@ def plot_evaluation_coverage(df):
         },
         "C. Preliminary endpoint-check coverage",
     )
-    fig.suptitle("Evaluation outcomes and coverage · 200 queries",
-                 fontsize=14, x=0.05, ha="left")
+    fig.suptitle(
+        "Evaluation outcomes and coverage · 200 queries", fontsize=14, x=0.05, ha="left"
+    )
     fig.tight_layout(rect=[0, 0, 1, 0.96], h_pad=2.8)
     save_figure(
-        fig, "figure_01_evaluation_coverage",
+        fig,
+        "figure_01_evaluation_coverage",
         "Recorded outcomes for 200 queries. Syntax acceptance is not answer "
         "correctness. Logical agreement is specific to the evaluated graph. "
         "Endpoint checks cover simple detected patterns; other cases remain "
@@ -165,8 +176,7 @@ def plot_evaluation_coverage(df):
 
 def plot_bleu_by_group(df):
     values = [
-        df.loc[df["complexity"].eq(group), "bleu_score"].to_numpy()
-        for group in GROUPS
+        df.loc[df["complexity"].eq(group), "bleu_score"].to_numpy() for group in GROUPS
     ]
     labels = [
         f"{group.capitalize()}\n(n={len(value)})"
@@ -178,7 +188,8 @@ def plot_bleu_by_group(df):
     ax.set_xlabel("Question-length group")
     fig.tight_layout()
     save_figure(
-        fig, "figure_02_bleu_by_question_length",
+        fig,
+        "figure_02_bleu_by_question_length",
         "Sentence BLEU distributions for 50 simple, 100 medium and 50 complex "
         "question-length groups. Boxes show quartiles and medians; whiskers "
         "follow the 1.5-IQR convention. Points show all observations, with "
@@ -194,8 +205,7 @@ def plot_bleu_by_review(df):
         "reviewed_without_final_binary_label",
     ]
     values = [
-        df.loc[df["manual_logical_review_status"].eq(status),
-               "bleu_score"].to_numpy()
+        df.loc[df["manual_logical_review_status"].eq(status), "bleu_score"].to_numpy()
         for status in statuses
     ]
     labels = [
@@ -205,11 +215,11 @@ def plot_bleu_by_review(df):
     ]
     fig, ax = plt.subplots(figsize=(8, 5))
     boxplot_with_points(ax, values, labels, [RUST, TEAL, GREY])
-    ax.set_title("BLEU across reconciled flagged-case reviews",
-                 loc="left", pad=14)
+    ax.set_title("BLEU across reconciled flagged-case reviews", loc="left", pad=14)
     fig.tight_layout()
     save_figure(
-        fig, "figure_03_bleu_by_review_outcome",
+        fig,
+        "figure_03_bleu_by_review_outcome",
         "BLEU for the 48 selected comparison cases: 10 recorded-rule errors, "
         "8 acceptable output alternatives and 30 without a final binary label. "
         "Reviews were AI-assisted. Selection was based on comparison differences; "
@@ -220,9 +230,7 @@ def plot_bleu_by_review(df):
 
 def plot_human_review(validation):
     fig, axes = plt.subplots(2, 2, figsize=(10, 7))
-    for ax, category in zip(
-        axes.flat, ["syntax", "schema", "logical", "reference"]
-    ):
+    for ax, category in zip(axes.flat, ["syntax", "schema", "logical", "reference"]):
         if category == "reference":
             outcomes = ["no_issue_identified", "issue_identified", "uncertain"]
         else:
@@ -240,11 +248,16 @@ def plot_human_review(validation):
         for position, count in enumerate(values):
             ax.text(position, count + 0.8, str(count), ha="center")
 
-    fig.suptitle("Student-verified, AI-assisted review · 40 cases",
-                 fontsize=14, x=0.06, ha="left")
+    fig.suptitle(
+        "Student-verified, AI-assisted review · 40 cases",
+        fontsize=14,
+        x=0.06,
+        ha="left",
+    )
     fig.tight_layout(rect=[0, 0, 1, 0.94], h_pad=2)
     save_figure(
-        fig, "figure_04_validation_assessments",
+        fig,
+        "figure_04_validation_assessments",
         "Assessments for the stratified 40-case sample: 10 simple, 20 medium "
         "and 10 complex questions. Student verification used AI proposals "
         "and some prior evidence; this is not independent blinded validation. "
@@ -258,9 +271,12 @@ def plot_performance():
     if summary.duplicated(keys).any():
         raise ValueError("Duplicate performance summary rows.")
 
-    matched = summary["all_repetitions_nonempty_result_match"].astype(
-        str
-    ).str.lower().eq("true")
+    matched = (
+        summary["all_repetitions_nonempty_result_match"]
+        .astype(str)
+        .str.lower()
+        .eq("true")
+    )
     if not matched.all() or not summary["repetitions"].eq(3).all():
         raise ValueError("Performance summary contains non-comparable cases.")
 
@@ -285,15 +301,21 @@ def plot_performance():
         generated = wide[(metric, "generated")]
         comparison[f"reference_{metric}"] = reference
         comparison[f"generated_{metric}"] = generated
-        comparison[f"generated_to_reference_{metric}"] = (
-            generated / reference.replace(0, np.nan)
+        comparison[f"generated_to_reference_{metric}"] = generated / reference.replace(
+            0, np.nan
         )
 
-        ax.scatter(reference, generated, s=30, color=BLUE,
-                   alpha=0.7, edgecolors="white", linewidths=0.4)
+        ax.scatter(
+            reference,
+            generated,
+            s=30,
+            color=BLUE,
+            alpha=0.7,
+            edgecolors="white",
+            linewidths=0.4,
+        )
         limit = max(float(reference.max()), float(generated.max()), 1) * 1.15
-        ax.plot([0, limit], [0, limit], color="#87939B",
-                linestyle="--", linewidth=1)
+        ax.plot([0, limit], [0, limit], color="#87939B", linestyle="--", linewidth=1)
         ax.set_xscale("symlog", linthresh=1)
         ax.set_yscale("symlog", linthresh=1)
         ax.set_xlim(0, limit)
@@ -304,14 +326,17 @@ def plot_performance():
         ax.grid(color="#E6EAED", linewidth=0.5)
         ax.set_axisbelow(True)
 
-    comparison.reset_index().to_csv(
-        OUTPUTS / "performance_comparison.csv", index=False
+    comparison.reset_index().to_csv(OUTPUTS / "performance_comparison.csv", index=False)
+    fig.suptitle(
+        f"Paired performance measurements · {len(wide)} query pairs",
+        fontsize=14,
+        x=0.06,
+        ha="left",
     )
-    fig.suptitle(f"Paired performance measurements · {len(wide)} query pairs",
-                 fontsize=14, x=0.06, ha="left")
     fig.tight_layout(rect=[0, 0, 1, 0.93])
     save_figure(
-        fig, "figure_05_paired_performance",
+        fig,
+        "figure_05_paired_performance",
         f"Median measurements from three repetitions per query for {len(wide)} "
         "previously matching pairs. Warm-ups excluded. All measured repetitions "
         "returned non-empty matching results under the recorded comparator. "
@@ -339,9 +364,7 @@ def run_visualisations():
     plot_human_review(validation)
     plot_performance()
 
-    pd.DataFrame(captions).to_csv(
-        FIGURES / "figure_captions.csv", index=False
-    )
+    pd.DataFrame(captions).to_csv(FIGURES / "figure_captions.csv", index=False)
     print("\nFive figures exported as PNG and PDF.")
     print("Captions:", FIGURES / "figure_captions.csv")
     print("Historical figures were not deleted or used as evidence.")

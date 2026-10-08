@@ -1,0 +1,9 @@
+.env
+venv/
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+data/text2cypher_full.csv
+neo4j/
+neo4j_5.18.sif
+*.sif

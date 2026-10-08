@@ -36,8 +36,12 @@ def run_cross_tabulation():
     df = pd.read_csv(INPUT, dtype=str).fillna("")
 
     required = {
-        "instance_id", "complexity", "bleu_score", "exact_match",
-        "case_sensitive_trimmed_exact_match", *STAGES.values(),
+        "instance_id",
+        "complexity",
+        "bleu_score",
+        "exact_match",
+        "case_sensitive_trimmed_exact_match",
+        *STAGES.values(),
     }
     missing = required - set(df.columns)
     if missing:
@@ -59,9 +63,7 @@ def run_cross_tabulation():
     if not df["bleu_score"].between(0, 100).all():
         raise SystemExit("BLEU scores outside 0–100.")
 
-    metric_columns = [
-        "exact_match", "case_sensitive_trimmed_exact_match"
-    ]
+    metric_columns = ["exact_match", "case_sensitive_trimmed_exact_match"]
     for column in metric_columns:
         values = df[column]
         invalid = ~values.isin(["", "0", "1", "0.0", "1.0"])
@@ -76,36 +78,29 @@ def run_cross_tabulation():
 
     for stage, column in STAGES.items():
         outcomes = df[column].replace("", "not_recorded")
-        table = pd.crosstab(df["complexity"], outcomes).reindex(
-            GROUPS, fill_value=0
-        )
+        table = pd.crosstab(df["complexity"], outcomes).reindex(GROUPS, fill_value=0)
         print(f"\n{stage.upper()}")
         print(table.to_string())
 
         for group in GROUPS:
             subset = df.loc[df["complexity"].eq(group)]
-            counts = subset[column].replace(
-                "", "not_recorded"
-            ).value_counts()
+            counts = subset[column].replace("", "not_recorded").value_counts()
 
             for outcome, count in counts.items():
-                output_rows.append({
-                    "stage": stage,
-                    "question_length_group": group,
-                    "outcome": outcome,
-                    "records": int(count),
-                    "group_records": len(subset),
-                    "percent_of_group": round(
-                        100 * count / len(subset), 2
-                    ),
-                })
+                output_rows.append(
+                    {
+                        "stage": stage,
+                        "question_length_group": group,
+                        "outcome": outcome,
+                        "records": int(count),
+                        "group_records": len(subset),
+                        "percent_of_group": round(100 * count / len(subset), 2),
+                    }
+                )
 
     metric_rows = []
     for group in GROUPS + ["all"]:
-        subset = (
-            df if group == "all"
-            else df.loc[df["complexity"].eq(group)]
-        )
+        subset = df if group == "all" else df.loc[df["complexity"].eq(group)]
         scores = subset["bleu_score"]
 
         row = {
@@ -121,9 +116,7 @@ def run_cross_tabulation():
             values = subset[column].dropna()
             row[column + "_assessable"] = len(values)
             row[column + "_count"] = int(values.sum())
-            row[column + "_percent"] = (
-                100 * values.mean() if len(values) else None
-            )
+            row[column + "_percent"] = 100 * values.mean() if len(values) else None
 
         metric_rows.append(row)
 
@@ -148,7 +141,9 @@ def run_cross_tabulation():
     print("Historical Exact Match lowercases and trims query text.")
     print("The added Exact Match preserves case and trims query text.")
     print("Neither text metric establishes answer correctness.")
-    print("The completed 40-case AI-assisted validation is reported separately in classifier_validation.csv.")
+    print(
+        "The completed 40-case AI-assisted validation is reported separately in classifier_validation.csv."
+    )
 
     print("\nSaved: outputs/cross_tabulation.csv")
     print("Saved: outputs/bleu_by_complexity.csv")

@@ -13,7 +13,6 @@ from dotenv import load_dotenv
 from neo4j import GraphDatabase, Query
 from neo4j.exceptions import Neo4jError
 
-
 PROJECT = Path(__file__).resolve().parents[1]
 INPUT = PROJECT / "data" / "generated_queries.csv"
 OUTPUT = PROJECT / "outputs" / "neo4j_syntax_validation.csv"
@@ -31,9 +30,7 @@ def validate_query(session, query):
         }
 
     try:
-        session.run(
-            Query("EXPLAIN " + str(query).strip(), timeout=30)
-        ).consume()
+        session.run(Query("EXPLAIN " + str(query).strip(), timeout=30)).consume()
 
         return {
             "status": "accepted",
@@ -78,9 +75,7 @@ def main():
     missing = [name for name in required if not os.getenv(name)]
 
     if missing:
-        raise SystemExit(
-            "Missing configuration: " + ", ".join(missing)
-        )
+        raise SystemExit("Missing configuration: " + ", ".join(missing))
 
     df = pd.read_csv(INPUT)
     required_columns = {"instance_id", "question", "generated_cypher", "cypher"}

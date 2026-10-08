@@ -5,6 +5,13 @@
 **Supervisor:** Ying He  
 **University:** University of Technology Sydney
 
+## Quick start and project organisation
+
+Run `streamlit run app.py --server.port 8501` from the project root.
+See [the project guide](docs/PROJECT_GUIDE.md) for folders, active entry points
+and the six comparison tabs. Historical source copies are retained in
+`archive/source_snapshots/`; historical CSV evidence remains at its original paths.
+
 ## About this project
 
 This project studies how well a language model turns an everyday question
@@ -375,3 +382,56 @@ Exclude:
 - Existing ZIP archives
 
 Check scripts and notebooks for embedded credentials before sharing.
+## Gemini–Gemma benchmark extension
+
+The added **Model comparison** page compares saved Gemini and Gemma answers on the same 200 question IDs, questions, supplied schemas and reference queries. The original Gemini results and reviews remain separate.
+
+Gemini is recorded as Gemini 3.1 Flash Lite in the generation script/journal; original per-query model metadata was not retained. The Gemma benchmark records `gemma-4-26b-a4b-it`. This comparison evaluates the recorded runs using provider defaults; it is not a controlled experiment isolating model architecture or openness.
+
+| Metric | Gemini | Gemma |
+|---|---:|---:|
+| Mean saved sentence BLEU, including zeros | 60.2673 | 58.9396 |
+| Lowercase trimmed Exact Match | 14/200 (7.0%) | 14/200 (7.0%) |
+| Case-sensitive trimmed Exact Match | 13/200 (6.5%) | 12/200 (6.0%) |
+| Neo4j syntax accepted | 198/200 (99.0%) | 183/200 (91.5%) |
+| Observed reference-result matches | 52 | 38 |
+
+BLEU is averaged from the saved per-query scores, rather than regenerated. Exact Match is recomputed from saved queries. Syntax acceptance tests parsing/planning, not logical correctness. Both models have 89 unavailable-graph outcomes but only 88 share the same IDs; syntax checks can occur before graph checks. Public graph snapshots were not immutable. Neither observed-match counts nor flagged-case reviews establish overall semantic accuracy.
+
+On the paired records, both models have observed matches on 34 questions; only Gemini matches on 18 and only Gemma on four. The other 144 pairs include unavailable, review and inconclusive cases. The Gemma review register contains 47 AI-assisted query/schema/preview inspections without independent adjudication or database rerun. Raw automatic outcomes are preserved. The existing Gemini performance evidence is not a Gemma performance benchmark, and no cross-model runtime conclusion is made.
+
+### Rebuild comparison outputs
+
+From the project root, with the existing `text2cypher` environment active:
+
+```bash
+python scripts/build_model_metrics.py
+python scripts/build_benchmark_comparison.py
+streamlit run app.py
+```
+
+These two build scripts read saved files and write `outputs/benchmark_comparison`; they make no model API or database requests. Opening **Model comparison** also uses saved files only. The sidebar's **Update combined results** button updates the original Gemini evaluation assembly; rebuild the comparison using the commands above.
+
+Generated outputs include three figure sets (PNG and PDF), model metrics, outcome counts, a paired crosstab, all 200 paired evidence records and input provenance hashes. `outputs/gemma_26b_schema_flag_review.csv` records the three discussed schema/reference concerns separately from the preliminary automatic inventory.
+
+### Journal and demonstration evidence
+
+Capture `06_Gemini_Gemma_Benchmark_Comparison.png` showing the comparison metrics and `07_Gemini_Gemma_Paired_Example.png` showing one question with both generated queries and saved outcomes. Use the generated figures directly in the report. Demonstrate navigating from the original results to Model comparison and inspecting one paired question. Keep uncertain cases visible.
+
+The report should describe this as an extension of the existing robustness evaluation on the same sample. It can support the existing research questions; an additional research question is not required simply because a second model was added. Report the missing generation metadata, uncontrolled provider defaults, unavailable graphs, reference defects and lack of independent review as limitations.
+
+### Same 40-case review and Gemma performance completion
+
+After recording student verification in `outputs/gemma_40_review/gemma_40_human_validation.csv`, run `python scripts/build_review_comparison.py` to rebuild the paired review counts and figure. Verification labels `verified` and `student_verified` are accepted; pending reviews are rejected. The comparison page shows the resulting table and figure. The separate flagged logical register retains its own verification status.
+
+Run Gemma plan inspection with `python pipeline/performance_classifier_gemma_26b.py`. Run bounded measurements with `python pipeline/performance_classifier_gemma_26b.py --profile --max-cases 200`, then `python pipeline/performance_classifier_gemma_26b.py --summarise`. The profiler selects only saved observed-result-match pairs (currently 38), not all 200. Its measurement logic is the original Gemini implementation with different input/output paths. It uses one warm-up and three measurements per generated/reference pair, alternating order, a 15-second transaction timeout and 5,000-row cap, with read-only EXPLAIN guards. It executes PROFILE queries on mapped source graphs. Do not run concurrently with other evaluation workloads.
+
+Connection uses the existing demo graph driver and optional `NEO4J_DEMO_TUNNEL_PORT`. Gemma outputs are separately prefixed `gemma_26b_performance_`; original Gemini measurements are preserved. Inconclusive measurements cause the summary check to fail rather than silently treating them as valid. Resolve connection failures before rebuilding summaries.
+
+After a successful summary, run `python scripts/build_performance_comparison.py`. It selects common IDs/database pairs with three repetitions and nonempty reference agreement in both saved summaries. Report this subset and its coverage, not whole-model efficiency. Client timing includes network transfer, PROFILE overhead and different evaluation dates/cache/load conditions; DB-hit differences are recorded query-plan work, not model generation speed. For a controlled latency comparison, rerun both models' saved queries together under a common schedule and environment.
+
+### Recorded performance comparison results
+
+Gemma completed 304 PROFILE records for 38 generated/reference pairs: 76 warm-up records and 228 measured records. Query hashes and repetition schedules passed validation; all 38 pairs matched with nonempty results in each measured repetition. The saved Gemini and Gemma summaries share 34 eligible questions. On these 34, the median per-query database-hit medians are 1,298 for Gemini and 1,312.5 for Gemma; median per-query client PROFILE time medians are 264.2265 ms and 291.8490 ms respectively. These aggregate medians describe recorded query runs; they do not establish statistical significance or controlled model-speed differences.
+
+Rebuild the performance report figure with `python scripts/plot_performance_comparison.py`. The Model comparison page displays the summary, PNG figure and expandable paired records. Timing includes network transfer and PROFILE overhead, with runs made at different times. The final 47-case Gemma register retains its recorded student-verification status; the verified 40-case sample is a separate activity.

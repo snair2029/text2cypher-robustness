@@ -59,12 +59,16 @@ def canonical(value):
     """Preserve types, duplicates and graph identity within this graph."""
     if isinstance(value, Node):
         return (
-            "node", value.element_id,
-            tuple(sorted(value.labels)), canonical(dict(value)),
+            "node",
+            value.element_id,
+            tuple(sorted(value.labels)),
+            canonical(dict(value)),
         )
     if isinstance(value, Relationship):
         return (
-            "relationship", value.element_id, value.type,
+            "relationship",
+            value.element_id,
+            value.type,
             value.start_node.element_id,
             value.end_node.element_id,
             canonical(dict(value)),
@@ -150,9 +154,9 @@ def run_logical_classifier():
         raise ValueError("Duplicate instance IDs in the schema inventory.")
     inventory = inventory.set_index("instance_id")
 
-    syntax = pd.read_csv(
-        PROJECT / "outputs/neo4j_syntax_validation.csv"
-    ).set_index("instance_id")
+    syntax = pd.read_csv(PROJECT / "outputs/neo4j_syntax_validation.csv").set_index(
+        "instance_id"
+    )
 
     drivers = {}
     graph_checks = {}
@@ -172,21 +176,30 @@ def run_logical_classifier():
                     populated = result.single() is not None
                     summary = result.consume()
                     labels = {
-                        record[0] for record in session.run(
+                        record[0]
+                        for record in session.run(
                             Query("CALL db.labels()", timeout=TIMEOUT)
                         )
                     }
                     types = {
-                        record[0] for record in session.run(
+                        record[0]
+                        for record in session.run(
                             Query("CALL db.relationshipTypes()", timeout=TIMEOUT)
                         )
                     }
                     graph_checks[database] = (
-                        populated, labels, types, summary.server.agent, ""
+                        populated,
+                        labels,
+                        types,
+                        summary.server.agent,
+                        "",
                     )
             except Exception as error:
                 graph_checks[database] = (
-                    False, set(), set(), "",
+                    False,
+                    set(),
+                    set(),
+                    "",
                     f"{type(error).__name__}: {error}"[:1000],
                 )
         return graph_checks[database]
@@ -198,13 +211,11 @@ def run_logical_classifier():
             instance_id = row["instance_id"]
             reference = "" if pd.isna(row["cypher"]) else str(row["cypher"])
             generated = (
-                "" if pd.isna(row["generated_cypher"])
-                else str(row["generated_cypher"])
+                "" if pd.isna(row["generated_cypher"]) else str(row["generated_cypher"])
             )
             alias = row.get("database_reference_alias")
             audit = (
-                inventory.loc[instance_id]
-                if instance_id in inventory.index else None
+                inventory.loc[instance_id] if instance_id in inventory.index else None
             )
 
             record = {
@@ -234,14 +245,11 @@ def run_logical_classifier():
                 record["logical_status"] = "generated_syntax_error"
             elif syntax.loc[instance_id, "reference_status"] != "accepted":
                 record["logical_status"] = "reference_syntax_not_accepted"
-            elif (
-                audit is not None
-                and (
-                    audit.get("reference_coverage_status")
-                    == "reference_schema_inconsistency"
-                    or audit.get("reference_logical_review_status")
-                    == "confirmed_age_calculation_defect"
-                )
+            elif audit is not None and (
+                audit.get("reference_coverage_status")
+                == "reference_schema_inconsistency"
+                or audit.get("reference_logical_review_status")
+                == "confirmed_age_calculation_defect"
             ):
                 record["logical_status"] = "reference_defect_needs_review"
             elif pd.isna(alias) or not str(alias).strip():
@@ -251,7 +259,7 @@ def run_logical_classifier():
             elif audit is None:
                 record["logical_status"] = "schema_inventory_unavailable"
             else:
-                database = str(alias)[len(PREFIX):]
+                database = str(alias)[len(PREFIX) :]
                 if database == "eoflix":
                     database = "neoflix"
                 record["database"] = database
@@ -270,22 +278,24 @@ def run_logical_classifier():
                     required_labels = set()
                     required_types = set()
                     for prefix in ("reference", "generated"):
-                        required_labels.update(json.loads(
-                            audit[f"{prefix}_node_labels"]
-                        ))
-                        required_types.update(json.loads(
-                            audit[f"{prefix}_relationship_types"]
-                        ))
+                        required_labels.update(
+                            json.loads(audit[f"{prefix}_node_labels"])
+                        )
+                        required_types.update(
+                            json.loads(audit[f"{prefix}_relationship_types"])
+                        )
 
                     missing_labels = required_labels - labels
                     missing_types = required_types - types
 
                     if missing_labels or missing_types:
                         record["logical_status"] = "graph_names_need_review"
-                        record["review_notes"] = json.dumps({
-                            "labels_absent_from_graph": sorted(missing_labels),
-                            "types_absent_from_graph": sorted(missing_types),
-                        })
+                        record["review_notes"] = json.dumps(
+                            {
+                                "labels_absent_from_graph": sorted(missing_labels),
+                                "types_absent_from_graph": sorted(missing_types),
+                            }
+                        )
                     else:
                         with drivers[database].session(
                             database=database,
@@ -335,7 +345,8 @@ def run_logical_classifier():
                                     match = Counter(ref_rows) == Counter(gen_rows)
                                 status = (
                                     "observed_result_match"
-                                    if match else "observed_result_difference"
+                                    if match
+                                    else "observed_result_difference"
                                 )
 
                             record["logical_status"] = status
@@ -360,10 +371,7 @@ def run_logical_classifier():
             driver.close()
 
     print("\nLOGICAL EVALUATION STATUS")
-    print(
-        pd.DataFrame(records)["logical_status"]
-        .value_counts().to_string()
-    )
+    print(pd.DataFrame(records)["logical_status"].value_counts().to_string())
     print(f"\nSaved: {OUTPUT}")
     print("Original generated_queries.csv was not changed.")
 

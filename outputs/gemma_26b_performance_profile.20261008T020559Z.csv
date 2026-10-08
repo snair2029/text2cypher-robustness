@@ -1,0 +1,83 @@
+instance_id,database,phase,repetition,query_kind,query_sha256,evaluated_at_utc,execution_node,comparison_mode,profile_status,current_pair_result_match,error,column_count,returned_rows,db_hits,client_elapsed_profile_ms,server_result_available_ms,server_result_consumed_ms,server_version
+instance_id_20114,network,warmup,0.0,reference,6154e958cfdd578e1cd723133b75b0ec642c0808d8518577f9f83e22ea2faf84,2026-10-08T02:03:18.137823+00:00,mars13.ihpc.uts.edu.au,ordered_rows,measured,1,,1.0,3.0,19.0,267.905,4.0,0.0,Neo4j/2026.05.0
+instance_id_20114,network,warmup,0.0,generated,19a073a48bc3c48e52f05725a57d4ecf095d69d140841273631e9e0a7b41dec0,2026-10-08T02:03:19.148005+00:00,mars13.ihpc.uts.edu.au,ordered_rows,measured,1,,1.0,3.0,11.0,249.209,3.0,0.0,Neo4j/2026.05.0
+instance_id_20114,network,measurement,1.0,generated,19a073a48bc3c48e52f05725a57d4ecf095d69d140841273631e9e0a7b41dec0,2026-10-08T02:03:20.241285+00:00,mars13.ihpc.uts.edu.au,ordered_rows,measured,1,,1.0,3.0,11.0,301.178,0.0,1.0,Neo4j/2026.05.0
+instance_id_20114,network,measurement,1.0,reference,6154e958cfdd578e1cd723133b75b0ec642c0808d8518577f9f83e22ea2faf84,2026-10-08T02:03:21.932888+00:00,mars13.ihpc.uts.edu.au,ordered_rows,measured,1,,1.0,3.0,19.0,945.303,1.0,0.0,Neo4j/2026.05.0
+instance_id_20114,network,measurement,2.0,reference,6154e958cfdd578e1cd723133b75b0ec642c0808d8518577f9f83e22ea2faf84,2026-10-08T02:03:24.324240+00:00,mars13.ihpc.uts.edu.au,ordered_rows,measured,1,,1.0,3.0,19.0,246.002,0.0,1.0,Neo4j/2026.05.0
+instance_id_20114,network,measurement,2.0,generated,19a073a48bc3c48e52f05725a57d4ecf095d69d140841273631e9e0a7b41dec0,2026-10-08T02:03:25.359898+00:00,mars13.ihpc.uts.edu.au,ordered_rows,measured,1,,1.0,3.0,11.0,275.298,6.0,1.0,Neo4j/2026.05.0
+instance_id_20114,network,measurement,3.0,generated,19a073a48bc3c48e52f05725a57d4ecf095d69d140841273631e9e0a7b41dec0,2026-10-08T02:03:26.415752+00:00,mars13.ihpc.uts.edu.au,ordered_rows,measured,,,1.0,3.0,11.0,254.928,0.0,1.0,Neo4j/2026.05.0
+instance_id_20114,network,measurement,3.0,reference,6154e958cfdd578e1cd723133b75b0ec642c0808d8518577f9f83e22ea2faf84,2026-10-08T02:03:27.462273+00:00,mars13.ihpc.uts.edu.au,ordered_rows,inconclusive,,"IncompleteCommit: Failed to read from defunct connection IPv4Address(('127.0.0.1', 17687)) (ResolvedIPv4Address(('127.0.0.1', 17687)))",,,,,,,
+instance_id_21484,fincen,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_24234,twitter,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_24481,twitch,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_25644,stackoverflow2,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_25847,stackoverflow2,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_26668,companies,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_26774,fincen,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_26887,companies,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_27333,companies,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_27805,companies,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_28312,fincen,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_28333,fincen,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_29249,gameofthrones,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_29500,buzzoverflow,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_29913,companies,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_30890,offshoreleaks,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_30935,offshoreleaks,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_30995,offshoreleaks,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_31645,neoflix,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_32991,movies,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_33096,movies,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_33128,movies,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_33286,gameofthrones,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_33573,grandstack,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_34278,neoflix,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_34335,neoflix,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_34400,neoflix,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_34833,neoflix,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_34993,movies,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_35021,movies,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_35505,recommendations,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_37145,twitter,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_38844,grandstack,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_38912,grandstack,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_39959,grandstack,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_44091,network,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,
+instance_id_44611,northwind,connection,,,,,,,inconclusive,,"ServiceUnavailable: Couldn't connect to 127.0.0.1:17687 (resolved to ('127.0.0.1:17687',)):
+Failed to establish connection to ResolvedIPv4Address(('127.0.0.1', 17687)) (reason [Errno 111] Connection refused)",,,,,,,

@@ -75,8 +75,7 @@ def read_checked(path):
 def counts(frame, column):
     return {
         str(key): int(value)
-        for key, value in frame[column].fillna("not_recorded")
-        .value_counts().items()
+        for key, value in frame[column].fillna("not_recorded").value_counts().items()
     }
 
 
@@ -84,7 +83,6 @@ def save_csv(frame, path):
     temporary = path.with_suffix(".tmp")
     frame.to_csv(temporary, index=False)
     temporary.replace(path)
-
 
 
 def read_logical_reviews(expected_ids, logical_results):
@@ -106,13 +104,15 @@ def read_logical_reviews(expected_ids, logical_results):
         "reviewed_at_utc",
     }
 
-    required.update({
-        "final_review_decision",
-        "final_generated_logical_error",
-        "reconciliation_notes",
-        "reconciliation_method",
-        "reconciled_at_utc",
-    })
+    required.update(
+        {
+            "final_review_decision",
+            "final_generated_logical_error",
+            "reconciliation_notes",
+            "reconciliation_method",
+            "reconciled_at_utc",
+        }
+    )
 
     missing = required - set(reviews.columns)
     if missing:
@@ -126,13 +126,9 @@ def read_logical_reviews(expected_ids, logical_results):
 
     unknown_ids = set(reviews["instance_id"]) - expected_ids
     if unknown_ids:
-        raise ValueError(
-            f"Review register contains unknown IDs: {sorted(unknown_ids)}"
-        )
+        raise ValueError(f"Review register contains unknown IDs: {sorted(unknown_ids)}")
 
-    logical_reviews = reviews.loc[
-        reviews["review_stage"].eq("logical")
-    ].copy()
+    logical_reviews = reviews.loc[reviews["review_stage"].eq("logical")].copy()
 
     labels = logical_reviews["final_generated_logical_error"]
     if not labels.isin(["", "0", "1"]).all():
@@ -162,10 +158,12 @@ def read_logical_reviews(expected_ids, logical_results):
 
     candidates = set(
         logical_results.loc[
-            logical_results["logical_status"].isin([
-                "output_shape_differs_needs_review",
-                "observed_result_difference",
-            ]),
+            logical_results["logical_status"].isin(
+                [
+                    "output_shape_differs_needs_review",
+                    "observed_result_difference",
+                ]
+            ),
             "instance_id",
         ]
     )
@@ -182,9 +180,7 @@ def read_logical_reviews(expected_ids, logical_results):
         "flagged_comparison_cases": len(candidates),
         "flagged_comparison_cases_reviewed": len(candidates & reviewed_ids),
         "flagged_comparison_cases_without_review": len(missing_reviews),
-        "confirmed_generated_errors_under_recorded_rules": int(
-            labels.eq("1").sum()
-        ),
+        "confirmed_generated_errors_under_recorded_rules": int(labels.eq("1").sum()),
         "acceptable_output_alternatives": int(labels.eq("0").sum()),
         "without_final_binary_label": int(labels.eq("").sum()),
         "decision_counts": counts(logical_reviews, "final_review_decision"),
@@ -224,9 +220,7 @@ def run_full_pipeline():
 
         missing_columns = set(REQUIRED_COLUMNS[stage]) - set(frame.columns)
         if missing_columns:
-            raise ValueError(
-                f"{stage}: missing columns {sorted(missing_columns)}"
-            )
+            raise ValueError(f"{stage}: missing columns {sorted(missing_columns)}")
 
         missing_ids = expected_ids - set(frame["instance_id"])
         extra_ids = set(frame["instance_id"]) - expected_ids
@@ -240,31 +234,29 @@ def run_full_pipeline():
         diagnostics[stage] = frame
         print(f"{stage}: {len(frame)} records, IDs match", flush=True)
 
-    combined = queries.rename(columns={
-        column: "legacy_" + column
-        for column in LEGACY_COLUMNS
-        if column in queries.columns
-    })
+    combined = queries.rename(
+        columns={
+            column: "legacy_" + column
+            for column in LEGACY_COLUMNS
+            if column in queries.columns
+        }
+    )
 
     for stage, frame in diagnostics.items():
-        renamed = frame.rename(columns={
-            column: (
-                column
-                if column.startswith(stage + "_")
-                else stage + "_" + column
-            )
-            for column in frame.columns
-            if column != "instance_id"
-        })
+        renamed = frame.rename(
+            columns={
+                column: (
+                    column if column.startswith(stage + "_") else stage + "_" + column
+                )
+                for column in frame.columns
+                if column != "instance_id"
+            }
+        )
 
-        collisions = (
-            set(combined.columns) & set(renamed.columns)
-        ) - {"instance_id"}
+        collisions = (set(combined.columns) & set(renamed.columns)) - {"instance_id"}
 
         if collisions:
-            raise ValueError(
-                f"{stage}: conflicting columns {sorted(collisions)}"
-            )
+            raise ValueError(f"{stage}: conflicting columns {sorted(collisions)}")
 
         combined = combined.merge(
             renamed,
@@ -278,13 +270,9 @@ def run_full_pipeline():
         expected_ids, diagnostics["logical"]
     )
 
-    collisions = (
-        set(combined.columns) & set(manual_reviews.columns)
-    ) - {"instance_id"}
+    collisions = (set(combined.columns) & set(manual_reviews.columns)) - {"instance_id"}
     if collisions:
-        raise ValueError(
-            f"Manual reviews: conflicting columns {sorted(collisions)}"
-        )
+        raise ValueError(f"Manual reviews: conflicting columns {sorted(collisions)}")
 
     combined = combined.merge(
         manual_reviews,
@@ -300,15 +288,15 @@ def run_full_pipeline():
     labels = combined["manual_final_generated_logical_error"].fillna("")
 
     combined["manual_logical_review_status"] = "not_reviewed"
-    combined.loc[
-        reviewed, "manual_logical_review_status"
-    ] = "reviewed_without_final_binary_label"
-    combined.loc[
-        reviewed & labels.eq("1"), "manual_logical_review_status"
-    ] = "confirmed_generated_error_under_recorded_rules"
-    combined.loc[
-        reviewed & labels.eq("0"), "manual_logical_review_status"
-    ] = "acceptable_output_alternative"
+    combined.loc[reviewed, "manual_logical_review_status"] = (
+        "reviewed_without_final_binary_label"
+    )
+    combined.loc[reviewed & labels.eq("1"), "manual_logical_review_status"] = (
+        "confirmed_generated_error_under_recorded_rules"
+    )
+    combined.loc[reviewed & labels.eq("0"), "manual_logical_review_status"] = (
+        "acceptable_output_alternative"
+    )
 
     total = len(combined)
 
@@ -324,9 +312,7 @@ def run_full_pipeline():
         & combined["generated_cypher"].fillna("").str.strip().ne("")
     )
 
-    strict_match = pd.Series(
-        pd.NA, index=combined.index, dtype="Int64"
-    )
+    strict_match = pd.Series(pd.NA, index=combined.index, dtype="Int64")
     strict_match.loc[valid] = (
         combined.loc[valid, "cypher"].str.strip()
         == combined.loc[valid, "generated_cypher"].str.strip()
@@ -335,9 +321,7 @@ def run_full_pipeline():
     combined["case_sensitive_trimmed_exact_match"] = strict_match
 
     alias = combined["database_reference_alias"]
-    has_alias = (
-        alias.notna() & alias.fillna("").str.strip().ne("")
-    )
+    has_alias = alias.notna() & alias.fillna("").str.strip().ne("")
 
     summary = {
         "assembled_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -346,32 +330,21 @@ def run_full_pipeline():
         "total_records": total,
         "records_with_source_graph_alias": int(has_alias.sum()),
         "records_without_source_graph_alias": int((~has_alias).sum()),
-        "generated_syntax_status": counts(
-            diagnostics["syntax"], "generated_status"
-        ),
-        "reference_syntax_status": counts(
-            diagnostics["syntax"], "reference_status"
-        ),
+        "generated_syntax_status": counts(diagnostics["syntax"], "generated_status"),
+        "reference_syntax_status": counts(diagnostics["syntax"], "reference_status"),
         "generated_schema_name_status": counts(
             diagnostics["schema"], "generated_name_coverage_status"
         ),
         "generated_property_name_status": counts(
             diagnostics["schema"], "generated_property_name_status"
         ),
-        "logical_status": counts(
-            diagnostics["logical"], "logical_status"
-        ),
-        "performance_status": counts(
-            diagnostics["performance"], "performance_status"
-        ),
-        "case_sensitive_trimmed_exact_match_count": int(
-            strict_match.sum()
-        ),
+        "logical_status": counts(diagnostics["logical"], "logical_status"),
+        "performance_status": counts(diagnostics["performance"], "performance_status"),
+        "case_sensitive_trimmed_exact_match_count": int(strict_match.sum()),
         "exact_match_assessable_records": int(valid.sum()),
         "input_sha256": fingerprint(INPUT),
         "diagnostic_sha256": {
-            stage: fingerprint(path)
-            for stage, path in SOURCES.items()
+            stage: fingerprint(path) for stage, path in SOURCES.items()
         },
         "limitations": [
             "Matching IDs establish coverage, not freshness of evaluations.",
@@ -445,16 +418,15 @@ def run_full_pipeline():
     )
 
     print("\nPERFORMANCE PLAN STATUS")
-    print(
-        diagnostics["performance"]["performance_status"]
-        .value_counts().to_string()
-    )
+    print(diagnostics["performance"]["performance_status"].value_counts().to_string())
 
     print(f"\nResults: {COMBINED}")
     print(f"Summary: {SUMMARY}")
     print("Original queries and diagnostic files were not changed.")
     print("Database evaluations were not rerun.")
-    print("Reconciled review evidence assembled. PROFILE measurements are saved separately.")
+    print(
+        "Reconciled review evidence assembled. PROFILE measurements are saved separately."
+    )
 
 
 if __name__ == "__main__":

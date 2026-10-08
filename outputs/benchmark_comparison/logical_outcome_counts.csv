@@ -1,0 +1,11 @@
+logical_status,Gemini,Gemma
+source_graph_unavailable,89,89
+observed_result_match,52,38
+output_shape_differs_needs_review,25,27
+observed_result_difference,23,18
+result_limit_inconclusive,3,4
+both_empty_inconclusive,3,3
+reference_defect_needs_review,2,2
+generated_syntax_error,2,17
+timeout_inconclusive,1,0
+generated_execution_failed,0,2

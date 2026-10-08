@@ -1,0 +1,3 @@
+model,records,mean_sentence_bleu,lowercase_trimmed_exact_match_count,case_sensitive_trimmed_exact_match_count,syntax_accepted_count,syntax_error_count
+Gemini,200,60.26727650000001,14,13,198,2
+Gemma,200,58.9395665,14,12,183,17

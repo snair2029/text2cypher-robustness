@@ -21,8 +21,7 @@ Question: {question}
 Return only the Cypher query, nothing else."""
 
 response = client.models.generate_content(
-    model="gemini-2.5-flash-lite",
-    contents=prompt
+    model="gemini-2.5-flash-lite", contents=prompt
 )
 
 print("Generated Cypher:")

@@ -1,0 +1,20 @@
+{
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.ipynb_checkpoints": true,
+    "**/*.before*": true,
+    "**/*.historical_audit.*": true,
+    "**/*_backup_*": true,
+    "**/archive": true
+  },
+  "search.exclude": {
+    "**/archive/**": true,
+    "**/*.before*": true,
+    "**/__pycache__/**": true
+  },
+  "editor.rulers": [
+    88
+  ],
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true
+}

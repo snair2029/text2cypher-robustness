@@ -1,0 +1,1493 @@
+review_order,instance_id,complexity,selection_seed,review_order_seed,model_requested,question,schema,reference_cypher,generated_cypher,case_sha256,source_file_sha256,syntax_assessment,schema_assessment,logical_assessment,reference_assessment,review_reason,reviewer,reviewed_at_utc,verified_at_utc,performance_assessment,review_status,verification_status,assistance_used,prior_exposure,automatic_syntax_generated_status,automatic_syntax_message,automatic_logical_status,automatic_schema_generated_name_coverage_status,automatic_schema_generated_property_name_status,automatic_schema_generated_endpoint_status,reference_preview,generated_preview,reference_error,generated_error,reference_row_count,generated_row_count,proposed_syntax_assessment,proposed_schema_assessment,proposed_logical_assessment,proposed_reference_assessment,proposed_reason,proposal_method,flagged_review_decision,flagged_review_reason,proposal_created_at_utc,verification_method
+1,instance_id_35775,medium,20261002,20261003,gemma-4-26b-a4b-it,Which organizations have a parent organization with a higher revenue?,"Node properties:
+- **Person**
+  - `name`: STRING Example: ""Julie Spellman Sweet""
+  - `id`: STRING Example: ""Eaf0bpz6NNoqLVUCqNZPAew""
+  - `summary`: STRING Example: ""CEO at Accenture""
+- **Organization**
+  - `revenue`: FLOAT Example: ""1.2E8""
+  - `motto`: STRING Example: """"
+  - `nbrEmployees`: INTEGER Example: ""375""
+  - `isDissolved`: BOOLEAN 
+  - `id`: STRING Example: ""E0ZU8eCc5OaqS1LU9qE3n3w""
+  - `isPublic`: BOOLEAN 
+  - `name`: STRING Example: ""New Energy Group""
+  - `summary`: STRING Example: ""Software company based in Rome, Metropolitan City ""
+- **IndustryCategory**
+  - `name`: STRING Example: ""Electronic Products Manufacturers""
+  - `id`: STRING Example: ""EUNd__O4zMNW81lAXNK2GNw""
+- **City**
+  - `id`: STRING Example: ""EZHWv2xKgN92oYDKSjhJ2gw""
+  - `summary`: STRING Example: ""City in and county seat of King County, Washington""
+  - `name`: STRING Example: ""Seattle""
+- **Country**
+  - `name`: STRING Example: ""United States of America""
+  - `id`: STRING Example: ""E01d4EK33MmCosgI2KXa4-A""
+  - `summary`: STRING Example: ""Country in North America""
+- **Article**
+  - `id`: STRING Example: ""ART176872705964""
+  - `sentiment`: FLOAT Example: ""0.856""
+  - `author`: STRING Example: ""David Correa""
+  - `siteName`: STRING Example: ""MrWeb""
+  - `summary`: STRING Example: ""Boston and Mumbai-based consumer behavior analyses""
+  - `date`: DATE_TIME Example: ""2022-03-10T00:00:00Z""
+  - `title`: STRING Example: ""Funds for Consumer Behavior Specialist Infinite An""
+- **Chunk**
+  - `text`: STRING Example: ""Boston and Mumbai-based consumer behavior analyses""
+- **Fewshot**
+  - `Question`: STRING Available options: ['How is Emil Eifrem connected to Michael Hunger? ', 'What are the latest news regarding Google? ', 'Are there any news regarding return to office poli', 'What is Microsoft policy regarding to the return t', 'How many levels of subsidiaries does Blackstone ha', 'How many Telecommunications Companies are from Mal']
+  - `Cypher`: STRING Available options: ['MATCH (p1:Person {{name:""Emil Eifrem""}}), (p2:Pers', 'MATCH (o:Organization {{name:""Google""}})<-[:MENTIO', 'CALL apoc.ml.openai.embedding([""Are there any news', 'CALL apoc.ml.openai.embedding([""What is Microsoft ', 'MATCH p=(o:Organization {name:""Blackstone""})-[:HAS', 'MATCH (o:Organization) WHERE EXISTS {(o)-[:HAS_CAT']
+  - `id`: INTEGER Min: 2, Max: 7
+Relationship properties:
+
+The relationships:
+(:Person)-[:HAS_PARENT]->(:Person)
+(:Person)-[:HAS_CHILD]->(:Person)
+(:Organization)-[:IN_CITY]->(:City)
+(:Organization)-[:HAS_CEO]->(:Person)
+(:Organization)-[:HAS_CATEGORY]->(:IndustryCategory)
+(:Organization)-[:HAS_SUBSIDIARY]->(:Organization)
+(:Organization)-[:HAS_SUPPLIER]->(:Organization)
+(:Organization)-[:HAS_INVESTOR]->(:Organization)
+(:Organization)-[:HAS_INVESTOR]->(:Person)
+(:Organization)-[:HAS_BOARD_MEMBER]->(:Person)
+(:Organization)-[:HAS_COMPETITOR]->(:Organization)
+(:City)-[:IN_COUNTRY]->(:Country)
+(:Article)-[:HAS_CHUNK]->(:Chunk)
+(:Article)-[:MENTIONS]->(:Organization)","MATCH (o:Organization)-[:HAS_SUBSIDIARY]->(sub:Organization) WHERE o.revenue > sub.revenue RETURN o.name AS ParentOrganization, o.revenue AS ParentRevenue,         sub.name AS Subsidiary, sub.revenue AS SubsidiaryRevenue","MATCH (parent:Organization)-[:HAS_SUBSIDIARY]->(child:Organization)
+WHERE parent.revenue > child.revenue
+RETURN child",356475517d6ad5eeadbc40189359e55999465ae677fff4c08bcefd1f13a4f65f,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Gemma uses the declared parent-to-subsidiary direction, filters higher parent revenue and returns the requested child organisations. Extra reference columns are optional. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,output_shape_differs_needs_review,detected_names_covered,detected_names_present_somewhere_in_schema,detected_simple_endpoints_supported,"[[""'Microsoft Corporation'"", ""198270000000.0"", ""'LinkedIn'"", ""3500000000.0""], [""'Microsoft Corporation'"", ""198270000000.0"", ""'Skype'"", ""185000000.0""], [""'Microsoft Corporation'"", ""198270000000.0"", ""'Nuance Communications'"", ""1362379000.0""]]","[[""<Node element_id='4:14b688aa-0200-40b1-a396-d141d8c3e402:669' labels=frozenset({'Organization'}) properties={'summary': 'Software company based in Sunnyvale, California, United States and owned by Microsoft', 'revenue': 3500000000.0, 'isDissolved': False, 'diffbotId': 'https://diffbot.com/entity/E7x""], [""<Node element_id='4:14b688aa-0200-40b1-a396-d141d8c3e402:671' labels=frozenset({'Organization'}) properties={'summary': 'Subsidiary of Microsoft, which is developing Skype', 'revenue': 185000000.0, 'isDissolved': False, 'diffbotId': 'https://diffbot.com/entity/Ey37iFsVMOiqFnSlv1AiosQ', 'nbrEmployees""], [""<Node element_id='4:14b688aa-0200-40b1-a396-d141d8c3e402:672' labels=frozenset({'Organization'}) properties={'summary': 'Software company based in Burlington, Massachusetts, United States and owned by Microsoft', 'revenue': 1362379000.0, 'isDissolved': False, 'diffbotId': 'https://diffbot.com/entity""]]",,,262.0,262.0,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Gemma uses the declared parent-to-subsidiary direction, filters higher parent revenue and returns the requested child organisations. Extra reference columns are optional. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",acceptable_output_alternative,"Gemma uses declared parent-HAS_SUBSIDIARY->child direction and parent revenue > child revenue, returning requested child organisations. Reference returns parent/child details. Both return 262 rows. The prior Gemini HAS_PARENT defect is absent.",2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+2,instance_id_2789,simple,20261002,20261003,gemma-4-26b-a4b-it,Find all 'Vehicle Crime' crimes,"Node properties are the following: "":Person {surname: STRING, nhs_no: STRING, name: STRING, age: STRING},:Location {latitude: FLOAT, postcode: STRING, longitude: FLOAT, address: STRING},:Phone {phoneNo: STRING},:Email {email_address: STRING},:Officer {badge_no: STRING, rank: STRING, name: STRING, surname: STRING},:PostCode {code: STRING},:Area {areaCode: STRING},:PhoneCall {call_duration: STRING, call_time: STRING, call_date: STRING, call_type: STRING},:Crime {date: STRING, id: STRING, type: STRING, last_outcome: STRING, note: STRING, charge: STRING},:Object {description: STRING, id: STRING, type: STRING},:Vehicle {model: STRING, reg: STRING, make: STRING, year: STRING}"" Relationship properties are the following: "":CURRENT_ADDRESS {},:HAS_PHONE {},:HAS_EMAIL {},:HAS_POSTCODE {},:POSTCODE_IN_AREA {},:LOCATION_IN_AREA {},:KNOWS_SN {},:KNOWS {},:CALLER {},:CALLED {},:KNOWS_PHONE {},:OCCURRED_AT {},:INVESTIGATED_BY {},:INVOLVED_IN {},:PARTY_TO {},:FAMILY_REL {rel_type: STRING},:KNOWS_LW {}"" Relationship point from source to target nodes ""(:Person)-[:FAMILY_REL]->(:Person),(:Person)-[:CURRENT_ADDRESS]->(:Location),(:Person)-[:KNOWS]->(:Person),(:Person)-[:HAS_PHONE]->(:Phone),(:Person)-[:KNOWS_PHONE]->(:Person),(:Person)-[:HAS_EMAIL]->(:Email),(:Person)-[:KNOWS_SN]->(:Person),(:Person)-[:KNOWS_LW]->(:Person),(:Person)-[:PARTY_TO]->(:Crime),(:Location)-[:LOCATION_IN_AREA]->(:Area),(:Location)-[:HAS_POSTCODE]->(:PostCode),(:PostCode)-[:POSTCODE_IN_AREA]->(:Area),(:PhoneCall)-[:CALLED]->(:Phone),(:PhoneCall)-[:CALLER]->(:Phone),(:Crime)-[:INVESTIGATED_BY]->(:Officer),(:Crime)-[:OCCURRED_AT]->(:Location),(:Object)-[:INVOLVED_IN]->(:Crime),(:Vehicle)-[:INVOLVED_IN]->(:Crime)""",MATCH (n:Crime) WHERE toLower(n.type) = toLower('Vehicle Crime') RETURN n,MATCH (c:Crime) WHERE c.type = 'Vehicle Crime' RETURN c,59520a75bd23b02cbe14f14689b8bf794d000191197860e9ef42de08e9118766,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,uncertain,uncertain,"Exact Vehicle Crime equality differs from reference case-insensitive comparison. Stored capitalization and the required matching policy are unavailable; no database check was possible. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,source_graph_unavailable,detected_names_covered,detected_names_present_somewhere_in_schema,no_explicit_typed_pattern_detected,,,,,,,no_error_identified,no_error_identified,uncertain,uncertain,"Exact Vehicle Crime equality differs from reference case-insensitive comparison. Stored capitalization and the required matching policy are unavailable; no database check was possible. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+3,instance_id_5551,complex,20261002,20261003,gemma-4-26b-a4b-it,"Look for the report_no of the Report that is not related  to the Article with the  comments  19 pages, AMSLatex, references added!","Graph schema: Relevant node labels and their properties (with datatypes) are:
+Report {report_no: STRING}
+Article {comments: STRING}","MATCH (n:Report), (:Article {comments: '19 pages, AMSLatex, references added'}) WHERE NOT (n) --> (:Article) RETURN n.report_no","MATCH (a:Article {comments: '19 pages, AMSLatex, references added!'}) MATCH (r:Report) WHERE NOT (r)-[]-(a) RETURN r.report_no",f624d0370eb2fdacf5c46ec52598d68272cf92a9d3076fc4e79f16c9e7c8648e,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,uncertain,issue_identified,"Gemma excludes relationships to the specifically selected Article; reference excludes outgoing links to any Article and leaves the selected Article unbound. Exclamation-mark literal and intended direction remain ambiguous. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,source_graph_unavailable,detected_names_covered,detected_names_present_somewhere_in_schema,no_explicit_typed_pattern_detected,,,,,,,no_error_identified,no_error_identified,uncertain,issue_identified,"Gemma excludes relationships to the specifically selected Article; reference excludes outgoing links to any Article and leaves the selected Article unbound. Exclamation-mark literal and intended direction remain ambiguous. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+4,instance_id_29896,simple,20261002,20261003,gemma-4-26b-a4b-it,Which organization has the most subsidiaries?,"Node properties:
+- **Person**
+  - `name`: STRING Example: ""Julie Spellman Sweet""
+  - `id`: STRING Example: ""Eaf0bpz6NNoqLVUCqNZPAew""
+  - `summary`: STRING Example: ""CEO at Accenture""
+- **Organization**
+  - `revenue`: FLOAT Example: ""1.2E8""
+  - `motto`: STRING Example: """"
+  - `nbrEmployees`: INTEGER Example: ""375""
+  - `isDissolved`: BOOLEAN 
+  - `id`: STRING Example: ""E0ZU8eCc5OaqS1LU9qE3n3w""
+  - `isPublic`: BOOLEAN 
+  - `name`: STRING Example: ""New Energy Group""
+  - `summary`: STRING Example: ""Software company based in Rome, Metropolitan City ""
+- **IndustryCategory**
+  - `name`: STRING Example: ""Electronic Products Manufacturers""
+  - `id`: STRING Example: ""EUNd__O4zMNW81lAXNK2GNw""
+- **City**
+  - `id`: STRING Example: ""EZHWv2xKgN92oYDKSjhJ2gw""
+  - `summary`: STRING Example: ""City in and county seat of King County, Washington""
+  - `name`: STRING Example: ""Seattle""
+- **Country**
+  - `name`: STRING Example: ""United States of America""
+  - `id`: STRING Example: ""E01d4EK33MmCosgI2KXa4-A""
+  - `summary`: STRING Example: ""Country in North America""
+- **Article**
+  - `id`: STRING Example: ""ART176872705964""
+  - `sentiment`: FLOAT Example: ""0.856""
+  - `author`: STRING Example: ""David Correa""
+  - `siteName`: STRING Example: ""MrWeb""
+  - `summary`: STRING Example: ""Boston and Mumbai-based consumer behavior analyses""
+  - `date`: DATE_TIME Example: ""2022-03-10T00:00:00Z""
+  - `title`: STRING Example: ""Funds for Consumer Behavior Specialist Infinite An""
+- **Chunk**
+  - `text`: STRING Example: ""Boston and Mumbai-based consumer behavior analyses""
+- **Fewshot**
+  - `Question`: STRING Available options: ['How is Emil Eifrem connected to Michael Hunger? ', 'What are the latest news regarding Google? ', 'Are there any news regarding return to office poli', 'What is Microsoft policy regarding to the return t', 'How many levels of subsidiaries does Blackstone ha', 'How many Telecommunications Companies are from Mal']
+  - `Cypher`: STRING Available options: ['MATCH (p1:Person {{name:""Emil Eifrem""}}), (p2:Pers', 'MATCH (o:Organization {{name:""Google""}})<-[:MENTIO', 'CALL apoc.ml.openai.embedding([""Are there any news', 'CALL apoc.ml.openai.embedding([""What is Microsoft ', 'MATCH p=(o:Organization {name:""Blackstone""})-[:HAS', 'MATCH (o:Organization) WHERE EXISTS {(o)-[:HAS_CAT']
+  - `id`: INTEGER Min: 2, Max: 7
+Relationship properties:
+
+The relationships:
+(:Person)-[:HAS_PARENT]->(:Person)
+(:Person)-[:HAS_CHILD]->(:Person)
+(:Organization)-[:IN_CITY]->(:City)
+(:Organization)-[:HAS_CEO]->(:Person)
+(:Organization)-[:HAS_CATEGORY]->(:IndustryCategory)
+(:Organization)-[:HAS_SUBSIDIARY]->(:Organization)
+(:Organization)-[:HAS_SUPPLIER]->(:Organization)
+(:Organization)-[:HAS_INVESTOR]->(:Organization)
+(:Organization)-[:HAS_INVESTOR]->(:Person)
+(:Organization)-[:HAS_BOARD_MEMBER]->(:Person)
+(:Organization)-[:HAS_COMPETITOR]->(:Organization)
+(:City)-[:IN_COUNTRY]->(:Country)
+(:Article)-[:HAS_CHUNK]->(:Chunk)
+(:Article)-[:MENTIONS]->(:Organization)","MATCH (o:Organization)-[:HAS_SUBSIDIARY]->(s) WITH o, size(collect(s)) AS subsidiaryCount ORDER BY subsidiaryCount DESC LIMIT 1 RETURN o.name AS organizationName","MATCH (o:Organization)-[:HAS_SUBSIDIARY]->(:Organization)
+RETURN o.name
+ORDER BY count(*) DESC
+LIMIT 1",c62a9f70e85c82832c67fe51fe6721c0cc497cf82d1ba4a473bab4da288756b4,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,error_present,no_error_identified,uncertain,no_issue_identified,"Saved Neo4j syntax validation rejected this query. Names and relationship are declared, but aggregation in ORDER BY is not successfully planned; no separate semantic correctness judgement is possible. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,syntax_error,"{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Illegal aggregation expression(s) in order by: count(*). If an aggregation expression is used in order by, it also needs to be a projection item on it's own. For example, in 'RETURN n.a, 1 + count(*) ORDER BY count(*) + 1' the aggregation expression 'count(*) + 1' is not a projection item on its own, but it could be rewritten to 'RETURN n.a, 1 + count(*) AS cnt ORDER BY 1 + count(*)'. (line 3, column 10 (offset: 89))
+""ORDER BY count(*) DESC""
+          ^} {gql_status: 42001} {gql_status_description: error: syntax error or access rule violation - invalid syntax}",generated_syntax_error,detected_names_covered,detected_names_present_somewhere_in_schema,detected_simple_endpoints_supported,,,,,,,error_present,no_error_identified,uncertain,no_issue_identified,"Saved Neo4j syntax validation rejected this query. Names and relationship are declared, but aggregation in ORDER BY is not successfully planned; no separate semantic correctness judgement is possible. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+5,instance_id_16495,medium,20261002,20261003,gemma-4-26b-a4b-it,Find nodes that share a relationship with both Keyword and Keyword!,"Graph schema: Relevant node labels and their properties  are:
+Keyword
+Keyword",MATCH (c:Keyword)<-[r1]-(n)-[r2]->(d:Keyword) RETURN labels(n),"MATCH (n)-[]-(k1:Keyword), (n)-[]-(k2:Keyword) WHERE k1 <> k2 RETURN n",1d6963199f36192ebcf0f85fbba36eb612c13b9c85c92bae25aac5963a1e1561,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,uncertain,uncertain,"Gemma requires two distinct Keyword neighbours in either direction and returns nodes; reference requires outgoing connections and returns labels. The repeated Keyword wording does not resolve distinctness or direction. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,source_graph_unavailable,detected_names_covered,no_static_property_names_detected,no_explicit_typed_pattern_detected,,,,,,,no_error_identified,no_error_identified,uncertain,uncertain,"Gemma requires two distinct Keyword neighbours in either direction and returns nodes; reference requires outgoing connections and returns labels. The repeated Keyword wording does not resolve distinctness or direction. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+6,instance_id_6067,complex,20261002,20261003,gemma-4-26b-a4b-it,Find nodes that are at the end of a path starting at Keyword where name is log-balanced and traversing through Author with author_id befdd60b44b9cd4d5ffc084ce31d92d4!,"Graph schema: Relevant node labels and their properties (with datatypes) are:
+Keyword {name: STRING}
+Author {author_id: STRING}",MATCH (a:Keyword{name:'log-balanced'})-[*]->(d:Author{author_id:'befdd60b44b9cd4d5ffc084ce31d92d4'})-[*]->(n) RETURN n,MATCH (k:Keyword {name: 'log-balanced'})-->(a:Author {author_id: 'befdd60b44b9cd4d5ffc084ce31d92d4'})-->(n) RETURN n,81b23f872eaff6078285bb11e0758b22b60be1ec59745e7cef9f67f2f7a7cab2,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,uncertain,uncertain,"Gemma permits exactly one hop to Author and one hop onwards; reference permits variable-length paths on both segments. Intended path length is unspecified and source graph unavailable. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,source_graph_unavailable,detected_names_covered,detected_names_present_somewhere_in_schema,no_explicit_typed_pattern_detected,,,,,,,no_error_identified,no_error_identified,uncertain,uncertain,"Gemma permits exactly one hop to Author and one hop onwards; reference permits variable-length paths on both segments. Intended path length is unspecified and source graph unavailable. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+7,instance_id_24738,simple,20261002,20261003,gemma-4-26b-a4b-it,Which 3 movies have the highest IMDb votes?,"Node properties:
+- **Movie**
+  - `url`: STRING Example: ""https://themoviedb.org/movie/862""
+  - `runtime`: INTEGER Min: 2, Max: 910
+  - `revenue`: INTEGER Min: 1, Max: 2787965087
+  - `imdbRating`: FLOAT Min: 1.6, Max: 9.6
+  - `released`: STRING Example: ""1995-11-22""
+  - `countries`: LIST Min Size: 1, Max Size: 16
+  - `languages`: LIST Min Size: 1, Max Size: 19
+  - `plot`: STRING Example: ""A cowboy doll is profoundly threatened and jealous""
+  - `imdbVotes`: INTEGER Min: 13, Max: 1626900
+  - `imdbId`: STRING Example: ""0114709""
+  - `year`: INTEGER Min: 1902, Max: 2016
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/uXDf""
+  - `movieId`: STRING Example: ""1""
+  - `tmdbId`: STRING Example: ""862""
+  - `title`: STRING Example: ""Toy Story""
+  - `budget`: INTEGER Min: 1, Max: 380000000
+- **Genre**
+  - `name`: STRING Example: ""Adventure""
+- **User**
+  - `userId`: STRING Example: ""1""
+  - `name`: STRING Example: ""Omar Huffman""
+- **Actor**
+  - `url`: STRING Example: ""https://themoviedb.org/person/1271225""
+  - `name`: STRING Example: ""François Lallement""
+  - `tmdbId`: STRING Example: ""1271225""
+  - `bornIn`: STRING Example: ""France""
+  - `bio`: STRING Example: ""​From Wikipedia, the free encyclopedia  Lillian Di""
+  - `died`: DATE Example: ""1954-01-01""
+  - `born`: DATE Example: ""1877-02-04""
+  - `imdbId`: STRING Example: ""2083046""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/6DCW""
+- **Director**
+  - `url`: STRING Example: ""https://themoviedb.org/person/88953""
+  - `bornIn`: STRING Example: ""Burchard, Nebraska, USA""
+  - `born`: DATE Min: 1861-12-08, Max: 2018-05-01
+  - `died`: DATE Min: 1930-08-26, Max: 2976-09-29
+  - `tmdbId`: STRING Example: ""88953""
+  - `imdbId`: STRING Example: ""0516001""
+  - `name`: STRING Example: ""Harold Lloyd""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/er4Z""
+  - `bio`: STRING Example: ""Harold Lloyd has been called the cinema’s “first m""
+- **Person**
+  - `url`: STRING Example: ""https://themoviedb.org/person/1271225""
+  - `died`: DATE Example: ""1954-01-01""
+  - `bornIn`: STRING Example: ""France""
+  - `born`: DATE Example: ""1877-02-04""
+  - `imdbId`: STRING Example: ""2083046""
+  - `name`: STRING Example: ""François Lallement""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/6DCW""
+  - `tmdbId`: STRING Example: ""1271225""
+  - `bio`: STRING Example: ""​From Wikipedia, the free encyclopedia  Lillian Di""
+Relationship properties:
+- **RATED**
+  - `rating: FLOAT` Example: ""2.0""
+  - `timestamp: INTEGER` Example: ""1260759108""
+- **ACTED_IN**
+  - `role: STRING` Example: ""Officer of the Marines (uncredited)""
+- **DIRECTED**
+  - `role: STRING` 
+The relationships:
+(:Movie)-[:IN_GENRE]->(:Genre)
+(:User)-[:RATED]->(:Movie)
+(:Actor)-[:ACTED_IN]->(:Movie)
+(:Actor)-[:DIRECTED]->(:Movie)
+(:Director)-[:DIRECTED]->(:Movie)
+(:Director)-[:ACTED_IN]->(:Movie)
+(:Person)-[:ACTED_IN]->(:Movie)
+(:Person)-[:DIRECTED]->(:Movie)",MATCH (m:Movie) WHERE m.imdbVotes IS NOT NULL RETURN m ORDER BY m.imdbVotes DESC LIMIT 3,"MATCH (m:Movie)
+RETURN m.title
+ORDER BY m.imdbVotes DESC
+LIMIT 3",dd57c378fb77eb57c7b0f6ee0ecfdfcc295e22297e1f0af01799eb460cb811a0,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,error_present,no_issue_identified,"Under the recorded highest-known-votes rule, Gemma omits the non-null IMDb-vote filter before descending ranking. Unknown votes can outrank known values. Titles are an acceptable projection; saved outputs differ. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,observed_result_difference,detected_names_covered,detected_names_present_somewhere_in_schema,no_explicit_typed_pattern_detected,"[[""<Node element_id='4:6636a433-9f85-4f47-b4a7-e2cd79149f79:303' labels=frozenset({'Movie'}) properties={'languages': ['English'], 'plotEmbedding': [0.0037316230591386557, -0.037755995988845825, 0.015640312805771828, -0.032402344048023224, -0.0148500120267272, 0.006832280196249485, 0.001533598289825022""], [""<Node element_id='4:6636a433-9f85-4f47-b4a7-e2cd79149f79:6935' labels=frozenset({'Movie'}) properties={'languages': ['English', ' Mandarin'], 'plotEmbedding': [-0.004382744897156954, -0.04111402481794357, 0.01898147538304329, -0.01819370687007904, -0.015605323016643524, -0.0044577703811228275, -0.01""], [""<Node element_id='4:6636a433-9f85-4f47-b4a7-e2cd79149f79:7594' labels=frozenset({'Movie'}) properties={'languages': ['English', ' Japanese', ' French'], 'plotEmbedding': [0.0007911681313998997, -0.029693223536014557, 0.003001880832016468, -0.03651745617389679, -0.006674463860690594, 0.01861035823822""]]","[[""'Gate of Heavenly Peace, The'""], [""'Wedding Gift, The'""], [""'This Is Spinal Tap'""]]",,,3.0,3.0,no_error_identified,no_error_identified,error_present,no_issue_identified,"Under the recorded highest-known-votes rule, Gemma omits the non-null IMDb-vote filter before descending ranking. Unknown votes can outrank known values. Titles are an acceptable projection; saved outputs differ. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",confirmed_generated_logical_error,"Under the recorded highest-known-votes rule, descending imdbVotes without a non-null filter can rank unknown values first. Gemma omits that filter. Returning titles is acceptable; exact selected vote values are absent from saved previews.",2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+8,instance_id_42155,simple,20261002,20261003,gemma-4-26b-a4b-it,List the top 5 oldest directors in the database.,"Node properties:
+- **Movie**
+  - `url`: STRING Example: ""https://themoviedb.org/movie/862""
+  - `runtime`: INTEGER Min: 2, Max: 910
+  - `revenue`: INTEGER Min: 1, Max: 2787965087
+  - `imdbRating`: FLOAT Min: 1.6, Max: 9.6
+  - `released`: STRING Example: ""1995-11-22""
+  - `countries`: LIST Min Size: 1, Max Size: 16
+  - `languages`: LIST Min Size: 1, Max Size: 19
+  - `plot`: STRING Example: ""A cowboy doll is profoundly threatened and jealous""
+  - `imdbVotes`: INTEGER Min: 13, Max: 1626900
+  - `imdbId`: STRING Example: ""0114709""
+  - `year`: INTEGER Min: 1902, Max: 2016
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/uXDf""
+  - `movieId`: STRING Example: ""1""
+  - `tmdbId`: STRING Example: ""862""
+  - `title`: STRING Example: ""Toy Story""
+  - `budget`: INTEGER Min: 1, Max: 380000000
+- **Genre**
+  - `name`: STRING Example: ""Adventure""
+- **User**
+  - `userId`: STRING Example: ""1""
+  - `name`: STRING Example: ""Omar Huffman""
+- **Actor**
+  - `url`: STRING Example: ""https://themoviedb.org/person/1271225""
+  - `name`: STRING Example: ""François Lallement""
+  - `tmdbId`: STRING Example: ""1271225""
+  - `bornIn`: STRING Example: ""France""
+  - `bio`: STRING Example: ""​From Wikipedia, the free encyclopedia  Lillian Di""
+  - `died`: DATE Example: ""1954-01-01""
+  - `born`: DATE Example: ""1877-02-04""
+  - `imdbId`: STRING Example: ""2083046""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/6DCW""
+- **Director**
+  - `url`: STRING Example: ""https://themoviedb.org/person/88953""
+  - `bornIn`: STRING Example: ""Burchard, Nebraska, USA""
+  - `born`: DATE Min: 1861-12-08, Max: 2018-05-01
+  - `died`: DATE Min: 1930-08-26, Max: 2976-09-29
+  - `tmdbId`: STRING Example: ""88953""
+  - `imdbId`: STRING Example: ""0516001""
+  - `name`: STRING Example: ""Harold Lloyd""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/er4Z""
+  - `bio`: STRING Example: ""Harold Lloyd has been called the cinema’s “first m""
+- **Person**
+  - `url`: STRING Example: ""https://themoviedb.org/person/1271225""
+  - `died`: DATE Example: ""1954-01-01""
+  - `bornIn`: STRING Example: ""France""
+  - `born`: DATE Example: ""1877-02-04""
+  - `imdbId`: STRING Example: ""2083046""
+  - `name`: STRING Example: ""François Lallement""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/6DCW""
+  - `tmdbId`: STRING Example: ""1271225""
+  - `bio`: STRING Example: ""​From Wikipedia, the free encyclopedia  Lillian Di""
+Relationship properties:
+- **RATED**
+  - `rating: FLOAT` Example: ""2.0""
+  - `timestamp: INTEGER` Example: ""1260759108""
+- **ACTED_IN**
+  - `role: STRING` Example: ""Officer of the Marines (uncredited)""
+- **DIRECTED**
+  - `role: STRING` 
+The relationships:
+(:Movie)-[:IN_GENRE]->(:Genre)
+(:User)-[:RATED]->(:Movie)
+(:Actor)-[:ACTED_IN]->(:Movie)
+(:Actor)-[:DIRECTED]->(:Movie)
+(:Director)-[:DIRECTED]->(:Movie)
+(:Director)-[:ACTED_IN]->(:Movie)
+(:Person)-[:ACTED_IN]->(:Movie)
+(:Person)-[:DIRECTED]->(:Movie)","MATCH (d:Director) RETURN d.name, d.born ORDER BY d.born ASC LIMIT 5","MATCH (d:Director)
+RETURN d.name
+ORDER BY d.born ASC
+LIMIT 5",ed6d0dfc4ee495c522df744b441fa7e3e5ea9d3e28036df1da36f674bd965cd7,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Same Director population, birth-date ascending order and limit five. Director names satisfy the list request. Tie handling is unspecified in both; judgement is limited to query inspection. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,output_shape_differs_needs_review,detected_names_covered,detected_names_present_somewhere_in_schema,no_explicit_typed_pattern_detected,"[[""'Georges M\u00e9li\u00e8s'"", ""neo4j.time.Date(1861, 12, 8)""], [""'Robert Wiene'"", ""neo4j.time.Date(1873, 4, 27)""], [""'Fred Niblo'"", ""neo4j.time.Date(1874, 1, 6)""]]","[[""'Georges M\u00e9li\u00e8s'""], [""'Robert Wiene'""], [""'Fred Niblo'""]]",,,5.0,5.0,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Same Director population, birth-date ascending order and limit five. Director names satisfy the list request. Tie handling is unspecified in both; judgement is limited to query inspection. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",acceptable_output_alternative,"Same Director selection, born ascending and limit five. Returning names without supplementary birth dates satisfies the requested director list. Shared missing-date and tie handling are not independently resolved.",2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+9,instance_id_30819,medium,20261002,20261003,gemma-4-26b-a4b-it,What is the average unit price of products in orders shipped to 'Denmark'?,"Node properties:
+- **Product**
+  - `productName`: STRING Example: ""Chai""
+  - `quantityPerUnit`: STRING Example: ""10 boxes x 20 bags""
+  - `unitsOnOrder`: INTEGER Min: 0, Max: 100
+  - `supplierID`: STRING Example: ""1""
+  - `productID`: STRING Example: ""1""
+  - `discontinued`: BOOLEAN 
+  - `categoryID`: STRING Available options: ['1', '2', '7', '6', '8', '4', '3', '5']
+  - `reorderLevel`: INTEGER Min: 0, Max: 30
+  - `unitsInStock`: INTEGER Min: 0, Max: 125
+  - `unitPrice`: FLOAT Min: 2.5, Max: 263.5
+- **Category**
+  - `picture`: STRING Available options: ['0x151C2F00020000000D000E0014002100FFFFFFFF4269746D']
+  - `categoryID`: STRING Available options: ['1', '2', '3', '4', '5', '6', '7', '8']
+  - `description`: STRING Available options: ['Soft drinks, coffees, teas, beers, and ales', 'Sweet and savory sauces, relishes, spreads, and se', 'Desserts, candies, and sweet breads', 'Cheeses', 'Breads, crackers, pasta, and cereal', 'Prepared meats', 'Dried fruit and bean curd', 'Seaweed and fish']
+  - `categoryName`: STRING Available options: ['Beverages', 'Condiments', 'Confections', 'Dairy Products', 'Grains/Cereals', 'Meat/Poultry', 'Produce', 'Seafood']
+- **Supplier**
+  - `companyName`: STRING Example: ""Exotic Liquids""
+  - `contactName`: STRING Example: ""Charlotte Cooper""
+  - `homePage`: STRING Available options: ['NULL', '#CAJUN.HTM#', ""Mayumi's (on the World Wide Web)#http://www.micros"", '(03) 444-6588', 'Plutzer (on the World Wide Web)#http://www.microso', '(0544) 60603', '(1) 03.83.00.62', '(02) 555-4873', '(089) 6547667', '38.76.98.58']
+  - `phone`: STRING Example: ""(171) 555-2222""
+  - `postalCode`: STRING Example: ""EC1 4SD""
+  - `contactTitle`: STRING Example: ""Purchasing Manager""
+  - `region`: STRING Example: ""NULL""
+  - `address`: STRING Example: ""49 Gilbert St.""
+  - `fax`: STRING Example: ""NULL""
+  - `supplierID`: STRING Example: ""1""
+  - `country`: STRING Example: ""UK""
+  - `city`: STRING Example: ""London""
+- **Customer**
+  - `fax`: STRING Example: ""030-0076545""
+  - `companyName`: STRING Example: ""Alfreds Futterkiste""
+  - `customerID`: STRING Example: ""ALFKI""
+  - `phone`: STRING Example: ""030-0074321""
+  - `contactName`: STRING Example: ""Maria Anders""
+  - `contactTitle`: STRING Example: ""Sales Representative""
+  - `region`: STRING Example: ""NULL""
+  - `address`: STRING Example: ""Obere Str. 57""
+  - `postalCode`: STRING Example: ""12209""
+  - `country`: STRING Example: ""Germany""
+  - `city`: STRING Example: ""Berlin""
+- **Order**
+  - `shipName`: STRING Example: ""Vins et alcools Chevalier""
+  - `requiredDate`: STRING Example: ""1996-08-01 00:00:00.000""
+  - `shipCity`: STRING Example: ""Reims""
+  - `employeeID`: STRING Available options: ['5', '6', '4', '3', '9', '1', '8', '2', '7']
+  - `shipPostalCode`: STRING Example: ""51100""
+  - `shippedDate`: STRING Example: ""1996-07-16 00:00:00.000""
+  - `freight`: STRING Example: ""32.38""
+  - `orderDate`: STRING Example: ""1996-07-04 00:00:00.000""
+  - `orderID`: STRING Example: ""10248""
+  - `shipAddress`: STRING Example: ""59 rue de l'Abbaye""
+  - `customerID`: STRING Example: ""VINET""
+  - `shipCountry`: STRING Example: ""France""
+  - `shipVia`: STRING Available options: ['3', '1', '2']
+  - `shipRegion`: STRING Example: ""NULL""
+Relationship properties:
+- **ORDERS**
+  - `orderID: STRING` Example: ""10248""
+  - `unitPrice: STRING` Example: ""34.80""
+  - `productID: STRING` Example: ""72""
+  - `quantity: INTEGER` Min: 1, Max:  130
+  - `discount: STRING` Example: ""0""
+The relationships:
+(:Product)-[:PART_OF]->(:Category)
+(:Supplier)-[:SUPPLIES]->(:Product)
+(:Customer)-[:PURCHASED]->(:Order)
+(:Order)-[:ORDERS]->(:Product)",MATCH (o:Order {shipCountry: 'Denmark'})-[:ORDERS]->(p:Product) WITH avg(toFloat(o.unitPrice)) AS averageUnitPrice RETURN averageUnitPrice,"MATCH (o:Order)-[r:ORDERS]->(p:Product)
+WHERE o.shipCountry = 'Denmark'
+RETURN avg(toFloat(r.unitPrice))",ccd6bedf61d88cac39d931e62210c90f44bbf8f2e078731a1258bf40e999740c,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,uncertain,issue_identified,"Gemma averages the declared ORDERS.unitPrice property; reference reads undeclared Order.unitPrice. Transaction versus product-catalogue price and averaging unit remain ambiguous. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,observed_result_difference,detected_names_covered,detected_names_present_somewhere_in_schema,detected_simple_endpoints_supported,"[[""None""]]","[[""26.35304347826087""]]",,,1.0,1.0,no_error_identified,no_error_identified,uncertain,issue_identified,"Gemma averages the declared ORDERS.unitPrice property; reference reads undeclared Order.unitPrice. Transaction versus product-catalogue price and averaging unit remain ambiguous. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",reference_defect_with_price_interpretation_concern,Reference reads Order.unitPrice absent from supplied Order schema. Gemma uses ORDERS.unitPrice. Product.unitPrice also exists; intended transaction versus catalogue price and averaging unit remain unspecified. No generated binary label.,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+10,instance_id_14059,medium,20261002,20261003,gemma-4-26b-a4b-it,Find the Keyword for which name is super-population viewpoint!,"Graph schema: Relevant node labels and their properties (with datatypes) are:
+Keyword {name: STRING}",MATCH (n:Keyword {name:'super-population viewpoint'}) RETURN n,MATCH (k:Keyword {name: 'super-population viewpoint'}) RETURN k,602cccdb504a88572a8ae6565605805cb4d4598c8de54a71442feb15ecedb17c,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Equivalent Keyword label and exact name predicate; alias changes do not change meaning. No source graph was available, so this is a static judgement. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,source_graph_unavailable,detected_names_covered,detected_names_present_somewhere_in_schema,no_explicit_typed_pattern_detected,,,,,,,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Equivalent Keyword label and exact name predicate; alias changes do not change meaning. No source graph was available, so this is a static judgement. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+11,instance_id_14512,simple,20261002,20261003,gemma-4-26b-a4b-it,Fetch the Keyword where key_id ends with d8!,"Graph schema: Relevant node labels and their properties (with datatypes) are:
+Keyword {key_id: STRING}",MATCH (n:Keyword) WHERE n.key_id =~'d8.*' RETURN n,"MATCH (n:Keyword)
+WHERE n.key_id ENDS WITH 'd8!'
+RETURN n",df7170541bb306572b22a829387f912e8df58cf850af033ae57fb23c6d471dcc,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,uncertain,issue_identified,"Reference regex d8.* tests a prefix rather than the requested suffix. Gemma uses ENDS WITH d8!, possibly treating sentence punctuation as literal data. Intended suffix punctuation is unresolved. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,source_graph_unavailable,detected_names_covered,detected_names_present_somewhere_in_schema,no_explicit_typed_pattern_detected,,,,,,,no_error_identified,no_error_identified,uncertain,issue_identified,"Reference regex d8.* tests a prefix rather than the requested suffix. Gemma uses ENDS WITH d8!, possibly treating sentence punctuation as literal data. Intended suffix punctuation is unresolved. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+12,instance_id_39698,medium,20261002,20261003,gemma-4-26b-a4b-it,Show the top 5 oldest movies in the collection with the highest revenue.,"Node properties:
+- **Movie**
+  - `average_vote`: FLOAT Example: ""7.7""
+  - `overview`: STRING Example: ""Led by Woody, Andy's toys live happily in his room""
+  - `revenue`: FLOAT Example: ""3.73554033E8""
+  - `vote_count`: INTEGER Example: ""5415""
+  - `tagline`: STRING Example: ""Roll the dice and unleash the excitement!""
+  - `budget`: INTEGER Example: ""30000000""
+  - `title`: STRING Example: ""Toy Story""
+  - `poster_path`: STRING Example: ""/rhIRbceoE9lR4veEXuwCC2wARtG.jpg""
+  - `imdb_id`: STRING Example: ""tt0114709""
+  - `status`: STRING Example: ""Released""
+  - `runtime`: FLOAT Example: ""81.0""
+  - `popularity`: FLOAT Example: ""21.946943""
+  - `homepage`: STRING Example: ""http://toystory.disney.com/toy-story""
+  - `release_date`: DATE Example: ""1995-10-30""
+  - `id`: INTEGER Min: 862, Max: 31357
+  - `original_title`: STRING Example: ""Toy Story""
+  - `original_language`: STRING Example: ""en""
+- **Language**
+  - `id`: STRING Example: ""en""
+  - `name`: STRING Available options: ['', 'Gaeilge', 'Kiswahili', 'Azərbaycan', 'Somali', 'беларуская мова', 'Fulfulde', 'Hausa']
+- **Country**
+  - `id`: STRING Example: ""US""
+  - `name`: STRING Example: ""United States of America""
+- **Genre**
+  - `id`: INTEGER Min: 12, Max: 10770
+  - `name`: STRING Example: ""Animation""
+- **ProductionCompany**
+  - `id`: INTEGER Min: 3, Max: 10201
+  - `name`: STRING Example: ""Pixar Animation Studios""
+- **Collection**
+  - `name`: STRING Example: ""Toy Story Collection""
+  - `id`: INTEGER Min: 10, Max: 480160
+  - `backdrop_path`: STRING Example: ""/9FBwqcd9IRruEDUrTdcaafOMKUq.jpg""
+  - `poster_path`: STRING Example: ""/7G9915LfUQ2lVfwMEEhDsn3kT4B.jpg""
+- **Person**
+  - `gender`: INTEGER Example: ""2""
+  - `profile_path`: STRING Example: ""/pQFoyx7rp09CJTAb932F2g8Nlho.jpg""
+  - `id`: INTEGER Min: 31, Max: 12900
+  - `name`: STRING Example: ""Tom Hanks""
+- **User**
+  - `id`: INTEGER Min: 27490cf6-22eb-495d-9dd6-902c0f89c627, Max: 4
+- **Keyword**
+  - `id`: INTEGER Min: 931, Max: 9713
+  - `name`: STRING Example: ""jealousy""
+- **Video**
+  - `tagline`: STRING Example: ""Fresh Fish. Mixed Vegetables.""
+  - `average_vote`: FLOAT Min: 0.0, Max: 10.0
+  - `overview`: STRING Example: ""Get ready as Bob the Tomato, Larry the Cucumber an""
+  - `revenue`: FLOAT Min: 0.0, Max: 0.0
+  - `poster_path`: STRING Example: ""/iWahPsY3hsKOizZHgzQcAxv4O3B.jpg""
+  - `vote_count`: INTEGER Min: 0, Max: 115
+  - `title`: STRING Example: ""Jonah: A VeggieTales Movie""
+  - `release_date`: DATE Min: 1973-01-12, Max: 2017-03-17
+  - `status`: STRING Available options: ['Released']
+  - `budget`: INTEGER Min: 0, Max: 2219684
+  - `popularity`: FLOAT Min: 0.0, Max: 9.22546
+  - `imdb_id`: STRING Example: ""tt0298388""
+  - `original_title`: STRING Example: ""Jonah: A VeggieTales Movie""
+  - `id`: INTEGER Min: 13284, Max: 461088
+  - `runtime`: FLOAT Min: 0.0, Max: 583.0
+  - `original_language`: STRING Example: ""en""
+  - `homepage`: STRING Example: ""http://www.loosechange911.com/""
+- **Adult**
+  - `average_vote`: FLOAT Min: 0.0, Max: 6.3
+  - `overview`: STRING Available options: ['A sailor takes an American businessman and his gir', 'The FBI and Texas police make ready to storm the h', 'Electrical Girl centers around a horny young woman', 'Ágata suffers from a psychological disorder which ', ""Shane Ryan's sequel to the disturbing Amateur Porn"", 'Australian film about a fictional sub-par Australi', 'Olaf and his mother run a boarding house and a whi', 'A man who returns home to find his wife cheating o', 'An American scientific research facility opens a p']
+  - `revenue`: FLOAT Min: 0.0, Max: 0.0
+  - `poster_path`: STRING Available options: ['/tzVK7nTnzUiVeFSZhOAIHmrgXUS.jpg', '/1VzwIa8HTykNiCCW8PBaJnyTvO8.jpg', '/yTfqRQlJMTAuTNDG01XjNg5KPPg.jpg', '/oP2WvKIWxqSBVHjfYAizFHOqBLG.jpg', '/zpycBSiBFp5Uib6gWJpgEvfOgdn.jpg', '/e7CAc8OadcUoKNPIX86SEPSX7f.jpg', '/jjncR0vECvXVrBvr0A1vLghL4pN.jpg', '/pJLmZBruOmn2c9mYWe3h1xcXaA0.jpg', '/3uv9oaqOJkkdZiQp6r9lf24tkHW.jpg']
+  - `vote_count`: INTEGER Min: 0, Max: 16
+  - `title`: STRING Available options: ['Erotic Nights of the Living Dead', 'Standoff', 'Electrical Girl', 'Diet of Sex', 'Amateur Porn Star Killer 2', 'The Band', 'The Sinful Dwarf', 'Adulterers', 'Half -Life']
+  - `release_date`: DATE Min: 1973-12-20, Max: 2016-01-05
+  - `status`: STRING Available options: ['Released', 'In Production']
+  - `budget`: INTEGER Min: 0, Max: 750000
+  - `popularity`: FLOAT Min: 0.001803, Max: 6.889832
+  - `imdb_id`: STRING Available options: ['tt0079642', 'tt0119931', 'tt0322232', 'tt3094816', 'tt1161951', 'tt1153101', 'tt0070696', 'tt4044464', 'tt2697688']
+  - `original_title`: STRING Available options: ['Le notti erotiche dei morti viventi', 'Standoff', '發電悄嬌娃', 'Diet of Sex', 'Amateur Porn Star Killer 2', 'The Band', 'Dværgen', 'Adulterers', 'Half -Life']
+  - `id`: INTEGER Min: 5422, Max: 448290
+  - `runtime`: FLOAT Min: 0.0, Max: 112.0
+  - `original_language`: STRING Available options: ['it', 'en', 'cn', 'es', 'da']
+  - `tagline`: STRING Available options: ['Trust Will Get You Killed', 'Comedy, food, drama and sex, a lot of sex', 'Humiliation. Rape. Murder. You know the drill.', ""Sex, drugs and Rock 'n Roll"", 'The Mother of all Dwarfsploitation films!', 'Love. Betrayal. Vengeance']
+  - `homepage`: STRING Available options: ['http://www.imdb.com/title/tt0119931/', 'http://www.dietofsex.com/']
+- **Package**
+  - `price`: FLOAT Min: 0.0, Max: 99.99
+  - `duration`: DURATION 
+  - `id`: INTEGER Min: 0, Max: 6
+  - `name`: STRING Available options: ['Childrens', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Ultimate', 'Free Trial']
+- **Subscription**
+  - `expiresAt`: DATE_TIME Min: 2020-08-23T16:20:52.383Z, Max: 2020-08-23T16:20:52.383Z
+  - `id`: STRING Available options: ['e74f7163-eace-4169-8043-41627f1fe236']
+Relationship properties:
+- **CAST_FOR**
+  - `credit_id: STRING` Example: ""52fe4459c3a36847f8090d7d""
+  - `order: INTEGER` Example: ""0""
+  - `character: STRING` Example: ""Charlie Wilson""
+  - `cast_id: INTEGER` Example: ""12""
+- **CREW_FOR**
+  - `credit_id: STRING` Example: ""55e4f0abc3a368140800047e""
+  - `job: STRING` Example: ""Producer""
+  - `department: STRING` Example: ""Production""
+- **RATED**
+  - `timestamp: DATE_TIME` Example: ""2015-03-09T22:49:42Z""
+  - `rating: FLOAT` Example: ""5.0""
+The relationships:
+(:Movie)-[:ORIGINAL_LANGUAGE]->(:Language)
+(:Movie)-[:SPOKEN_IN_LANGUAGE]->(:Language)
+(:Movie)-[:PRODUCED_IN_COUNTRY]->(:Country)
+(:Movie)-[:IN_GENRE]->(:Genre)
+(:Movie)-[:PRODUCED_BY]->(:ProductionCompany)
+(:Movie)-[:HAS_KEYWORD]->(:Keyword)
+(:Movie)-[:IN_COLLECTION]->(:Collection)
+(:Person)-[:CAST_FOR]->(:Movie)
+(:Person)-[:CREW_FOR]->(:Movie)
+(:Person)-[:CREW_FOR]->(:Video)
+(:User)-[:RATED]->(:Movie)
+(:User)-[:RATED]->(:Video)
+(:Video)-[:ORIGINAL_LANGUAGE]->(:Language)
+(:Video)-[:SPOKEN_IN_LANGUAGE]->(:Language)
+(:Video)-[:PRODUCED_IN_COUNTRY]->(:Country)
+(:Video)-[:IN_GENRE]->(:Genre)
+(:Video)-[:PRODUCED_BY]->(:ProductionCompany)
+(:Video)-[:HAS_KEYWORD]->(:Keyword)
+(:Video)-[:IN_COLLECTION]->(:Collection)
+(:Adult)-[:ORIGINAL_LANGUAGE]->(:Language)
+(:Adult)-[:SPOKEN_IN_LANGUAGE]->(:Language)
+(:Adult)-[:PRODUCED_IN_COUNTRY]->(:Country)
+(:Adult)-[:IN_GENRE]->(:Genre)
+(:Adult)-[:PRODUCED_BY]->(:ProductionCompany)
+(:Adult)-[:HAS_KEYWORD]->(:Keyword)
+(:Package)-[:PROVIDES_ACCESS_TO]->(:Genre)
+(:Subscription)-[:FOR_PACKAGE]->(:Package)","MATCH (m:Movie)-[:IN_COLLECTION]->(c:Collection) WITH m, c ORDER BY m.release_date ASC LIMIT 5 RETURN m.title AS MovieTitle, m.release_date AS ReleaseDate, m.revenue AS Revenue ORDER BY m.revenue DESC LIMIT 5","MATCH (m:Movie)-[:IN_COLLECTION]->(c:Collection)
+WITH c, sum(m.revenue) AS total_revenue
+ORDER BY total_revenue DESC
+LIMIT 1
+MATCH (movie:Movie)-[:IN_COLLECTION]->(c)
+RETURN movie
+ORDER BY movie.release_date ASC
+LIMIT 5",cc81f0ea949c21caf7ab26aff8cad1effff3b41ddddbad535a4861ffbddf3b37,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,uncertain,issue_identified,"Gemma selects the collection with greatest summed revenue and then its oldest movies. Reference never selects a highest-revenue collection. Revenue aggregation, ties and collection interpretation remain unresolved. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,output_shape_differs_needs_review,detected_names_covered,detected_names_present_somewhere_in_schema,detected_simple_endpoints_supported,"[[""'Fant\u00f4mas: In the Shadow of the Guillotine'"", ""neo4j.time.Date(1913, 5, 9)"", ""0.0""], [""'Fant\u00f4mas: Juve Against Fant\u00f4mas'"", ""neo4j.time.Date(1913, 9, 12)"", ""0.0""], [""'Fant\u00f4mas: The Dead Man Who Killed'"", ""neo4j.time.Date(1913, 11, 28)"", ""0.0""]]","[[""<Node element_id='4:4fbde390-a0da-4183-b582-ed005ae7c0a2:4765' labels=frozenset({'Movie'}) properties={'average_vote': 7.5, 'overview': \""Harry Potter has lived under the stairs at his aunt and uncle's house his whole life. But on his 11th birthday, he learns he's a powerful wizard -- with a place wa""], [""<Node element_id='4:4fbde390-a0da-4183-b582-ed005ae7c0a2:5677' labels=frozenset({'Movie'}) properties={'average_vote': 7.4, 'overview': 'Ignoring threats to his life, Harry returns to Hogwarts to investigate \u2013 aided by Ron and Hermione \u2013 a mysterious series of attacks.', 'original_language': 'en', '""], [""<Node element_id='4:4fbde390-a0da-4183-b582-ed005ae7c0a2:7724' labels=frozenset({'Movie'}) properties={'average_vote': 7.7, 'overview': 'Harry, Ron and Hermione return to Hogwarts for another magic-filled year. Harry comes face to face with danger yet again, this time in the form of escaped convict,""]]",,,5.0,5.0,no_error_identified,no_error_identified,uncertain,issue_identified,"Gemma selects the collection with greatest summed revenue and then its oldest movies. Reference never selects a highest-revenue collection. Revenue aggregation, ties and collection interpretation remain unresolved. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",unresolved,"Gemma selects the collection with highest summed revenue then its oldest five movies. Reference selects oldest movie-collection matches globally and sorts their revenue; it never selects the highest-revenue collection. Record reference concern and ambiguous revenue aggregation, not a generated error.",2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+13,instance_id_29243,medium,20261002,20261003,gemma-4-26b-a4b-it,Find the characters who have 'INTERACTS1' relationships with a 'weight' greater than 10.,"Node properties:
+- **Character**
+  - `centrality`: FLOAT Min: 0.0, Max: 1.0
+  - `book45PageRank`: FLOAT Min: 0.15000000000000002, Max: 11.409916274911177
+  - `fastrf_embedding`: LIST Min Size: 10, Max Size: 10
+  - `book1BetweennessCentrality`: FLOAT Min: 0.0, Max: 4638.53495125504
+  - `book1PageRank`: FLOAT Min: 0.15000000000000002, Max: 8.164174336296284
+  - `louvain`: INTEGER Min: 0, Max: 10
+  - `community`: INTEGER Min: 504, Max: 795
+  - `degree`: FLOAT Min: 0.0, Max: 300.0
+  - `name`: STRING Example: ""Addam-Marbrand""
+  - `pagerank`: FLOAT Min: 0.15000000000000002, Max: 9.473142454730429
+Relationship properties:
+- **INTERACTS**
+  - `weight: INTEGER` Min: 3, Max:  334
+- **INTERACTS1**
+  - `weight: INTEGER` Min: 3, Max:  291
+  - `book: INTEGER` Min: 1, Max:  1
+- **INTERACTS2**
+  - `weight: INTEGER` Min: 3, Max:  92
+  - `book: INTEGER` Min: 2, Max:  2
+- **INTERACTS3**
+  - `weight: INTEGER` Min: 3, Max:  95
+  - `book: INTEGER` Min: 3, Max:  3
+- **INTERACTS45**
+  - `weight: INTEGER` Min: 3, Max:  96
+  - `book: INTEGER` Min: 45, Max:  45
+The relationships:
+(:Character)-[:INTERACTS45]->(:Character)
+(:Character)-[:INTERACTS]->(:Character)
+(:Character)-[:INTERACTS1]->(:Character)
+(:Character)-[:INTERACTS3]->(:Character)
+(:Character)-[:INTERACTS2]->(:Character)",MATCH (c:Character)-[r:INTERACTS1]->() WHERE r.weight > 10 RETURN DISTINCT c.name,"MATCH (c:Character)-[r:INTERACTS1]->(:Character)
+WHERE r.weight > 10
+RETURN c",d619bc39eceed7c666de09843c82497638e66af179fdd9ee1df4db3df18fd58d,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,uncertain,uncertain,"Declared INTERACTS1/weight pattern is used. Gemma returns one Character node per edge rather than distinct reference names: 175 versus 53 rows. Unique-character and source-only interpretations require clarification. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,observed_result_difference,detected_names_covered,detected_names_present_somewhere_in_schema,detected_simple_endpoints_supported,"[[""'Aemon-Targaryen-(Maester-Aemon)'""], [""'Aerys-II-Targaryen'""], [""'Aggo'""]]","[[""<Node element_id='4:98bdd553-b658-4a18-bf68-9c192c309495:6' labels=frozenset({'Character'}) properties={'book1BetweennessCentrality': 186.58333333333334, 'louvain': 4, 'fastrf_embedding': [0.09763889759778976, -0.542799174785614, 0.3037383556365967, 0.6556527614593506, -0.04637296870350838, -0.50697""], [""<Node element_id='4:98bdd553-b658-4a18-bf68-9c192c309495:6' labels=frozenset({'Character'}) properties={'book1BetweennessCentrality': 186.58333333333334, 'louvain': 4, 'fastrf_embedding': [0.09763889759778976, -0.542799174785614, 0.3037383556365967, 0.6556527614593506, -0.04637296870350838, -0.50697""], [""<Node element_id='4:98bdd553-b658-4a18-bf68-9c192c309495:10' labels=frozenset({'Character'}) properties={'book1BetweennessCentrality': 8.28829365079365, 'louvain': 2, 'fastrf_embedding': [0.3397246301174164, -0.7213707566261292, -0.4630584418773651, 0.8045739531517029, 0.1143319234251976, -0.3947611""]]",,,53.0,175.0,no_error_identified,no_error_identified,uncertain,uncertain,"Declared INTERACTS1/weight pattern is used. Gemma returns one Character node per edge rather than distinct reference names: 175 versus 53 rows. Unique-character and source-only interpretations require clarification. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",unresolved,"Gemma returns source Character nodes per qualifying INTERACTS1 edge, 175 rows versus 53 distinct reference names. Source-only versus all-participant meaning and unique-character output remain ambiguous under the existing rule; no binary label.",2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+14,instance_id_27807,simple,20261002,20261003,gemma-4-26b-a4b-it,"""Who is related to John Snow?""","Node properties:
+Character {centrality: FLOAT, book45PageRank: FLOAT, fastrf_embedding: LIST, book1BetweennessCentrality: FLOAT, book1PageRank: FLOAT, louvain: INTEGER, community: INTEGER, degree: FLOAT, name: STRING, pagerank: FLOAT}
+Relationship properties:
+INTERACTS {weight: INTEGER}
+INTERACTS1 {weight: INTEGER, book: INTEGER}
+INTERACTS2 {weight: INTEGER, book: INTEGER}
+INTERACTS3 {weight: INTEGER, book: INTEGER}
+INTERACTS45 {weight: INTEGER, book: INTEGER}
+The relationships:
+(:Character)-[:INTERACTS45]->(:Character)
+(:Character)-[:INTERACTS]->(:Character)
+(:Character)-[:INTERACTS1]->(:Character)
+(:Character)-[:INTERACTS3]->(:Character)
+(:Character)-[:INTERACTS2]->(:Character)","MATCH (c1:Character {name: ""John Snow""})-[:INTERACTS|:INTERACTS1|:INTERACTS2|:INTERACTS3|:INTERACTS45]-(c2:Character) RETURN c2.name AS RelatedCharacter",MATCH (n:Character {name: 'John Snow'})-[:INTERACTS|INTERACTS1|INTERACTS2|INTERACTS3|INTERACTS45]-(related:Character) RETURN related.name,997c6d2ae049a6012da1beb533c0c079095565aee4e2be89c36e4961639b287a,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,no_error_identified,uncertain,"The generated undirected relationship-type union is equivalent to the reference pattern. Both return no rows; John Snow spelling/data coverage is unresolved. Static equivalence is not demonstrated answer correctness. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,both_empty_inconclusive,detected_names_covered,detected_names_present_somewhere_in_schema,detected_simple_endpoints_supported,[],[],,,0.0,0.0,no_error_identified,no_error_identified,no_error_identified,uncertain,"The generated undirected relationship-type union is equivalent to the reference pattern. Both return no rows; John Snow spelling/data coverage is unresolved. Static equivalence is not demonstrated answer correctness. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+15,instance_id_22532,medium,20261002,20261003,gemma-4-26b-a4b-it,Show the first 5 reviews with a star rating below 4.0.,"Node properties:
+- **Business**
+  - `address`: STRING Available options: ['301 E Main St', '200 W Pine St', '313 N 1st St W', '1151 W Broadway St', '201 E Front St', '723 California Dr', '121 W Broadway St', '716 N San Mateo Dr', '111 E 5th Ave']
+  - `location`: POINT 
+  - `city`: STRING Available options: ['Missoula', 'Burlingame', 'San Mateo']
+  - `state`: STRING Available options: ['MT', 'CA']
+  - `businessId`: STRING Available options: ['b5', 'b3', 'b1', 'b2', 'b4', 'b7', 'b6', 'b8', 'b9']
+  - `name`: STRING Available options: ['Missoula Public Library', ""Ninja Mike's"", 'KettleHouse Brewing Co.', 'Imagine Nation Brewing', 'Market on Front', 'Hanabi', 'Zootown Brew', ""Ducky's Car Wash"", 'Neo4j']
+- **User**
+  - `name`: STRING Available options: ['Will', 'Bob', 'Jenny', 'Angie']
+  - `userId`: STRING Available options: ['u1', 'u2', 'u3', 'u4']
+- **Review**
+  - `date`: DATE Min: 2015-08-29, Max: 2018-09-10
+  - `text`: STRING Available options: ['Not a great selection of books, but fortunately th', ""Best breakfast sandwich at the Farmer's Market. Al"", 'Great IPA selection!', ""Awesome full-service car wash. Love Ducky's!"", ""The world's leading graph database HQ!""]
+  - `stars`: FLOAT Min: 3.0, Max: 5.0
+  - `reviewId`: STRING Example: ""r7""
+- **Category**
+  - `name`: STRING Example: ""Library""
+Relationship properties:
+
+The relationships:
+(:Business)-[:IN_CATEGORY]->(:Category)
+(:User)-[:WROTE]->(:Review)
+(:Review)-[:REVIEWS]->(:Business)","MATCH (u:User)-[:WROTE]->(r:Review)-[:REVIEWS]->(b:Business) WHERE r.stars < 4.0 RETURN r, u, b ORDER BY r.date LIMIT 5","MATCH (r:Review)
+WHERE r.stars < 4.0
+RETURN r
+LIMIT 5",2192ed677a05bd8b1d6ceff2c0d8e73f41b8c1adf6943a5acd31eea02f4a253f,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,uncertain,uncertain,"The low-star predicate is correct and Review nodes are an acceptable output. Gemma lacks reference date ordering and User/Business restrictions; the intended first-five ordering is unspecified. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,output_shape_differs_needs_review,detected_names_covered,detected_names_present_somewhere_in_schema,no_explicit_typed_pattern_detected,"[[""<Node element_id='4:f7e01af4-4957-40ce-add1-a4cacb6c8f69:13' labels=frozenset({'Review'}) properties={'date': neo4j.time.Date(2015, 8, 29), 'text': 'Not a great selection of books, but fortunately the inter-library loan system is good. Wifi is quite slow. Not many comfortable places to site and read"", ""<Node element_id='4:f7e01af4-4957-40ce-add1-a4cacb6c8f69:9' labels=frozenset({'User'}) properties={'name': 'Will', 'userId': 'u1'}>"", ""<Node element_id='4:f7e01af4-4957-40ce-add1-a4cacb6c8f69:0' labels=frozenset({'Business'}) properties={'address': '301 E Main St', 'city': 'Missoula', 'businessId': 'b5', 'name': 'Missoula Public Library', 'location': WGS84Point(-113.990976, 46.870035), 'state': 'MT'}>""], [""<Node element_id='4:f7e01af4-4957-40ce-add1-a4cacb6c8f69:31' labels=frozenset({'Review'}) properties={'date': neo4j.time.Date(2018, 9, 10), 'stars': 3.0, 'reviewId': 'r3'}>"", ""<Node element_id='4:f7e01af4-4957-40ce-add1-a4cacb6c8f69:12' labels=frozenset({'User'}) properties={'name': 'Angie', 'userId': 'u4'}>"", ""<Node element_id='4:f7e01af4-4957-40ce-add1-a4cacb6c8f69:3' labels=frozenset({'Business'}) properties={'address': '1151 W Broadway St', 'city': 'Missoula', 'businessId': 'b2', 'name': 'Imagine Nation Brewing', 'location': WGS84Point(-114.009628, 46.876672), 'state': 'MT'}>""]]","[[""<Node element_id='4:f7e01af4-4957-40ce-add1-a4cacb6c8f69:13' labels=frozenset({'Review'}) properties={'date': neo4j.time.Date(2015, 8, 29), 'text': 'Not a great selection of books, but fortunately the inter-library loan system is good. Wifi is quite slow. Not many comfortable places to site and read""], [""<Node element_id='4:f7e01af4-4957-40ce-add1-a4cacb6c8f69:31' labels=frozenset({'Review'}) properties={'date': neo4j.time.Date(2018, 9, 10), 'stars': 3.0, 'reviewId': 'r3'}>""]]",,,2.0,2.0,no_error_identified,no_error_identified,uncertain,uncertain,"The low-star predicate is correct and Review nodes are an acceptable output. Gemma lacks reference date ordering and User/Business restrictions; the intended first-five ordering is unspecified. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",unresolved,"Gemma selects low-star Review nodes without reference User/Business connections or date ordering. Returning reviews is acceptable, but first ordering and equivalence of the wider selection remain unresolved; counts alone do not prove identity agreement.",2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+16,instance_id_5095,medium,20261002,20261003,gemma-4-26b-a4b-it,Fetch eight samples of the description of the Topic and the label for Topic!,"Graph schema: Relevant node labels and their properties (with datatypes) are:
+Topic {description: STRING}
+Topic {label: STRING}","MATCH (n:Topic) MATCH (m:Topic) RETURN n.description, m.label LIMIT 8","MATCH (t:Topic) RETURN t.description, t.label LIMIT 8",e80189f78b7f98fda19ba863d176333f7dee9e971f6411d694159492f6ef22f1,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,no_error_identified,issue_identified,"Gemma returns description and label from the same Topic, limited to eight. Reference independently matches two Topic variables and creates cross-pairs. Gemma is a reasonable direct interpretation of the requested samples. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,source_graph_unavailable,detected_names_covered,detected_names_present_somewhere_in_schema,no_explicit_typed_pattern_detected,,,,,,,no_error_identified,no_error_identified,no_error_identified,issue_identified,"Gemma returns description and label from the same Topic, limited to eight. Reference independently matches two Topic variables and creates cross-pairs. Gemma is a reasonable direct interpretation of the requested samples. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+17,instance_id_10719,medium,20261002,20261003,gemma-4-26b-a4b-it,Find the nodes connected to Topic where cluster is 4 and list their properties!,"Graph schema: Relevant node labels and their properties (with datatypes) are:
+Topic {cluster: INTEGER}","MATCH (a:Topic{cluster:'4'})-[r]->(n) RETURN properties(n), r",MATCH (n)--(t:Topic {cluster: 4}) RETURN properties(n),75070bb7ad1e775453ba8b86d4af8bc1e854bdc7611b0d300d08caa1e92d8bb8,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,no_error_identified,issue_identified,"Supplied schema declares Topic.cluster INTEGER: Gemma uses integer 4 and returns neighbour properties. Reference compares cluster with string 4. Undirected connectedness follows the question, although the sparse schema lacks endpoint evidence. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,source_graph_unavailable,detected_names_covered,detected_names_present_somewhere_in_schema,no_explicit_typed_pattern_detected,,,,,,,no_error_identified,no_error_identified,no_error_identified,issue_identified,"Supplied schema declares Topic.cluster INTEGER: Gemma uses integer 4 and returns neighbour properties. Reference compares cluster with string 4. Undirected connectedness follows the question, although the sparse schema lacks endpoint evidence. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+18,instance_id_19058,complex,20261002,20261003,gemma-4-26b-a4b-it,"Fetch the distinct values of the label from Topic where either description is Studies eigenvalues and eigenvectors of operators, analyzing how structures behave under various conditions in mathematics and physics. or label is not null!","Graph schema: Relevant node labels and their properties (with datatypes) are:
+Topic {description: STRING}
+Topic {label: STRING}","MATCH (n:Topic) WHERE n.description = 'Studies eigenvalues and eigenvectors of operators, analyzing how structures behave under various conditions in mathematics and physics.' OR n.label IS NOT NULL RETURN DISTINCT n.label AS label","MATCH (t:Topic)
+WHERE t.description = 'Studies eigenvalues and eigenvectors of operators, analyzing how structures behave under various conditions in mathematics and physics.' OR t.label IS NOT NULL
+RETURN DISTINCT t.label",3e843ca2fe64214c1744d01c32d2c0a4aa3d5af35259188981480f9a210a5b10,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Equivalent OR predicate and DISTINCT Topic.label projection. The description text is preserved. Judgement is static because no source graph was available. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,source_graph_unavailable,detected_names_covered,detected_names_present_somewhere_in_schema,no_explicit_typed_pattern_detected,,,,,,,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Equivalent OR predicate and DISTINCT Topic.label projection. The description text is preserved. Judgement is static because no source graph was available. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+19,instance_id_10822,complex,20261002,20261003,gemma-4-26b-a4b-it,Find all nodes directly connected to the Categories that has category_id 088fbf884bd7c6533956a45531b362b7!,"Graph schema: Relevant node labels and their properties (with datatypes) are:
+Categories {category_id: STRING}",MATCH path=(:Categories {category_id:'088fbf884bd7c6533956a45531b362b7'})-->() RETURN path,MATCH (c:Categories {category_id: '088fbf884bd7c6533956a45531b362b7'})--(n) RETURN n,bbb273936ed1a4878547fc9703922a17f941882c222ad750be9975d6fa0573e9,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,no_error_identified,uncertain,"Gemma returns nodes directly connected in either direction to the selected Categories node. That fits the broad question wording; reference restricts outgoing paths and returns paths instead of nodes. Intended direction remains a reference concern. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,source_graph_unavailable,detected_names_covered,detected_names_present_somewhere_in_schema,no_explicit_typed_pattern_detected,,,,,,,no_error_identified,no_error_identified,no_error_identified,uncertain,"Gemma returns nodes directly connected in either direction to the selected Categories node. That fits the broad question wording; reference restricts outgoing paths and returns paths instead of nodes. Intended direction remains a reference concern. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+20,instance_id_39266,medium,20261002,20261003,gemma-4-26b-a4b-it,Find the first 5 businesses that have a category of 'Brewery'.,"Node properties:
+- **Business**
+  - `address`: STRING Available options: ['301 E Main St', '200 W Pine St', '313 N 1st St W', '1151 W Broadway St', '201 E Front St', '723 California Dr', '121 W Broadway St', '716 N San Mateo Dr', '111 E 5th Ave']
+  - `location`: POINT 
+  - `city`: STRING Available options: ['Missoula', 'Burlingame', 'San Mateo']
+  - `state`: STRING Available options: ['MT', 'CA']
+  - `businessId`: STRING Available options: ['b5', 'b3', 'b1', 'b2', 'b4', 'b7', 'b6', 'b8', 'b9']
+  - `name`: STRING Available options: ['Missoula Public Library', ""Ninja Mike's"", 'KettleHouse Brewing Co.', 'Imagine Nation Brewing', 'Market on Front', 'Hanabi', 'Zootown Brew', ""Ducky's Car Wash"", 'Neo4j']
+- **User**
+  - `name`: STRING Available options: ['Will', 'Bob', 'Jenny', 'Angie']
+  - `userId`: STRING Available options: ['u1', 'u2', 'u3', 'u4']
+- **Review**
+  - `date`: DATE Min: 2015-08-29, Max: 2018-09-10
+  - `text`: STRING Available options: ['Not a great selection of books, but fortunately th', ""Best breakfast sandwich at the Farmer's Market. Al"", 'Great IPA selection!', ""Awesome full-service car wash. Love Ducky's!"", ""The world's leading graph database HQ!""]
+  - `stars`: FLOAT Min: 3.0, Max: 5.0
+  - `reviewId`: STRING Example: ""r7""
+- **Category**
+  - `name`: STRING Example: ""Library""
+Relationship properties:
+
+The relationships:
+(:Business)-[:IN_CATEGORY]->(:Category)
+(:User)-[:WROTE]->(:Review)
+(:Review)-[:REVIEWS]->(:Business)","MATCH (b:Business)-[:IN_CATEGORY]->(c:Category {name: 'Brewery'}) RETURN b.name, b.address, b.city, b.state, b.businessId LIMIT 5","MATCH (b:Business)-[:IN_CATEGORY]->(c:Category {name: 'Brewery'})
+RETURN b
+LIMIT 5",aaf1d072dd795eaab7937ec526abd0f91cac09220c93af226b75a012df69c089,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,uncertain,uncertain,"Same Brewery category pattern and limit five; Business nodes are an acceptable projection. Both queries omit ordering for first five, so a final ordered-selection judgement remains uncertain. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,output_shape_differs_needs_review,detected_names_covered,detected_names_present_somewhere_in_schema,detected_simple_endpoints_supported,"[[""'KettleHouse Brewing Co.'"", ""'313 N 1st St W'"", ""'Missoula'"", ""'MT'"", ""'b1'""], [""'Imagine Nation Brewing'"", ""'1151 W Broadway St'"", ""'Missoula'"", ""'MT'"", ""'b2'""]]","[[""<Node element_id='4:f7e01af4-4957-40ce-add1-a4cacb6c8f69:2' labels=frozenset({'Business'}) properties={'address': '313 N 1st St W', 'city': 'Missoula', 'businessId': 'b1', 'name': 'KettleHouse Brewing Co.', 'location': WGS84Point(-113.995297, 46.877981), 'state': 'MT'}>""], [""<Node element_id='4:f7e01af4-4957-40ce-add1-a4cacb6c8f69:3' labels=frozenset({'Business'}) properties={'address': '1151 W Broadway St', 'city': 'Missoula', 'businessId': 'b2', 'name': 'Imagine Nation Brewing', 'location': WGS84Point(-114.009628, 46.876672), 'state': 'MT'}>""]]",,,2.0,2.0,no_error_identified,no_error_identified,uncertain,uncertain,"Same Brewery category pattern and limit five; Business nodes are an acceptable projection. Both queries omit ordering for first five, so a final ordered-selection judgement remains uncertain. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",unresolved,"Same Brewery category selection and limit five; full Business nodes are an acceptable projection. Both return two rows, but first ordering is unspecified, following the prior reconciled uncertainty rule.",2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+21,instance_id_1170,medium,20261002,20261003,gemma-4-26b-a4b-it,What are the names of rooms that have either king or queen bed?,"{""Room"": {""count"": 10, ""labels"": [], ""properties"": {""decor"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""beds"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""RoomId"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""roomName"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""bedType"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""maxOccupancy"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""basePrice"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}}, ""type"": ""node"", ""relationships"": {""BOOKED_IN"": {""count"": 600, ""direction"": ""in"", ""labels"": [""Reservation""], ""properties"": {}}}}, ""Reservation"": {""count"": 600, ""labels"": [], ""properties"": {""CheckIn"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""Room"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""Kids"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""FirstName"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""CheckOut"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""Adults"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""LastName"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""Code"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""Rate"": {""unique"": false, ""indexed"": false, ""type"": ""FLOAT"", ""existence"": false}}, ""type"": ""node"", ""relationships"": {""BOOKED_IN"": {""count"": 0, ""direction"": ""out"", ""labels"": [""Room""], ""properties"": {}}}}, ""BOOKED_IN"": {""count"": 600, ""properties"": {}, ""type"": ""relationship""}}","MATCH (r:Room) WHERE r.bedType = ""King"" OR r.bedType = ""Queen"" RETURN r.roomName",MATCH (n:Room) WHERE n.bedType = 'king' OR n.bedType = 'queen' RETURN n.roomName,db52167468d5fa41d8f88b75a299c8e2ec0aadb22db405391532aec1f4d9915b,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,uncertain,uncertain,"Room/bedType/roomName belong to the declared schema. Gemma uses lowercase king/queen whereas reference uses King/Queen; the schema provides no stored category values and the source graph is unavailable. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,source_graph_unavailable,detected_names_covered,detected_names_present_somewhere_in_schema,no_explicit_typed_pattern_detected,,,,,,,no_error_identified,no_error_identified,uncertain,uncertain,"Room/bedType/roomName belong to the declared schema. Gemma uses lowercase king/queen whereas reference uses King/Queen; the schema provides no stored category values and the source graph is unavailable. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+22,instance_id_40923,medium,20261002,20261003,gemma-4-26b-a4b-it,Find all users who asked a question with the word 'error' in the text.,"Node properties:
+- **Question**
+  - `favorites`: INTEGER Example: ""0""
+  - `answered`: BOOLEAN 
+  - `text`: STRING Example: ""### This is:  Bug    ### Specifications  OS: Win10""
+  - `link`: STRING Example: ""https://stackoverflow.com/questions/62224586/playg""
+  - `createdAt`: DATE_TIME Min: 2020-06-05T16:57:19Z, Max: 2020-06-05T21:49:16Z
+  - `title`: STRING Example: ""Playground is not loading with apollo-server-lambd""
+  - `id`: INTEGER Min: 62220505, Max: 62224586
+  - `upVotes`: INTEGER Example: ""0""
+  - `score`: INTEGER Example: ""-1""
+  - `downVotes`: INTEGER Example: ""1""
+- **Tag**
+  - `name`: STRING Example: ""aws-lambda""
+- **User**
+  - `image`: STRING Example: ""https://lh3.googleusercontent.com/-NcFYSuXU0nk/AAA""
+  - `link`: STRING Example: ""https://stackoverflow.com/users/10251021/alexandre""
+  - `id`: INTEGER Min: 751, Max: 13681006
+  - `reputation`: INTEGER Min: 1, Max: 420137
+  - `display_name`: STRING Example: ""Alexandre Le""
+Relationship properties:
+
+The relationships:
+(:Question)-[:TAGGED]->(:Tag)
+(:User)-[:ASKED]->(:Question)","MATCH (u:User)-[:ASKED]->(q:Question) WHERE q.text CONTAINS 'error' RETURN u.display_name, u.id, u.link","MATCH (u:User)-[:ASKED]->(q:Question)
+WHERE q.text CONTAINS 'error'
+RETURN u",71084c28597f356a90b1ea6569c266953771b47528c9fa94f9a7896d6f085894,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,uncertain,uncertain,"ASKED direction and error substring agree. User-node projection is acceptable. Both can repeat users with multiple qualifying questions; distinct identities were not verified under the unique-user review rule. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,output_shape_differs_needs_review,detected_names_covered,detected_names_present_somewhere_in_schema,detected_simple_endpoints_supported,"[[""'Alexandre Le'"", ""10251021"", ""'https://stackoverflow.com/users/10251021/alexandre-le'""], [""'anthony galligani'"", ""1429803"", ""'https://stackoverflow.com/users/1429803/anthony-galligani'""], [""'Darkmatter5'"", ""2957975"", ""'https://stackoverflow.com/users/2957975/darkmatter5'""]]","[[""<Node element_id='4:2f491811-b2ca-4e5d-957e-864d25b3fffe:11571' labels=frozenset({'User'}) properties={'image': 'https://lh3.googleusercontent.com/-NcFYSuXU0nk/AAAAAAAAAAI/AAAAAAAAGig/cFtP76LwF6g/photo.jpg?sz=128', 'link': 'https://stackoverflow.com/users/10251021/alexandre-le', 'reputation': 1, 'id""], [""<Node element_id='4:2f491811-b2ca-4e5d-957e-864d25b3fffe:11573' labels=frozenset({'User'}) properties={'image': 'https://www.gravatar.com/avatar/abe65349ae3d314fa856b5106ef69225?s=128&d=identicon&r=PG', 'link': 'https://stackoverflow.com/users/1429803/anthony-galligani', 'reputation': 139, 'id': 142""], [""<Node element_id='4:2f491811-b2ca-4e5d-957e-864d25b3fffe:11574' labels=frozenset({'User'}) properties={'image': 'https://www.gravatar.com/avatar/57254856adf547299e473e4e913e3e20?s=128&d=identicon&r=PG&f=1', 'link': 'https://stackoverflow.com/users/2957975/darkmatter5', 'reputation': 811, 'id': 29579""]]",,,3839.0,3839.0,no_error_identified,no_error_identified,uncertain,uncertain,"ASKED direction and error substring agree. User-node projection is acceptable. Both can repeat users with multiple qualifying questions; distinct identities were not verified under the unique-user review rule. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",unresolved,"Same ASKED pattern and error substring predicate; returning User nodes is acceptable. Unlike prior Gemini, Gemma lacks DISTINCT. Saved equal row counts do not establish distinct user identities; duplicate effects under the unique-user rule need checking.",2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+23,instance_id_32158,medium,20261002,20261003,gemma-4-26b-a4b-it,List the `companyName` of suppliers who supply products with a `reorderLevel` of 0.,"Node properties:
+- **Product**
+  - `productName`: STRING Example: ""Chai""
+  - `quantityPerUnit`: STRING Example: ""10 boxes x 20 bags""
+  - `unitsOnOrder`: INTEGER Min: 0, Max: 100
+  - `supplierID`: STRING Example: ""1""
+  - `productID`: STRING Example: ""1""
+  - `discontinued`: BOOLEAN 
+  - `categoryID`: STRING Available options: ['1', '2', '7', '6', '8', '4', '3', '5']
+  - `reorderLevel`: INTEGER Min: 0, Max: 30
+  - `unitsInStock`: INTEGER Min: 0, Max: 125
+  - `unitPrice`: FLOAT Min: 2.5, Max: 263.5
+- **Category**
+  - `picture`: STRING Available options: ['0x151C2F00020000000D000E0014002100FFFFFFFF4269746D']
+  - `categoryID`: STRING Available options: ['1', '2', '3', '4', '5', '6', '7', '8']
+  - `description`: STRING Available options: ['Soft drinks, coffees, teas, beers, and ales', 'Sweet and savory sauces, relishes, spreads, and se', 'Desserts, candies, and sweet breads', 'Cheeses', 'Breads, crackers, pasta, and cereal', 'Prepared meats', 'Dried fruit and bean curd', 'Seaweed and fish']
+  - `categoryName`: STRING Available options: ['Beverages', 'Condiments', 'Confections', 'Dairy Products', 'Grains/Cereals', 'Meat/Poultry', 'Produce', 'Seafood']
+- **Supplier**
+  - `companyName`: STRING Example: ""Exotic Liquids""
+  - `contactName`: STRING Example: ""Charlotte Cooper""
+  - `homePage`: STRING Available options: ['NULL', '#CAJUN.HTM#', ""Mayumi's (on the World Wide Web)#http://www.micros"", '(03) 444-6588', 'Plutzer (on the World Wide Web)#http://www.microso', '(0544) 60603', '(1) 03.83.00.62', '(02) 555-4873', '(089) 6547667', '38.76.98.58']
+  - `phone`: STRING Example: ""(171) 555-2222""
+  - `postalCode`: STRING Example: ""EC1 4SD""
+  - `contactTitle`: STRING Example: ""Purchasing Manager""
+  - `region`: STRING Example: ""NULL""
+  - `address`: STRING Example: ""49 Gilbert St.""
+  - `fax`: STRING Example: ""NULL""
+  - `supplierID`: STRING Example: ""1""
+  - `country`: STRING Example: ""UK""
+  - `city`: STRING Example: ""London""
+- **Customer**
+  - `fax`: STRING Example: ""030-0076545""
+  - `companyName`: STRING Example: ""Alfreds Futterkiste""
+  - `customerID`: STRING Example: ""ALFKI""
+  - `phone`: STRING Example: ""030-0074321""
+  - `contactName`: STRING Example: ""Maria Anders""
+  - `contactTitle`: STRING Example: ""Sales Representative""
+  - `region`: STRING Example: ""NULL""
+  - `address`: STRING Example: ""Obere Str. 57""
+  - `postalCode`: STRING Example: ""12209""
+  - `country`: STRING Example: ""Germany""
+  - `city`: STRING Example: ""Berlin""
+- **Order**
+  - `shipName`: STRING Example: ""Vins et alcools Chevalier""
+  - `requiredDate`: STRING Example: ""1996-08-01 00:00:00.000""
+  - `shipCity`: STRING Example: ""Reims""
+  - `employeeID`: STRING Available options: ['5', '6', '4', '3', '9', '1', '8', '2', '7']
+  - `shipPostalCode`: STRING Example: ""51100""
+  - `shippedDate`: STRING Example: ""1996-07-16 00:00:00.000""
+  - `freight`: STRING Example: ""32.38""
+  - `orderDate`: STRING Example: ""1996-07-04 00:00:00.000""
+  - `orderID`: STRING Example: ""10248""
+  - `shipAddress`: STRING Example: ""59 rue de l'Abbaye""
+  - `customerID`: STRING Example: ""VINET""
+  - `shipCountry`: STRING Example: ""France""
+  - `shipVia`: STRING Available options: ['3', '1', '2']
+  - `shipRegion`: STRING Example: ""NULL""
+Relationship properties:
+- **ORDERS**
+  - `orderID: STRING` Example: ""10248""
+  - `unitPrice: STRING` Example: ""34.80""
+  - `productID: STRING` Example: ""72""
+  - `quantity: INTEGER` Min: 1, Max:  130
+  - `discount: STRING` Example: ""0""
+The relationships:
+(:Product)-[:PART_OF]->(:Category)
+(:Supplier)-[:SUPPLIES]->(:Product)
+(:Customer)-[:PURCHASED]->(:Order)
+(:Order)-[:ORDERS]->(:Product)",MATCH (p:Product {reorderLevel: 0})<-[:SUPPLIES]-(s:Supplier) RETURN DISTINCT s.companyName,"MATCH (s:Supplier)-[:SUPPLIES]->(p:Product)
+WHERE p.reorderLevel = 0
+RETURN s.companyName",65725979d6414f5630ca9fd539d3955bda5ca5f12d526a48ec00df6dc8efa7b7,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,error_present,no_issue_identified,"Under the recorded unique-supplier-list rule, Gemma omits DISTINCT and returns 24 rows versus 18 reference names, including repeated supplier names in the saved preview. Relationship and filter agree. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,observed_result_difference,detected_names_covered,detected_names_present_somewhere_in_schema,detected_simple_endpoints_supported,"[[""'New Orleans Cajun Delights'""], [""\""Grandma Kelly's Homestead\""""], [""'Tokyo Traders'""]]","[[""'New Orleans Cajun Delights'""], [""'New Orleans Cajun Delights'""], [""\""Grandma Kelly's Homestead\""""]]",,,18.0,24.0,no_error_identified,no_error_identified,error_present,no_issue_identified,"Under the recorded unique-supplier-list rule, Gemma omits DISTINCT and returns 24 rows versus 18 reference names, including repeated supplier names in the saved preview. Relationship and filter agree. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",confirmed_generated_logical_error,"Under the recorded unique-entity list interpretation, Gemma omits supplier deduplication and returns 24 rows versus 18 reference names. Saved preview repeats New Orleans Cajun Delights. Qualifying product predicate and relationship direction agree.",2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+24,instance_id_28212,complex,20261002,20261003,gemma-4-26b-a4b-it,Which country has the highest number of entities that filed filings with an amount greater than 1000000?,"Node properties:
+- **Country**
+  - `location`: POINT 
+  - `code`: STRING Example: ""AFG""
+  - `name`: STRING Example: ""Afghanistan""
+  - `tld`: STRING Example: ""AF""
+- **Filing**
+  - `begin`: DATE_TIME Min: 2000-02-08T00:00:00Z, Max: 2017-09-05T00:00:00Z
+  - `end`: DATE_TIME Min: 2000-02-08T00:00:00Z, Max: 2017-11-03T00:00:00Z
+  - `originator_bank_id`: STRING Example: ""cimb-bank-berhad""
+  - `sar_id`: STRING Example: ""3297""
+  - `beneficiary_bank`: STRING Example: ""Barclays Bank Plc""
+  - `filer_org_name_id`: STRING Example: ""the-bank-of-new-york-mellon-corp""
+  - `originator_bank_country`: STRING Example: ""Singapore""
+  - `beneficiary_bank_country`: STRING Example: ""United Kingdom""
+  - `filer_org_name`: STRING Example: ""The Bank of New York Mellon Corp.""
+  - `originator_iso`: STRING Example: ""SGP""
+  - `beneficiary_bank_id`: STRING Example: ""barclays-bank-plc-london-england-gbr""
+  - `origin_lat`: STRING Example: ""1.3667""
+  - `origin_lng`: STRING Example: ""103.8""
+  - `end_date_format`: STRING Example: ""2015-09-25T00:00:00Z""
+  - `begin_date_format`: STRING Example: ""2015-03-25T00:00:00Z""
+  - `originator_bank`: STRING Example: ""CIMB Bank Berhad""
+  - `beneficiary_lat`: STRING Example: ""54""
+  - `beneficiary_iso`: STRING Example: ""GBR""
+  - `beneficiary_lng`: STRING Example: ""-2""
+  - `begin_date`: STRING Example: ""Mar 25, 2015""
+  - `id`: STRING Example: ""223254""
+  - `end_date`: STRING Example: ""Sep 25, 2015""
+  - `amount`: INTEGER Min: 1.18, Max: 2721000000
+  - `number`: INTEGER Min: 1, Max: 174
+- **Entity**
+  - `id`: STRING Example: ""the-bank-of-new-york-mellon-corp""
+  - `location`: POINT 
+  - `name`: STRING Example: ""The Bank of New York Mellon Corp.""
+  - `country`: STRING Example: ""CHN""
+Relationship properties:
+
+The relationships:
+(:Filing)-[:BENEFITS]->(:Entity)
+(:Filing)-[:CONCERNS]->(:Entity)
+(:Filing)-[:ORIGINATOR]->(:Entity)
+(:Entity)-[:FILED]->(:Filing)
+(:Entity)-[:COUNTRY]->(:Country)","MATCH (f:Filing) WHERE f.amount > 1000000 WITH f MATCH (f)<-[:FILED]-(e:Entity)-[:COUNTRY]->(c:Country) WITH c, count(DISTINCT e) AS entityCount ORDER BY entityCount DESC RETURN c.name AS countryName, entityCount LIMIT 1","MATCH (c:Country)<-[:COUNTRY]-(e:Entity)-[:FILED]->(f:Filing)
+WHERE f.amount > 1000000
+RETURN c.name
+ORDER BY count(DISTINCT e) DESC
+LIMIT 1",1e39550ef64da04ead12245507efd6c974ba8ed9854d2b2603212a1a6444325d,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,error_present,no_error_identified,uncertain,no_issue_identified,"Neo4j syntax validation rejected this query. COUNTRY/FILED endpoints and properties are declared, but ordering by an unprojected aggregate did not plan. Keep syntax failure separate from a semantic label. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,syntax_error,"{neo4j_code: Neo.ClientError.Statement.SyntaxError} {message: Illegal aggregation expression(s) in order by: count(DISTINCT e). If an aggregation expression is used in order by, it also needs to be a projection item on it's own. For example, in 'RETURN n.a, 1 + count(*) ORDER BY count(*) + 1' the aggregation expression 'count(*) + 1' is not a projection item on its own, but it could be rewritten to 'RETURN n.a, 1 + count(*) AS cnt ORDER BY 1 + count(*)'. (line 4, column 10 (offset: 118))
+""ORDER BY count(DISTINCT e) DESC""
+          ^} {gql_status: 42001} {gql_status_description: error: syntax error or access rule violation - invalid syntax}",generated_syntax_error,detected_names_covered,detected_names_present_somewhere_in_schema,detected_simple_endpoints_supported,,,,,,,error_present,no_error_identified,uncertain,no_issue_identified,"Neo4j syntax validation rejected this query. COUNTRY/FILED endpoints and properties are declared, but ordering by an unprojected aggregate did not plan. Keep syntax failure separate from a semantic label. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+25,instance_id_25174,medium,20261002,20261003,gemma-4-26b-a4b-it,List all actors who have a poster URL that includes 'smile' in it.,"Node properties:
+- **Movie**
+  - `url`: STRING Example: ""https://themoviedb.org/movie/862""
+  - `runtime`: INTEGER Min: 2, Max: 910
+  - `revenue`: INTEGER Min: 1, Max: 2787965087
+  - `imdbRating`: FLOAT Min: 1.6, Max: 9.6
+  - `released`: STRING Example: ""1995-11-22""
+  - `countries`: LIST Min Size: 1, Max Size: 16
+  - `languages`: LIST Min Size: 1, Max Size: 19
+  - `plot`: STRING Example: ""A cowboy doll is profoundly threatened and jealous""
+  - `imdbVotes`: INTEGER Min: 13, Max: 1626900
+  - `imdbId`: STRING Example: ""0114709""
+  - `year`: INTEGER Min: 1902, Max: 2016
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/uXDf""
+  - `movieId`: STRING Example: ""1""
+  - `tmdbId`: STRING Example: ""862""
+  - `title`: STRING Example: ""Toy Story""
+  - `budget`: INTEGER Min: 1, Max: 380000000
+- **Genre**
+  - `name`: STRING Example: ""Adventure""
+- **User**
+  - `userId`: STRING Example: ""1""
+  - `name`: STRING Example: ""Omar Huffman""
+- **Actor**
+  - `url`: STRING Example: ""https://themoviedb.org/person/1271225""
+  - `name`: STRING Example: ""François Lallement""
+  - `tmdbId`: STRING Example: ""1271225""
+  - `bornIn`: STRING Example: ""France""
+  - `bio`: STRING Example: ""​From Wikipedia, the free encyclopedia  Lillian Di""
+  - `died`: DATE Example: ""1954-01-01""
+  - `born`: DATE Example: ""1877-02-04""
+  - `imdbId`: STRING Example: ""2083046""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/6DCW""
+- **Director**
+  - `url`: STRING Example: ""https://themoviedb.org/person/88953""
+  - `bornIn`: STRING Example: ""Burchard, Nebraska, USA""
+  - `born`: DATE Min: 1861-12-08, Max: 2018-05-01
+  - `died`: DATE Min: 1930-08-26, Max: 2976-09-29
+  - `tmdbId`: STRING Example: ""88953""
+  - `imdbId`: STRING Example: ""0516001""
+  - `name`: STRING Example: ""Harold Lloyd""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/er4Z""
+  - `bio`: STRING Example: ""Harold Lloyd has been called the cinema’s “first m""
+- **Person**
+  - `url`: STRING Example: ""https://themoviedb.org/person/1271225""
+  - `died`: DATE Example: ""1954-01-01""
+  - `bornIn`: STRING Example: ""France""
+  - `born`: DATE Example: ""1877-02-04""
+  - `imdbId`: STRING Example: ""2083046""
+  - `name`: STRING Example: ""François Lallement""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/6DCW""
+  - `tmdbId`: STRING Example: ""1271225""
+  - `bio`: STRING Example: ""​From Wikipedia, the free encyclopedia  Lillian Di""
+Relationship properties:
+- **RATED**
+  - `rating: FLOAT` Example: ""2.0""
+  - `timestamp: INTEGER` Example: ""1260759108""
+- **ACTED_IN**
+  - `role: STRING` Example: ""Officer of the Marines (uncredited)""
+- **DIRECTED**
+  - `role: STRING` 
+The relationships:
+(:Movie)-[:IN_GENRE]->(:Genre)
+(:User)-[:RATED]->(:Movie)
+(:Actor)-[:ACTED_IN]->(:Movie)
+(:Actor)-[:DIRECTED]->(:Movie)
+(:Director)-[:DIRECTED]->(:Movie)
+(:Director)-[:ACTED_IN]->(:Movie)
+(:Person)-[:ACTED_IN]->(:Movie)
+(:Person)-[:DIRECTED]->(:Movie)",MATCH (a:Actor) WHERE a.poster CONTAINS 'smile' RETURN a,MATCH (a:Actor) WHERE a.poster CONTAINS 'smile' RETURN a,8a6aeee59e48634d0f27305c37727907f998009d00629fa2dc92c7ce20be13f6,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Generated query is textually identical to reference and directly implements the poster smile substring request. Both empty results are inconclusive database evidence, not proof of an error. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,both_empty_inconclusive,detected_names_covered,detected_names_present_somewhere_in_schema,no_explicit_typed_pattern_detected,[],[],,,0.0,0.0,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Generated query is textually identical to reference and directly implements the poster smile substring request. Both empty results are inconclusive database evidence, not proof of an error. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+26,instance_id_2654,medium,20261002,20261003,gemma-4-26b-a4b-it,How many people have worked as a project manager in London?,"(:Person{label:'Person',id:string,role:string,description:string})-[:HAS_POSITION{}]->(:Position{label:'Position',id:string,title:string,location:string,startDate:string,endDate:string,url:string})
+(:Position{label:'Position',id:string,title:string,location:string,startDate:string,endDate:string,url:string})-[:AT_COMPANY{}]->(:Company{label:'Company',id:string,name:string})
+(:Person{label:'Person',id:string,role:string,description:string})-[:HAS_SKILL{}]->(:Skill{label:'Skill',id:string,name:string,level:string})
+(:Person{label:'Person',id:string,role:string,description:string})-[:HAS_EDUCATION{}]->(:Education{label:'Education',id:string,degree:string,university:string,graduation_date:string,score:string,url:string})",MATCH (p:Person)-[:HAS_POSITION]->(pos:Position) WHERE toLower(pos.title) CONTAINS 'project manager' AND toLower(pos.location) CONTAINS 'london' RETURN COUNT(p),"MATCH (p:Person)-[:HAS_POSITION]->(pos:Position)
+WHERE pos.title = 'Project Manager' AND pos.location = 'London'
+RETURN count(DISTINCT p)",510b6bebfee42541118e78f1ae3153807ba17f814bf2351aa71950a622cb8b8f,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,uncertain,uncertain,"Gemma counts distinct people using exact case-sensitive job title/location; reference uses case-insensitive substrings and counts matches. Broader position names, locality values and duplicate people remain unchecked. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,source_graph_unavailable,detected_names_covered,detected_names_present_somewhere_in_schema,detected_simple_endpoints_supported,,,,,,,no_error_identified,no_error_identified,uncertain,uncertain,"Gemma counts distinct people using exact case-sensitive job title/location; reference uses case-insensitive substrings and counts matches. Broader position names, locality values and duplicate people remain unchecked. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+27,instance_id_25306,complex,20261002,20261003,gemma-4-26b-a4b-it,Which movies have a director who was born after 1960 and have generated over 100 million in revenue?,"Node properties:
+- **Movie**
+  - `url`: STRING Example: ""https://themoviedb.org/movie/862""
+  - `runtime`: INTEGER Min: 2, Max: 910
+  - `revenue`: INTEGER Min: 1, Max: 2787965087
+  - `imdbRating`: FLOAT Min: 1.6, Max: 9.6
+  - `released`: STRING Example: ""1995-11-22""
+  - `countries`: LIST Min Size: 1, Max Size: 16
+  - `languages`: LIST Min Size: 1, Max Size: 19
+  - `plot`: STRING Example: ""A cowboy doll is profoundly threatened and jealous""
+  - `imdbVotes`: INTEGER Min: 13, Max: 1626900
+  - `imdbId`: STRING Example: ""0114709""
+  - `year`: INTEGER Min: 1902, Max: 2016
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/uXDf""
+  - `movieId`: STRING Example: ""1""
+  - `tmdbId`: STRING Example: ""862""
+  - `title`: STRING Example: ""Toy Story""
+  - `budget`: INTEGER Min: 1, Max: 380000000
+- **Genre**
+  - `name`: STRING Example: ""Adventure""
+- **User**
+  - `userId`: STRING Example: ""1""
+  - `name`: STRING Example: ""Omar Huffman""
+- **Actor**
+  - `url`: STRING Example: ""https://themoviedb.org/person/1271225""
+  - `name`: STRING Example: ""François Lallement""
+  - `tmdbId`: STRING Example: ""1271225""
+  - `bornIn`: STRING Example: ""France""
+  - `bio`: STRING Example: ""​From Wikipedia, the free encyclopedia  Lillian Di""
+  - `died`: DATE Example: ""1954-01-01""
+  - `born`: DATE Example: ""1877-02-04""
+  - `imdbId`: STRING Example: ""2083046""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/6DCW""
+- **Director**
+  - `url`: STRING Example: ""https://themoviedb.org/person/88953""
+  - `bornIn`: STRING Example: ""Burchard, Nebraska, USA""
+  - `born`: DATE Min: 1861-12-08, Max: 2018-05-01
+  - `died`: DATE Min: 1930-08-26, Max: 2976-09-29
+  - `tmdbId`: STRING Example: ""88953""
+  - `imdbId`: STRING Example: ""0516001""
+  - `name`: STRING Example: ""Harold Lloyd""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/er4Z""
+  - `bio`: STRING Example: ""Harold Lloyd has been called the cinema’s “first m""
+- **Person**
+  - `url`: STRING Example: ""https://themoviedb.org/person/1271225""
+  - `died`: DATE Example: ""1954-01-01""
+  - `bornIn`: STRING Example: ""France""
+  - `born`: DATE Example: ""1877-02-04""
+  - `imdbId`: STRING Example: ""2083046""
+  - `name`: STRING Example: ""François Lallement""
+  - `poster`: STRING Example: ""https://image.tmdb.org/t/p/w440_and_h660_face/6DCW""
+  - `tmdbId`: STRING Example: ""1271225""
+  - `bio`: STRING Example: ""​From Wikipedia, the free encyclopedia  Lillian Di""
+Relationship properties:
+- **RATED**
+  - `rating: FLOAT` Example: ""2.0""
+  - `timestamp: INTEGER` Example: ""1260759108""
+- **ACTED_IN**
+  - `role: STRING` Example: ""Officer of the Marines (uncredited)""
+- **DIRECTED**
+  - `role: STRING` 
+The relationships:
+(:Movie)-[:IN_GENRE]->(:Genre)
+(:User)-[:RATED]->(:Movie)
+(:Actor)-[:ACTED_IN]->(:Movie)
+(:Actor)-[:DIRECTED]->(:Movie)
+(:Director)-[:DIRECTED]->(:Movie)
+(:Director)-[:ACTED_IN]->(:Movie)
+(:Person)-[:ACTED_IN]->(:Movie)
+(:Person)-[:DIRECTED]->(:Movie)","MATCH (m:Movie)<-[:DIRECTED]-(d:Director) WHERE d.born > date('1960-01-01') AND m.revenue > 100000000 RETURN m.title, m.revenue, d.name, d.born","MATCH (d:Director)-[:DIRECTED]->(m:Movie)
+WHERE d.born.year > 1960 AND m.revenue > 100000000
+RETURN m.title",f9e698360944c8054f1382497d5a3cf4e37dad83782e246e1389e77a96315122,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,uncertain,uncertain,"Declared Director.born and Movie.revenue are used. Gemma excludes the entire year 1960; reference includes dates after January 1, 1960. After 1960 is ambiguous; titles are acceptable but duplicate movie matches are unchecked. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,output_shape_differs_needs_review,detected_names_covered,detected_names_present_somewhere_in_schema,detected_simple_endpoints_supported,"[[""'Couples Retreat'"", ""171844840"", ""'Peter Billingsley'"", ""neo4j.time.Date(1971, 4, 16)""], [""'Monuments Men, The'"", ""154984035"", ""'George Clooney'"", ""neo4j.time.Date(1961, 5, 6)""], [""'Cinderella'"", ""543514353"", ""'Kenneth Branagh'"", ""neo4j.time.Date(1960, 12, 10)""]]","[[""'Couples Retreat'""], [""'Monuments Men, The'""], [""'Battleship'""]]",,,634.0,604.0,no_error_identified,no_error_identified,uncertain,uncertain,"Declared Director.born and Movie.revenue are used. Gemma excludes the entire year 1960; reference includes dates after January 1, 1960. After 1960 is ambiguous; titles are acceptable but duplicate movie matches are unchecked. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",unresolved,"Gemma born.year > 1960 excludes all of 1960; reference born > 1960-01-01 includes much of that year, including Kenneth Branagh in the preview. After 1960 boundary is undefined. Titles-only projection is acceptable; unique movie versus director-match semantics remain unchecked.",2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+28,instance_id_33128,medium,20261002,20261003,gemma-4-26b-a4b-it,List the summaries of reviews for movies with a rating lower than 60.,"Node properties:
+- **Movie**
+  - `title`: STRING Example: ""The Matrix""
+  - `votes`: INTEGER Min: 1, Max: 5259
+  - `tagline`: STRING Example: ""Welcome to the Real World""
+  - `released`: INTEGER Min: 1975, Max: 2012
+- **Person**
+  - `born`: INTEGER Min: 1929, Max: 1996
+  - `name`: STRING Example: ""Keanu Reeves""
+Relationship properties:
+- **ACTED_IN**
+  - `roles: LIST` Min Size: 1, Max Size: 6
+- **REVIEWED**
+  - `summary: STRING` Available options: ['Pretty funny at times', 'A solid romp', 'Silly, but fun', 'You had me at Jerry', 'An amazing journey', 'Slapstick redeemed only by the Robin Williams and ', 'Dark, but compelling', 'The coolest football movie ever', 'Fun, but a little far fetched']
+  - `rating: INTEGER` Min: 45, Max:  100
+The relationships:
+(:Person)-[:ACTED_IN]->(:Movie)
+(:Person)-[:DIRECTED]->(:Movie)
+(:Person)-[:PRODUCED]->(:Movie)
+(:Person)-[:WROTE]->(:Movie)
+(:Person)-[:FOLLOWS]->(:Person)
+(:Person)-[:REVIEWED]->(:Movie)",MATCH (p:Person)-[r:REVIEWED]->(m:Movie) WHERE r.rating < 60 RETURN r.summary,"MATCH (:Person)-[r:REVIEWED]->(:Movie)
+WHERE r.rating < 60
+RETURN r.summary",c767791c6d2550035db9408d694eea81d77d22a8af46a8ce7da110893a71971f,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Same REVIEWED relationship, rating-below-60 filter and relationship summary projection. Saved execution results match. This supports the inspected question interpretation without establishing independent ground truth. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,observed_result_match,detected_names_covered,detected_names_present_somewhere_in_schema,detected_simple_endpoints_supported,"[[""\""Slapstick redeemed only by the Robin Williams and Gene Hackman's stellar performances\""""]]","[[""\""Slapstick redeemed only by the Robin Williams and Gene Hackman's stellar performances\""""]]",,,1.0,1.0,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Same REVIEWED relationship, rating-below-60 filter and relationship summary projection. Saved execution results match. This supports the inspected question interpretation without establishing independent ground truth. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+29,instance_id_32549,medium,20261002,20261003,gemma-4-26b-a4b-it,What is the average freight of orders made by the customer with customerID equal to 'ERNSH'?,"Node properties:
+- **Product**
+  - `productName`: STRING Example: ""Chai""
+  - `quantityPerUnit`: STRING Example: ""10 boxes x 20 bags""
+  - `unitsOnOrder`: INTEGER Min: 0, Max: 100
+  - `supplierID`: STRING Example: ""1""
+  - `productID`: STRING Example: ""1""
+  - `discontinued`: BOOLEAN 
+  - `categoryID`: STRING Available options: ['1', '2', '7', '6', '8', '4', '3', '5']
+  - `reorderLevel`: INTEGER Min: 0, Max: 30
+  - `unitsInStock`: INTEGER Min: 0, Max: 125
+  - `unitPrice`: FLOAT Min: 2.5, Max: 263.5
+- **Category**
+  - `picture`: STRING Available options: ['0x151C2F00020000000D000E0014002100FFFFFFFF4269746D']
+  - `categoryID`: STRING Available options: ['1', '2', '3', '4', '5', '6', '7', '8']
+  - `description`: STRING Available options: ['Soft drinks, coffees, teas, beers, and ales', 'Sweet and savory sauces, relishes, spreads, and se', 'Desserts, candies, and sweet breads', 'Cheeses', 'Breads, crackers, pasta, and cereal', 'Prepared meats', 'Dried fruit and bean curd', 'Seaweed and fish']
+  - `categoryName`: STRING Available options: ['Beverages', 'Condiments', 'Confections', 'Dairy Products', 'Grains/Cereals', 'Meat/Poultry', 'Produce', 'Seafood']
+- **Supplier**
+  - `companyName`: STRING Example: ""Exotic Liquids""
+  - `contactName`: STRING Example: ""Charlotte Cooper""
+  - `homePage`: STRING Available options: ['NULL', '#CAJUN.HTM#', ""Mayumi's (on the World Wide Web)#http://www.micros"", '(03) 444-6588', 'Plutzer (on the World Wide Web)#http://www.microso', '(0544) 60603', '(1) 03.83.00.62', '(02) 555-4873', '(089) 6547667', '38.76.98.58']
+  - `phone`: STRING Example: ""(171) 555-2222""
+  - `postalCode`: STRING Example: ""EC1 4SD""
+  - `contactTitle`: STRING Example: ""Purchasing Manager""
+  - `region`: STRING Example: ""NULL""
+  - `address`: STRING Example: ""49 Gilbert St.""
+  - `fax`: STRING Example: ""NULL""
+  - `supplierID`: STRING Example: ""1""
+  - `country`: STRING Example: ""UK""
+  - `city`: STRING Example: ""London""
+- **Customer**
+  - `fax`: STRING Example: ""030-0076545""
+  - `companyName`: STRING Example: ""Alfreds Futterkiste""
+  - `customerID`: STRING Example: ""ALFKI""
+  - `phone`: STRING Example: ""030-0074321""
+  - `contactName`: STRING Example: ""Maria Anders""
+  - `contactTitle`: STRING Example: ""Sales Representative""
+  - `region`: STRING Example: ""NULL""
+  - `address`: STRING Example: ""Obere Str. 57""
+  - `postalCode`: STRING Example: ""12209""
+  - `country`: STRING Example: ""Germany""
+  - `city`: STRING Example: ""Berlin""
+- **Order**
+  - `shipName`: STRING Example: ""Vins et alcools Chevalier""
+  - `requiredDate`: STRING Example: ""1996-08-01 00:00:00.000""
+  - `shipCity`: STRING Example: ""Reims""
+  - `employeeID`: STRING Available options: ['5', '6', '4', '3', '9', '1', '8', '2', '7']
+  - `shipPostalCode`: STRING Example: ""51100""
+  - `shippedDate`: STRING Example: ""1996-07-16 00:00:00.000""
+  - `freight`: STRING Example: ""32.38""
+  - `orderDate`: STRING Example: ""1996-07-04 00:00:00.000""
+  - `orderID`: STRING Example: ""10248""
+  - `shipAddress`: STRING Example: ""59 rue de l'Abbaye""
+  - `customerID`: STRING Example: ""VINET""
+  - `shipCountry`: STRING Example: ""France""
+  - `shipVia`: STRING Available options: ['3', '1', '2']
+  - `shipRegion`: STRING Example: ""NULL""
+Relationship properties:
+- **ORDERS**
+  - `orderID: STRING` Example: ""10248""
+  - `unitPrice: STRING` Example: ""34.80""
+  - `productID: STRING` Example: ""72""
+  - `quantity: INTEGER` Min: 1, Max:  130
+  - `discount: STRING` Example: ""0""
+The relationships:
+(:Product)-[:PART_OF]->(:Category)
+(:Supplier)-[:SUPPLIES]->(:Product)
+(:Customer)-[:PURCHASED]->(:Order)
+(:Order)-[:ORDERS]->(:Product)",MATCH (c:Customer {customerID: 'ERNSH'})-[:PURCHASED]->(o:Order) WITH avg(toFloat(o.freight)) AS averageFreight RETURN averageFreight,MATCH (:Customer {customerID: 'ERNSH'})-[:PURCHASED]->(o:Order) RETURN avg(o.freight),eafd69ce064317d849fb322083e95aa6e6e3bdadbea9d6c34128eedc019540cf,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,uncertain,no_issue_identified,"Declared Order.freight property is used, but saved execution fails because AVG receives String without toFloat. Reference converts the value. Record execution/type error separately; the logical filter and intended aggregation are otherwise aligned. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,generated_execution_failed,detected_names_covered,detected_names_present_somewhere_in_schema,detected_simple_endpoints_supported,"[[""206.84633333333332""]]",,,"Neo.ClientError.Statement.TypeError: {neo4j_code: Neo.ClientError.Statement.TypeError} {message: AVG() can only handle numerical values, duration, or null, but received: String} {gql_status: 22N38} {gql_status_description: error: data exception - invalid function argument. Invalid argument to the function AVG().}",1.0,,no_error_identified,no_error_identified,uncertain,no_issue_identified,"Declared Order.freight property is used, but saved execution fails because AVG receives String without toFloat. Reference converts the value. Record execution/type error separately; the logical filter and intended aggregation are otherwise aligned. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",confirmed_generated_execution_error,"Saved server error states AVG received String. Gemma averages o.freight without toFloat, whereas reference converts freight. Runtime type failure is established on this graph; keep separate from syntax and logical binary labels.",2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+30,instance_id_34335,simple,20261002,20261003,gemma-4-26b-a4b-it,List the first 5 movies released in 1995.,"Node properties:
+- **Movie**
+  - `average_vote`: FLOAT Example: ""7.7""
+  - `overview`: STRING Example: ""Led by Woody, Andy's toys live happily in his room""
+  - `revenue`: FLOAT Example: ""3.73554033E8""
+  - `vote_count`: INTEGER Example: ""5415""
+  - `tagline`: STRING Example: ""Roll the dice and unleash the excitement!""
+  - `budget`: INTEGER Example: ""30000000""
+  - `title`: STRING Example: ""Toy Story""
+  - `poster_path`: STRING Example: ""/rhIRbceoE9lR4veEXuwCC2wARtG.jpg""
+  - `imdb_id`: STRING Example: ""tt0114709""
+  - `status`: STRING Example: ""Released""
+  - `runtime`: FLOAT Example: ""81.0""
+  - `popularity`: FLOAT Example: ""21.946943""
+  - `homepage`: STRING Example: ""http://toystory.disney.com/toy-story""
+  - `release_date`: DATE Example: ""1995-10-30""
+  - `id`: INTEGER Min: 862, Max: 31357
+  - `original_title`: STRING Example: ""Toy Story""
+  - `original_language`: STRING Example: ""en""
+- **Language**
+  - `id`: STRING Example: ""en""
+  - `name`: STRING Available options: ['', 'Gaeilge', 'Kiswahili', 'Azərbaycan', 'Somali', 'беларуская мова', 'Fulfulde', 'Hausa']
+- **Country**
+  - `id`: STRING Example: ""US""
+  - `name`: STRING Example: ""United States of America""
+- **Genre**
+  - `id`: INTEGER Min: 12, Max: 10770
+  - `name`: STRING Example: ""Animation""
+- **ProductionCompany**
+  - `id`: INTEGER Min: 3, Max: 10201
+  - `name`: STRING Example: ""Pixar Animation Studios""
+- **Collection**
+  - `name`: STRING Example: ""Toy Story Collection""
+  - `id`: INTEGER Min: 10, Max: 480160
+  - `backdrop_path`: STRING Example: ""/9FBwqcd9IRruEDUrTdcaafOMKUq.jpg""
+  - `poster_path`: STRING Example: ""/7G9915LfUQ2lVfwMEEhDsn3kT4B.jpg""
+- **Person**
+  - `gender`: INTEGER Example: ""2""
+  - `profile_path`: STRING Example: ""/pQFoyx7rp09CJTAb932F2g8Nlho.jpg""
+  - `id`: INTEGER Min: 31, Max: 12900
+  - `name`: STRING Example: ""Tom Hanks""
+- **User**
+  - `id`: INTEGER Min: 27490cf6-22eb-495d-9dd6-902c0f89c627, Max: 4
+- **Keyword**
+  - `id`: INTEGER Min: 931, Max: 9713
+  - `name`: STRING Example: ""jealousy""
+- **Video**
+  - `tagline`: STRING Example: ""Fresh Fish. Mixed Vegetables.""
+  - `average_vote`: FLOAT Min: 0.0, Max: 10.0
+  - `overview`: STRING Example: ""Get ready as Bob the Tomato, Larry the Cucumber an""
+  - `revenue`: FLOAT Min: 0.0, Max: 0.0
+  - `poster_path`: STRING Example: ""/iWahPsY3hsKOizZHgzQcAxv4O3B.jpg""
+  - `vote_count`: INTEGER Min: 0, Max: 115
+  - `title`: STRING Example: ""Jonah: A VeggieTales Movie""
+  - `release_date`: DATE Min: 1973-01-12, Max: 2017-03-17
+  - `status`: STRING Available options: ['Released']
+  - `budget`: INTEGER Min: 0, Max: 2219684
+  - `popularity`: FLOAT Min: 0.0, Max: 9.22546
+  - `imdb_id`: STRING Example: ""tt0298388""
+  - `original_title`: STRING Example: ""Jonah: A VeggieTales Movie""
+  - `id`: INTEGER Min: 13284, Max: 461088
+  - `runtime`: FLOAT Min: 0.0, Max: 583.0
+  - `original_language`: STRING Example: ""en""
+  - `homepage`: STRING Example: ""http://www.loosechange911.com/""
+- **Adult**
+  - `average_vote`: FLOAT Min: 0.0, Max: 6.3
+  - `overview`: STRING Available options: ['A sailor takes an American businessman and his gir', 'The FBI and Texas police make ready to storm the h', 'Electrical Girl centers around a horny young woman', 'Ágata suffers from a psychological disorder which ', ""Shane Ryan's sequel to the disturbing Amateur Porn"", 'Australian film about a fictional sub-par Australi', 'Olaf and his mother run a boarding house and a whi', 'A man who returns home to find his wife cheating o', 'An American scientific research facility opens a p']
+  - `revenue`: FLOAT Min: 0.0, Max: 0.0
+  - `poster_path`: STRING Available options: ['/tzVK7nTnzUiVeFSZhOAIHmrgXUS.jpg', '/1VzwIa8HTykNiCCW8PBaJnyTvO8.jpg', '/yTfqRQlJMTAuTNDG01XjNg5KPPg.jpg', '/oP2WvKIWxqSBVHjfYAizFHOqBLG.jpg', '/zpycBSiBFp5Uib6gWJpgEvfOgdn.jpg', '/e7CAc8OadcUoKNPIX86SEPSX7f.jpg', '/jjncR0vECvXVrBvr0A1vLghL4pN.jpg', '/pJLmZBruOmn2c9mYWe3h1xcXaA0.jpg', '/3uv9oaqOJkkdZiQp6r9lf24tkHW.jpg']
+  - `vote_count`: INTEGER Min: 0, Max: 16
+  - `title`: STRING Available options: ['Erotic Nights of the Living Dead', 'Standoff', 'Electrical Girl', 'Diet of Sex', 'Amateur Porn Star Killer 2', 'The Band', 'The Sinful Dwarf', 'Adulterers', 'Half -Life']
+  - `release_date`: DATE Min: 1973-12-20, Max: 2016-01-05
+  - `status`: STRING Available options: ['Released', 'In Production']
+  - `budget`: INTEGER Min: 0, Max: 750000
+  - `popularity`: FLOAT Min: 0.001803, Max: 6.889832
+  - `imdb_id`: STRING Available options: ['tt0079642', 'tt0119931', 'tt0322232', 'tt3094816', 'tt1161951', 'tt1153101', 'tt0070696', 'tt4044464', 'tt2697688']
+  - `original_title`: STRING Available options: ['Le notti erotiche dei morti viventi', 'Standoff', '發電悄嬌娃', 'Diet of Sex', 'Amateur Porn Star Killer 2', 'The Band', 'Dværgen', 'Adulterers', 'Half -Life']
+  - `id`: INTEGER Min: 5422, Max: 448290
+  - `runtime`: FLOAT Min: 0.0, Max: 112.0
+  - `original_language`: STRING Available options: ['it', 'en', 'cn', 'es', 'da']
+  - `tagline`: STRING Available options: ['Trust Will Get You Killed', 'Comedy, food, drama and sex, a lot of sex', 'Humiliation. Rape. Murder. You know the drill.', ""Sex, drugs and Rock 'n Roll"", 'The Mother of all Dwarfsploitation films!', 'Love. Betrayal. Vengeance']
+  - `homepage`: STRING Available options: ['http://www.imdb.com/title/tt0119931/', 'http://www.dietofsex.com/']
+- **Package**
+  - `price`: FLOAT Min: 0.0, Max: 99.99
+  - `duration`: DURATION 
+  - `id`: INTEGER Min: 0, Max: 6
+  - `name`: STRING Available options: ['Childrens', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Ultimate', 'Free Trial']
+- **Subscription**
+  - `expiresAt`: DATE_TIME Min: 2020-08-23T16:20:52.383Z, Max: 2020-08-23T16:20:52.383Z
+  - `id`: STRING Available options: ['e74f7163-eace-4169-8043-41627f1fe236']
+Relationship properties:
+- **CAST_FOR**
+  - `credit_id: STRING` Example: ""52fe4459c3a36847f8090d7d""
+  - `order: INTEGER` Example: ""0""
+  - `character: STRING` Example: ""Charlie Wilson""
+  - `cast_id: INTEGER` Example: ""12""
+- **CREW_FOR**
+  - `credit_id: STRING` Example: ""55e4f0abc3a368140800047e""
+  - `job: STRING` Example: ""Producer""
+  - `department: STRING` Example: ""Production""
+- **RATED**
+  - `timestamp: DATE_TIME` Example: ""2015-03-09T22:49:42Z""
+  - `rating: FLOAT` Example: ""5.0""
+The relationships:
+(:Movie)-[:ORIGINAL_LANGUAGE]->(:Language)
+(:Movie)-[:SPOKEN_IN_LANGUAGE]->(:Language)
+(:Movie)-[:PRODUCED_IN_COUNTRY]->(:Country)
+(:Movie)-[:IN_GENRE]->(:Genre)
+(:Movie)-[:PRODUCED_BY]->(:ProductionCompany)
+(:Movie)-[:HAS_KEYWORD]->(:Keyword)
+(:Movie)-[:IN_COLLECTION]->(:Collection)
+(:Person)-[:CAST_FOR]->(:Movie)
+(:Person)-[:CREW_FOR]->(:Movie)
+(:Person)-[:CREW_FOR]->(:Video)
+(:User)-[:RATED]->(:Movie)
+(:User)-[:RATED]->(:Video)
+(:Video)-[:ORIGINAL_LANGUAGE]->(:Language)
+(:Video)-[:SPOKEN_IN_LANGUAGE]->(:Language)
+(:Video)-[:PRODUCED_IN_COUNTRY]->(:Country)
+(:Video)-[:IN_GENRE]->(:Genre)
+(:Video)-[:PRODUCED_BY]->(:ProductionCompany)
+(:Video)-[:HAS_KEYWORD]->(:Keyword)
+(:Video)-[:IN_COLLECTION]->(:Collection)
+(:Adult)-[:ORIGINAL_LANGUAGE]->(:Language)
+(:Adult)-[:SPOKEN_IN_LANGUAGE]->(:Language)
+(:Adult)-[:PRODUCED_IN_COUNTRY]->(:Country)
+(:Adult)-[:IN_GENRE]->(:Genre)
+(:Adult)-[:PRODUCED_BY]->(:ProductionCompany)
+(:Adult)-[:HAS_KEYWORD]->(:Keyword)
+(:Package)-[:PROVIDES_ACCESS_TO]->(:Genre)
+(:Subscription)-[:FOR_PACKAGE]->(:Package)",MATCH (m:Movie) WHERE m.release_date.year = 1995 WITH m ORDER by m.release_date RETURN m.title LIMIT 5,"MATCH (m:Movie)
+WHERE m.release_date.year = 1995
+RETURN m.title
+ORDER BY m.release_date ASC
+LIMIT 5",b1cdbb9a95a2051c81a83b654d7e5cacc28bf4aedcdacacb9458da39174e1abc,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Same release-year predicate, chronological ascending order and five-title limit. Saved results match. Equal-date tie policy is unspecified in both. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,observed_result_match,detected_names_covered,detected_names_present_somewhere_in_schema,no_explicit_typed_pattern_detected,"[[""'Angela'""], [""'Dream Man'""], [""'The White Balloon'""]]","[[""'Angela'""], [""'Dream Man'""], [""'The White Balloon'""]]",,,5.0,5.0,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Same release-year predicate, chronological ascending order and five-title limit. Saved results match. Equal-date tie policy is unspecified in both. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+31,instance_id_467,simple,20261002,20261003,gemma-4-26b-a4b-it,What are the different majors?,"{""HasAllergy"": {""count"": 59, ""labels"": [], ""properties"": {""StuID"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""Allergy"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}}, ""type"": ""node"", ""relationships"": {}}, ""Student"": {""count"": 34, ""labels"": [], ""properties"": {""StuID"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""Major"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""Age"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""Fname"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""city_code"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""Advisor"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""LName"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""Sex"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}}, ""type"": ""node"", ""relationships"": {}}, ""AllergyType"": {""count"": 14, ""labels"": [], ""properties"": {""Allergy"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""AllergyType"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}}, ""type"": ""node"", ""relationships"": {}}}",MATCH (s:Student) RETURN DISTINCT s.Major,MATCH (s:Student) RETURN DISTINCT s.Major,d0723a355edb46f39bbc1cc6be522cf6e37c0d6cc3742de677bd6f8bbca0870f,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Generated query equals reference: DISTINCT Student.Major implements different majors using a declared property. No source graph was available. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,source_graph_unavailable,detected_names_covered,detected_names_present_somewhere_in_schema,no_explicit_typed_pattern_detected,,,,,,,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Generated query equals reference: DISTINCT Student.Major implements different majors using a declared property. No source graph was available. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+32,instance_id_25423,complex,20261002,20261003,gemma-4-26b-a4b-it,Retrieve the top 3 highest viewed questions that have been answered by users with less than 3 answers in total.,"Node properties:
+- **Question**
+  - `link`: STRING Example: ""https://stackoverflow.com/q/65697972""
+  - `accepted_answer_id`: INTEGER Min: 61447621, Max: 69272967
+  - `creation_date`: INTEGER Min: 1587746198, Max: 1632249176
+  - `view_count`: INTEGER Min: 4, Max: 1851
+  - `answer_count`: INTEGER Min: 0, Max: 4
+  - `body_markdown`: STRING Example: ""I want to create a graph from my recursive JSON fi""
+  - `uuid`: INTEGER Min: 61413144, Max: 69273945
+  - `title`: STRING Example: ""Create graph from recursive JSON data using apoc.l""
+- **User**
+  - `uuid`: INTEGER Min: deleted, Max: 16922964
+  - `display_name`: STRING Example: ""schernichkin""
+- **Tag**
+  - `name`: STRING Example: ""neo4j""
+  - `link`: STRING Example: ""https://stackoverflow.com/questions/tagged/neo4j""
+- **Answer**
+  - `link`: STRING Example: ""https://stackoverflow.com/a/69272967""
+  - `title`: STRING Example: ""Return &#39;biggest fan of a tag&#39; neo4j""
+  - `is_accepted`: BOOLEAN 
+  - `body_markdown`: STRING Example: ""The error is here:    ```  WHERE COUNT(posted) &lt""
+  - `score`: INTEGER Min: -2, Max: 6
+  - `uuid`: INTEGER Min: 61445468, Max: 69273049
+- **Comment**
+  - `score`: INTEGER Min: 0, Max: 3
+  - `uuid`: INTEGER Min: 108645245, Max: 122427099
+  - `link`: STRING Example: ""https://stackoverflow.com/questions/69208813/confi""
+Relationship properties:
+
+The relationships:
+(:Question)-[:TAGGED]->(:Tag)
+(:User)-[:ASKED]->(:Question)
+(:User)-[:COMMENTED]->(:Comment)
+(:User)-[:PROVIDED]->(:Answer)
+(:Answer)-[:ANSWERED]->(:Question)
+(:Comment)-[:COMMENTED_ON]->(:Question)","MATCH (u:User)-[:PROVIDED]->(a:Answer)-[:ANSWERED]->(q:Question) WITH u, count(a) AS totalAnswers, q WHERE totalAnswers < 3 MATCH (q) RETURN q ORDER BY q.view_count DESC LIMIT 3","MATCH (u:User)-[:PROVIDED]->(a:Answer)
+WITH u, count(a) AS answer_count
+WHERE answer_count < 3
+MATCH (u)-[:PROVIDED]->(:Answer)-[:ANSWERED]->(q:Question)
+RETURN DISTINCT q
+ORDER BY q.view_count DESC
+LIMIT 3",90f07a7d061f63acbdb22a37ac81fb13a75be414c36aebaaaf5c2d6ea492fbfb,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,uncertain,issue_identified,"Gemma counts total answers per user before finding answered questions; reference groups by user and question, contradicting total answers. Generated null/tie ordering among most-viewed questions remains unchecked. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,observed_result_difference,detected_names_covered,detected_names_present_somewhere_in_schema,detected_simple_endpoints_supported,"[[""<Node element_id='4:e6150336-37d6-462e-a563-b7f6cba68410:42' labels=frozenset({'Question'}) properties={'accepted_answer_id': 67030913, 'body_markdown': 'The alphabets are enumerated as A = 0, B = 1, C = 2, ... , Z = 25. Consider an encryption scheme where a character with value Ci in the plaintext ""], [""<Node element_id='4:e6150336-37d6-462e-a563-b7f6cba68410:42' labels=frozenset({'Question'}) properties={'accepted_answer_id': 67030913, 'body_markdown': 'The alphabets are enumerated as A = 0, B = 1, C = 2, ... , Z = 25. Consider an encryption scheme where a character with value Ci in the plaintext ""], [""<Node element_id='4:e6150336-37d6-462e-a563-b7f6cba68410:42' labels=frozenset({'Question'}) properties={'accepted_answer_id': 67030913, 'body_markdown': 'The alphabets are enumerated as A = 0, B = 1, C = 2, ... , Z = 25. Consider an encryption scheme where a character with value Ci in the plaintext ""]]","[[""<Node element_id='4:e6150336-37d6-462e-a563-b7f6cba68410:42' labels=frozenset({'Question'}) properties={'accepted_answer_id': 67030913, 'body_markdown': 'The alphabets are enumerated as A = 0, B = 1, C = 2, ... , Z = 25. Consider an encryption scheme where a character with value Ci in the plaintext ""], [""<Node element_id='4:e6150336-37d6-462e-a563-b7f6cba68410:325' labels=frozenset({'Question'}) properties={'body_markdown': 'I have my community 4.1.1 neo4j service installed on the ubuntu commandline running on my windows machine. I have been using neo4j steadily for a month or two now, just recently""], [""<Node element_id='4:e6150336-37d6-462e-a563-b7f6cba68410:432' labels=frozenset({'Question'}) properties={'body_markdown': 'I&#39;m trying to implement encrypt with AES/128/CBC, but I need to encrypt with a 64 bytes key, But I have the problem with the length.\\r\\n\\r\\nIt is possible encrypt AES/128/CB""]]",,,3.0,3.0,no_error_identified,no_error_identified,uncertain,issue_identified,"Gemma counts total answers per user before finding answered questions; reference groups by user and question, contradicting total answers. Generated null/tie ordering among most-viewed questions remains unchecked. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",reference_defect_with_generated_identity_concern,"Gemma counts answers per user before joining to questions; reference groups count by both user and question, not total user answers. Reference grouping concern is supported. Gemma DISTINCT questions is reasonable, but ranking ties and view_count null handling need inspection before correctness labelling.",2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+33,instance_id_15256,medium,20261002,20261003,gemma-4-26b-a4b-it,Find the Journal where journal_id is 99571eecaa5c5d622bb0d1f855752d5f!,"Graph schema: Relevant node labels and their properties (with datatypes) are:
+Journal {journal_id: STRING}",MATCH (n:Journal) WHERE n.journal_id = '99571eecaa5c5d622bb0d1f855752d5f' RETURN n,MATCH (n:Journal {journal_id: '99571eecaa5c5d622bb0d1f855752d5f'}) RETURN n,91e8dfb87263fa4526f23bde964e7617f135ed61a1be3e93fd5ca9960ac0ccd7,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Declared Journal.journal_id equality is equivalent to the reference WHERE predicate; returning the Journal node fits the request. No source graph available. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,source_graph_unavailable,detected_names_covered,detected_names_present_somewhere_in_schema,no_explicit_typed_pattern_detected,,,,,,,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Declared Journal.journal_id equality is equivalent to the reference WHERE predicate; returning the Journal node fits the request. No source graph available. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+34,instance_id_15868,complex,20261002,20261003,gemma-4-26b-a4b-it,Find eight instances of Article where either article_id exceeds 1010 or article_id is less than 1048!,"Graph schema: Relevant node labels and their properties (with datatypes) are:
+Article {article_id: INTEGER}
+Article {article_id: INTEGER}",MATCH (n:Article) WHERE n.article_id > 1010 OR n.article_id < 1048 RETURN n LIMIT 8,"MATCH (a:Article)
+WHERE a.article_id > 1010 OR a.article_id < 1048
+LIMIT 8
+RETURN a",5c1577011e795e698a1b99774a6679a8e0342143143ad479ff74f0cfad94d0e1,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Saved Neo4j accepted LIMIT before RETURN. The declared integer article_id OR predicate and eight-node limit are preserved. OR covers all non-null integer values here, as in the question/reference; source execution was unavailable. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,source_graph_unavailable,detected_names_covered,detected_names_present_somewhere_in_schema,no_explicit_typed_pattern_detected,,,,,,,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Saved Neo4j accepted LIMIT before RETURN. The declared integer article_id OR predicate and eight-node limit are preserved. OR covers all non-null integer values here, as in the question/reference; source execution was unavailable. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+35,instance_id_41904,simple,20261002,20261003,gemma-4-26b-a4b-it,Who are the CEOs of the first 3 public companies?,"Node properties:
+- **Person**
+  - `name`: STRING Example: ""Julie Spellman Sweet""
+  - `id`: STRING Example: ""Eaf0bpz6NNoqLVUCqNZPAew""
+  - `summary`: STRING Example: ""CEO at Accenture""
+- **Organization**
+  - `revenue`: FLOAT Example: ""1.2E8""
+  - `motto`: STRING Example: """"
+  - `nbrEmployees`: INTEGER Example: ""375""
+  - `isDissolved`: BOOLEAN 
+  - `id`: STRING Example: ""E0ZU8eCc5OaqS1LU9qE3n3w""
+  - `isPublic`: BOOLEAN 
+  - `name`: STRING Example: ""New Energy Group""
+  - `summary`: STRING Example: ""Software company based in Rome, Metropolitan City ""
+- **IndustryCategory**
+  - `name`: STRING Example: ""Electronic Products Manufacturers""
+  - `id`: STRING Example: ""EUNd__O4zMNW81lAXNK2GNw""
+- **City**
+  - `id`: STRING Example: ""EZHWv2xKgN92oYDKSjhJ2gw""
+  - `summary`: STRING Example: ""City in and county seat of King County, Washington""
+  - `name`: STRING Example: ""Seattle""
+- **Country**
+  - `name`: STRING Example: ""United States of America""
+  - `id`: STRING Example: ""E01d4EK33MmCosgI2KXa4-A""
+  - `summary`: STRING Example: ""Country in North America""
+- **Article**
+  - `id`: STRING Example: ""ART176872705964""
+  - `sentiment`: FLOAT Example: ""0.856""
+  - `author`: STRING Example: ""David Correa""
+  - `siteName`: STRING Example: ""MrWeb""
+  - `summary`: STRING Example: ""Boston and Mumbai-based consumer behavior analyses""
+  - `date`: DATE_TIME Example: ""2022-03-10T00:00:00Z""
+  - `title`: STRING Example: ""Funds for Consumer Behavior Specialist Infinite An""
+- **Chunk**
+  - `text`: STRING Example: ""Boston and Mumbai-based consumer behavior analyses""
+- **Fewshot**
+  - `Question`: STRING Available options: ['How is Emil Eifrem connected to Michael Hunger? ', 'What are the latest news regarding Google? ', 'Are there any news regarding return to office poli', 'What is Microsoft policy regarding to the return t', 'How many levels of subsidiaries does Blackstone ha', 'How many Telecommunications Companies are from Mal']
+  - `Cypher`: STRING Available options: ['MATCH (p1:Person {{name:""Emil Eifrem""}}), (p2:Pers', 'MATCH (o:Organization {{name:""Google""}})<-[:MENTIO', 'CALL apoc.ml.openai.embedding([""Are there any news', 'CALL apoc.ml.openai.embedding([""What is Microsoft ', 'MATCH p=(o:Organization {name:""Blackstone""})-[:HAS', 'MATCH (o:Organization) WHERE EXISTS {(o)-[:HAS_CAT']
+  - `id`: INTEGER Min: 2, Max: 7
+Relationship properties:
+
+The relationships:
+(:Person)-[:HAS_PARENT]->(:Person)
+(:Person)-[:HAS_CHILD]->(:Person)
+(:Organization)-[:IN_CITY]->(:City)
+(:Organization)-[:HAS_CEO]->(:Person)
+(:Organization)-[:HAS_CATEGORY]->(:IndustryCategory)
+(:Organization)-[:HAS_SUBSIDIARY]->(:Organization)
+(:Organization)-[:HAS_SUPPLIER]->(:Organization)
+(:Organization)-[:HAS_INVESTOR]->(:Organization)
+(:Organization)-[:HAS_INVESTOR]->(:Person)
+(:Organization)-[:HAS_BOARD_MEMBER]->(:Person)
+(:Organization)-[:HAS_COMPETITOR]->(:Organization)
+(:City)-[:IN_COUNTRY]->(:Country)
+(:Article)-[:HAS_CHUNK]->(:Chunk)
+(:Article)-[:MENTIONS]->(:Organization)","MATCH (o:Organization {isPublic: true})-[:HAS_CEO]->(ceo:Person) RETURN ceo.name AS CEO, o.name AS Company ORDER BY o.name LIMIT 3",MATCH (o:Organization)-[:HAS_CEO]->(p:Person) WHERE o.isPublic = true RETURN p.name LIMIT 3,b999fcdf14e316bb330ef62fe04842426dfd5101597867cf4618015f4a4a2614,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,uncertain,uncertain,"Gemma uses the declared Organization-to-Person HAS_CEO direction and public-company flag. It returns names but does not impose reference alphabetical order. First three is undefined in the question. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,output_shape_differs_needs_review,detected_names_covered,detected_names_present_somewhere_in_schema,detected_simple_endpoints_supported,"[[""'Bobby Kotick'"", ""'Activision Blizzard'""], [""'Nourdine Bihmane'"", ""'Atos'""], [""'Tianyi Jiang'"", ""'AvePoint'""]]","[[""'Vincent Pilette'""], [""'Marcos A Lopez'""], [""'Richard Kramer'""]]",,,3.0,3.0,no_error_identified,no_error_identified,uncertain,uncertain,"Gemma uses the declared Organization-to-Person HAS_CEO direction and public-company flag. It returns names but does not impose reference alphabetical order. First three is undefined in the question. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",unresolved,"Gemma uses the declared Organization-HAS_CEO->Person direction and the public-company predicate. It lacks alphabetical ordering and supplementary company names; first three is undefined. Unlike prior Gemini, it has no reversed-direction defect.",2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+36,instance_id_40421,medium,20261002,20261003,gemma-4-26b-a4b-it,List the first 5 organizations that have a CEO with a summary mentioning 'Leader'.,"Node properties:
+- **Person**
+  - `name`: STRING Example: ""Julie Spellman Sweet""
+  - `id`: STRING Example: ""Eaf0bpz6NNoqLVUCqNZPAew""
+  - `summary`: STRING Example: ""CEO at Accenture""
+- **Organization**
+  - `revenue`: FLOAT Example: ""1.2E8""
+  - `motto`: STRING Example: """"
+  - `nbrEmployees`: INTEGER Example: ""375""
+  - `isDissolved`: BOOLEAN 
+  - `id`: STRING Example: ""E0ZU8eCc5OaqS1LU9qE3n3w""
+  - `isPublic`: BOOLEAN 
+  - `name`: STRING Example: ""New Energy Group""
+  - `summary`: STRING Example: ""Software company based in Rome, Metropolitan City ""
+- **IndustryCategory**
+  - `name`: STRING Example: ""Electronic Products Manufacturers""
+  - `id`: STRING Example: ""EUNd__O4zMNW81lAXNK2GNw""
+- **City**
+  - `id`: STRING Example: ""EZHWv2xKgN92oYDKSjhJ2gw""
+  - `summary`: STRING Example: ""City in and county seat of King County, Washington""
+  - `name`: STRING Example: ""Seattle""
+- **Country**
+  - `name`: STRING Example: ""United States of America""
+  - `id`: STRING Example: ""E01d4EK33MmCosgI2KXa4-A""
+  - `summary`: STRING Example: ""Country in North America""
+- **Article**
+  - `id`: STRING Example: ""ART176872705964""
+  - `sentiment`: FLOAT Example: ""0.856""
+  - `author`: STRING Example: ""David Correa""
+  - `siteName`: STRING Example: ""MrWeb""
+  - `summary`: STRING Example: ""Boston and Mumbai-based consumer behavior analyses""
+  - `date`: DATE_TIME Example: ""2022-03-10T00:00:00Z""
+  - `title`: STRING Example: ""Funds for Consumer Behavior Specialist Infinite An""
+- **Chunk**
+  - `text`: STRING Example: ""Boston and Mumbai-based consumer behavior analyses""
+- **Fewshot**
+  - `Question`: STRING Available options: ['How is Emil Eifrem connected to Michael Hunger? ', 'What are the latest news regarding Google? ', 'Are there any news regarding return to office poli', 'What is Microsoft policy regarding to the return t', 'How many levels of subsidiaries does Blackstone ha', 'How many Telecommunications Companies are from Mal']
+  - `Cypher`: STRING Available options: ['MATCH (p1:Person {{name:""Emil Eifrem""}}), (p2:Pers', 'MATCH (o:Organization {{name:""Google""}})<-[:MENTIO', 'CALL apoc.ml.openai.embedding([""Are there any news', 'CALL apoc.ml.openai.embedding([""What is Microsoft ', 'MATCH p=(o:Organization {name:""Blackstone""})-[:HAS', 'MATCH (o:Organization) WHERE EXISTS {(o)-[:HAS_CAT']
+  - `id`: INTEGER Min: 2, Max: 7
+Relationship properties:
+
+The relationships:
+(:Person)-[:HAS_PARENT]->(:Person)
+(:Person)-[:HAS_CHILD]->(:Person)
+(:Organization)-[:IN_CITY]->(:City)
+(:Organization)-[:HAS_CEO]->(:Person)
+(:Organization)-[:HAS_CATEGORY]->(:IndustryCategory)
+(:Organization)-[:HAS_SUBSIDIARY]->(:Organization)
+(:Organization)-[:HAS_SUPPLIER]->(:Organization)
+(:Organization)-[:HAS_INVESTOR]->(:Organization)
+(:Organization)-[:HAS_INVESTOR]->(:Person)
+(:Organization)-[:HAS_BOARD_MEMBER]->(:Person)
+(:Organization)-[:HAS_COMPETITOR]->(:Organization)
+(:City)-[:IN_COUNTRY]->(:Country)
+(:Article)-[:HAS_CHUNK]->(:Chunk)
+(:Article)-[:MENTIONS]->(:Organization)","MATCH (o:Organization)-[:HAS_CEO]->(p:Person) WHERE p.summary CONTAINS 'Leader' RETURN o.name AS organizationName, p.name AS ceoName, p.summary AS ceoSummary LIMIT 5","MATCH (o:Organization)-[:HAS_CEO]->(p:Person)
+WHERE p.summary CONTAINS 'Leader'
+RETURN o
+LIMIT 5",69652f64a9b6c92a8e491940b954aed156eb9b9e7ff67c121ec97ae613ffd136,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,uncertain,uncertain,"Same HAS_CEO pattern, Leader summary substring and limit five; organisation-node projection is acceptable. First ordering and unique organisation treatment remain unspecified; no final ordered-selection claim. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,output_shape_differs_needs_review,detected_names_covered,detected_names_present_somewhere_in_schema,detected_simple_endpoints_supported,"[[""'Taligent'"", ""'Cameron Hawley'"", ""'Leadership at Taligent'""], [""'BSI'"", ""'Susan Taylor'"", ""'Leadership at BSI'""], [""'Nimdzi Insights'"", ""'Mag. Josef Kubovsky'"", ""'Sales Leadership, Strategy and Growth Advisor at Nimdzi Insights'""]]","[[""<Node element_id='4:14b688aa-0200-40b1-a396-d141d8c3e402:1773' labels=frozenset({'Organization'}) properties={'diffbotId': 'https://diffbot.com/entity/EGAr61IJGMMq7izihLJMI6Q', 'name': 'Taligent', 'id': 'EGAr61IJGMMq7izihLJMI6Q'}>""], [""<Node element_id='4:14b688aa-0200-40b1-a396-d141d8c3e402:2142' labels=frozenset({'Organization'}) properties={'diffbotId': 'https://diffbot.com/entity/E68q7YNYQNXm5E7_h4AZalA', 'name': 'BSI', 'id': 'E68q7YNYQNXm5E7_h4AZalA'}>""], [""<Node element_id='4:14b688aa-0200-40b1-a396-d141d8c3e402:3415' labels=frozenset({'Organization'}) properties={'diffbotId': 'https://diffbot.com/entity/Ei6ym_DwPMUyh-h4o2CvYpw', 'name': 'Nimdzi Insights', 'id': 'Ei6ym_DwPMUyh-h4o2CvYpw'}>""]]",,,4.0,4.0,no_error_identified,no_error_identified,uncertain,uncertain,"Same HAS_CEO pattern, Leader summary substring and limit five; organisation-node projection is acceptable. First ordering and unique organisation treatment remain unspecified; no final ordered-selection claim. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",unresolved,"Same organisation/CEO pattern, summary Leader filter and limit five; returning organisations is an acceptable projection. First ordering is undefined in both. Equal four-row counts and previews do not establish universal correctness.",2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+37,instance_id_30995,medium,20261002,20261003,gemma-4-26b-a4b-it,What is the sourceID of the entity with internal_id '1001256'?,"Node properties:
+- **Entity**
+  - `countries`: STRING Example: ""Hong Kong""
+  - `ibcRUC`: STRING Example: ""25221""
+  - `valid_until`: STRING Example: ""The Panama Papers data is current through 2015""
+  - `country_codes`: STRING Example: ""HKG""
+  - `service_provider`: STRING Available options: ['Appleby', 'Portcullis Trustnet', 'Mossack Fonseca', 'Commonwealth Trust Limited']
+  - `address`: STRING Example: ""ORION HOUSE SERVICES (HK) LIMITED ROOM 1401; 14/F.""
+  - `inactivation_date`: STRING Example: ""18-FEB-2013""
+  - `struck_off_date`: STRING Example: ""15-FEB-2013""
+  - `status`: STRING Example: ""Defaulted""
+  - `jurisdiction_description`: STRING Example: ""Samoa""
+  - `incorporation_date`: STRING Example: ""23-MAR-2006""
+  - `original_name`: STRING Example: ""TIANSHENG INDUSTRY AND TRADING CO., LTD.""
+  - `jurisdiction`: STRING Example: ""SAM""
+  - `name`: STRING Example: ""TIANSHENG INDUSTRY AND TRADING CO., LTD.""
+  - `internal_id`: STRING Example: ""1001256""
+  - `lastEditTimestamp`: STRING Example: ""1638311020926""
+  - `node_id`: INTEGER Min: 10000001, Max: 10000005
+  - `sourceID`: STRING Example: ""Panama Papers""
+  - `former_name`: STRING 
+  - `company_type`: STRING 
+  - `tax_stat_description`: STRING 
+  - `note`: STRING 
+  - `dorm_date`: STRING 
+  - `type`: STRING 
+  - `closed_date`: STRING 
+  - `company_number`: STRING 
+  - `comments`: STRING 
+  - `entity_number`: STRING 
+- **Intermediary**
+  - `countries`: STRING Example: ""South Africa""
+  - `lastEditTimestamp`: STRING Example: ""1638311034131""
+  - `address`: STRING Example: ""MICHAEL PAPAGEORGE; MR. 106 NICHOLSON STREET BROOK""
+  - `valid_until`: STRING Example: ""The Panama Papers  data is current through 2015""
+  - `country_codes`: STRING Example: ""ZAF""
+  - `name`: STRING Example: ""MICHAEL PAPAGEORGE, MR.""
+  - `status`: STRING Available options: ['UNRECOVERABLE ACCOUNTS', 'CLIENT IN REPRESENTATIVE TERRITORY', 'ACTIVE', 'INACTIVE', 'SUSPENDED', 'DELINQUENT', 'PROSPECT', 'SUSPENDED LEGAL', 'ACTIVE LEGAL']
+  - `node_id`: INTEGER Min: 11000001, Max: 11000005
+  - `sourceID`: STRING Available options: ['Pandora Papers - Alemán, Cordero, Galindo & Lee (Alcogal)', 'Paradise Papers - Appleby', 'Paradise Papers - Barbados corporate registry', 'Bahamas Leaks', 'Panama Papers', 'Paradise Papers - Nevis corporate registry', 'Paradise Papers - Bahamas corporate registry', 'Offshore Leaks', 'Paradise Papers - Aruba corporate registry']
+  - `internal_id`: STRING Example: ""10001""
+  - `registered_office`: STRING 
+- **Officer**
+  - `valid_until`: STRING Example: ""The Panama Papers data is current through 2015""
+  - `name`: STRING Example: ""KIM SOO IN""
+  - `sourceID`: STRING Example: ""Panama Papers""
+  - `icij_id`: STRING Example: ""E72326DEA50F1A9C2876E112AAEB42BC""
+  - `node_id`: INTEGER Min: 12000001, Max: 12000005
+  - `lastEditTimestamp`: STRING Example: ""1638311034062""
+  - `country_codes`: STRING Example: ""KOR""
+  - `countries`: STRING Example: ""South Korea""
+  - `note`: STRING 
+- **Address**
+  - `original_address`: STRING Example: ""ANNEX FREDERICK & SHIRLEY STS, P. O. BOX N-4805 NA""
+  - `lastEditTimestamp`: STRING Example: ""1638311020926""
+  - `countries`: STRING Example: ""Bahamas""
+  - `address`: STRING Example: ""ANNEX FREDERICK & SHIRLEY STS, P.O. BOX N-4805, NA""
+  - `valid_until`: STRING Example: ""The Bahamas Leaks data is current through early 20""
+  - `icij_id`: STRING Example: ""7C1AAD6896EFDED57D680B82E7ADF7AB""
+  - `node_id`: INTEGER Min: 24000001, Max: 24000005
+  - `sourceID`: STRING Example: ""Bahamas Leaks""
+  - `country_codes`: STRING Example: ""BHS""
+  - `name`: STRING 
+  - `addressID`: STRING 
+  - `country_code`: STRING 
+  - `country`: STRING 
+- **Other**
+  - `lastEditTimestamp`: STRING Available options: ['1638311068329', '1638311074502', '1638311074946', '1638311075268', '1638311075503']
+  - `incorporation_date`: STRING Example: ""18-MAY-1983""
+  - `struck_off_date`: STRING Example: ""31-DEC-2002""
+  - `jurisdiction`: STRING Available options: ['AW']
+  - `jurisdiction_description`: STRING Available options: ['Aruba']
+  - `valid_until`: STRING Available options: ['Aruba corporate registry data is current through 2', 'Appleby data is current through 2014']
+  - `sourceID`: STRING Available options: ['Paradise Papers - Aruba corporate registry', 'Paradise Papers - Appleby']
+  - `name`: STRING Example: ""ANTAM ENTERPRISES N.V.""
+  - `type`: STRING Available options: ['LIMITED LIABILITY COMPANY', 'SOLE OWNERSHIP', 'FOREIGN FORMED CORPORATION']
+  - `node_id`: INTEGER Min: 80000012, Max: 85050056
+  - `closed_date`: STRING Example: ""28-NOV-2012""
+  - `note`: STRING Available options: ['Closed date stands for Cancelled date.', 'Closed date stands for Liquidation date.']
+  - `countries`: STRING Example: ""Bermuda;Isle of Man""
+  - `country_codes`: STRING Example: ""BMU;IMN""
+Relationship properties:
+- **registered_address**
+  - `link: STRING` Example: ""registered address""
+  - `sourceID: STRING` Example: ""Panama Papers""
+  - `valid_until: STRING` 
+- **intermediary_of**
+  - `valid_until: STRING` Example: ""The Panama Papers data is current through 2015""
+  - `sourceID: STRING` Example: ""Panama Papers""
+  - `link: STRING` Example: ""intermediary of""
+  - `end_date: STRING` 
+  - `start_date: STRING` 
+- **officer_of**
+  - `link: STRING` Example: ""shareholder of""
+  - `valid_until: STRING` Example: ""The Panama Papers data is current through 2015""
+  - `sourceID: STRING` Example: ""Panama Papers""
+  - `start_date: STRING` Example: ""19-NOV-1999""
+  - `end_date: STRING` Example: ""04-JUL-2000""
+  - `status: STRING` 
+- **similar**
+  - `link: STRING` Example: ""similar name and address as""
+- **same_as**
+  - `link: STRING` Available options: ['same name and registration date as', 'same address as', 'same as']
+- **same_name_as**
+  - `sourceID: STRING` Example: ""Bahamas Leaks""
+  - `link: STRING` Example: ""same name as""
+  - `valid_until: STRING` Example: ""The Bahamas Leaks data is current through early 20""
+- **same_company_as**
+  - `valid_until: STRING` Example: ""The Bahamas Leaks data is current through early 20""
+  - `sourceID: STRING` Example: ""Bahamas Leaks""
+  - `link: STRING` Example: ""same company as""
+- **same_id_as**
+  - `sourceID: STRING` Available options: ['Paradise Papers - Malta corporate registry']
+  - `link: STRING` Available options: ['same id as']
+  - `valid_until: STRING` Available options: ['Malta corporate registry data is current through 2']
+- **connected_to**
+  - `valid_until: STRING` Example: ""Aruba corporate registry data is current through 2""
+  - `link: STRING` Example: ""connected to""
+  - `sourceID: STRING` Example: ""Paradise Papers - Aruba corporate registry""
+The relationships:
+(:Entity)-[:same_as]->(:Entity)
+(:Entity)-[:registered_address]->(:Address)
+(:Entity)-[:same_company_as]->(:Entity)
+(:Entity)-[:same_name_as]->(:Other)
+(:Entity)-[:same_name_as]->(:Entity)
+(:Intermediary)-[:intermediary_of]->(:Entity)
+(:Intermediary)-[:registered_address]->(:Address)
+(:Intermediary)-[:officer_of]->(:Entity)
+(:Intermediary)-[:similar]->(:Officer)
+(:Intermediary)-[:same_name_as]->(:Intermediary)
+(:Intermediary)-[:same_name_as]->(:Officer)
+(:Intermediary)-[:same_as]->(:Officer)
+(:Officer)-[:officer_of]->(:Entity)
+(:Officer)-[:officer_of]->(:Other)
+(:Officer)-[:registered_address]->(:Address)
+(:Officer)-[:similar]->(:Officer)
+(:Officer)-[:similar]->(:Intermediary)
+(:Officer)-[:same_name_as]->(:Officer)
+(:Officer)-[:connected_to]->(:Entity)
+(:Officer)-[:same_id_as]->(:Officer)
+(:Address)-[:same_as]->(:Address)
+(:Other)-[:registered_address]->(:Address)
+(:Other)-[:connected_to]->(:Entity)
+(:Other)-[:same_name_as]->(:Entity)
+(:Other)-[:same_name_as]->(:Officer)
+(:Other)-[:same_name_as]->(:Other)",MATCH (e:Entity {internal_id: '1001256'}) RETURN e.sourceID,"MATCH (e:Entity {internal_id: '1001256'})
+RETURN e.sourceID",37084c186906437ae499793ca2ba39ad6884e967a74a07e3bdedfae52be4317b,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Same Entity.internal_id equality and sourceID projection. Properties belong to Entity and saved results match. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,observed_result_match,detected_names_covered,detected_names_present_somewhere_in_schema,no_explicit_typed_pattern_detected,"[[""'Panama Papers'""]]","[[""'Panama Papers'""]]",,,1.0,1.0,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Same Entity.internal_id equality and sourceID projection. Properties belong to Entity and saved results match. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+38,instance_id_1947,simple,20261002,20261003,gemma-4-26b-a4b-it,What are the names of all songs in English?,"{""CREATED_BY"": {""count"": 12, ""properties"": {}, ""type"": ""relationship""}, ""Song"": {""count"": 6, ""labels"": [], ""properties"": {""languages"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""artist_name"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""song_name"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""f_id"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""releasedate"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""rating"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""resolution"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""genre_is"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""country"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}}, ""type"": ""node"", ""relationships"": {""CREATED_BY"": {""count"": 0, ""direction"": ""out"", ""labels"": [""Artist""], ""properties"": {}}, ""ASSOCIATED_WITH"": {""count"": 0, ""direction"": ""out"", ""labels"": [""Genre""], ""properties"": {}}, ""STORED_IN"": {""count"": 0, ""direction"": ""out"", ""labels"": [""File""], ""properties"": {}}}}, ""ASSOCIATED_WITH"": {""count"": 12, ""properties"": {}, ""type"": ""relationship""}, ""File"": {""count"": 6, ""labels"": [], ""properties"": {""duration"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""file_size"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""artist_name"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""f_id"": {""unique"": false, ""indexed"": false, ""type"": ""INTEGER"", ""existence"": false}, ""formats"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}}, ""type"": ""node"", ""relationships"": {""CREATED_BY"": {""count"": 0, ""direction"": ""out"", ""labels"": [""Artist""], ""properties"": {}}, ""STORED_IN"": {""count"": 6, ""direction"": ""in"", ""labels"": [""Song""], ""properties"": {}}}}, ""Genre"": {""count"": 6, ""labels"": [], ""properties"": {""g_name"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""most_popular_in"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""rating"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}}, ""type"": ""node"", ""relationships"": {""ASSOCIATED_WITH"": {""count"": 6, ""direction"": ""in"", ""labels"": [""Song"", ""Artist""], ""properties"": {}}}}, ""STORED_IN"": {""count"": 6, ""properties"": {}, ""type"": ""relationship""}, ""Artist"": {""count"": 6, ""labels"": [], ""properties"": {""preferred_genre"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""artist_name"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""gender"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}, ""country"": {""unique"": false, ""indexed"": false, ""type"": ""STRING"", ""existence"": false}}, ""type"": ""node"", ""relationships"": {""CREATED_BY"": {""count"": 6, ""direction"": ""in"", ""labels"": [""Song"", ""File""], ""properties"": {}}, ""ASSOCIATED_WITH"": {""count"": 0, ""direction"": ""out"", ""labels"": [""Genre""], ""properties"": {}}}}}","MATCH (s:Song)-[:ASSOCIATED_WITH]->(g:Genre) WHERE s.languages = ""english"" RETURN s.Song_name",MATCH (s:Song) WHERE s.languages = 'English' RETURN s.song_name,4927e3ddc687cbff8131004a69bf4c0ab0804bd3ab3cc32b25e87294318d1470,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,uncertain,issue_identified,"Gemma uses declared Song.song_name, while reference uses undeclared Song.Song_name. Generated English versus reference english literal can alter matching; actual stored values are unavailable. The genre restriction in reference is also not requested. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,source_graph_unavailable,detected_names_covered,detected_names_present_somewhere_in_schema,no_explicit_typed_pattern_detected,,,,,,,no_error_identified,no_error_identified,uncertain,issue_identified,"Gemma uses declared Song.song_name, while reference uses undeclared Song.Song_name. Generated English versus reference english literal can alter matching; actual stored values are unavailable. The genre restriction in reference is also not requested. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+39,instance_id_29249,complex,20261002,20261003,gemma-4-26b-a4b-it,Find the characters who interacted with 'Aemon-Targaryen-(Dragonknight)' in 'INTERACTS3' relationship.,"Node properties:
+- **Character**
+  - `centrality`: FLOAT Min: 0.0, Max: 1.0
+  - `book45PageRank`: FLOAT Min: 0.15000000000000002, Max: 11.409916274911177
+  - `fastrf_embedding`: LIST Min Size: 10, Max Size: 10
+  - `book1BetweennessCentrality`: FLOAT Min: 0.0, Max: 4638.53495125504
+  - `book1PageRank`: FLOAT Min: 0.15000000000000002, Max: 8.164174336296284
+  - `louvain`: INTEGER Min: 0, Max: 10
+  - `community`: INTEGER Min: 504, Max: 795
+  - `degree`: FLOAT Min: 0.0, Max: 300.0
+  - `name`: STRING Example: ""Addam-Marbrand""
+  - `pagerank`: FLOAT Min: 0.15000000000000002, Max: 9.473142454730429
+Relationship properties:
+- **INTERACTS**
+  - `weight: INTEGER` Min: 3, Max:  334
+- **INTERACTS1**
+  - `weight: INTEGER` Min: 3, Max:  291
+  - `book: INTEGER` Min: 1, Max:  1
+- **INTERACTS2**
+  - `weight: INTEGER` Min: 3, Max:  92
+  - `book: INTEGER` Min: 2, Max:  2
+- **INTERACTS3**
+  - `weight: INTEGER` Min: 3, Max:  95
+  - `book: INTEGER` Min: 3, Max:  3
+- **INTERACTS45**
+  - `weight: INTEGER` Min: 3, Max:  96
+  - `book: INTEGER` Min: 45, Max:  45
+The relationships:
+(:Character)-[:INTERACTS45]->(:Character)
+(:Character)-[:INTERACTS]->(:Character)
+(:Character)-[:INTERACTS1]->(:Character)
+(:Character)-[:INTERACTS3]->(:Character)
+(:Character)-[:INTERACTS2]->(:Character)",MATCH (a:Character {name: 'Aemon-Targaryen-(Dragonknight)'})-[r:INTERACTS3]-(b:Character) RETURN b.name,"MATCH (c:Character {name: 'Aemon-Targaryen-(Dragonknight)'})-[:INTERACTS3]-(other:Character)
+RETURN other.name",0ba7d29c8858f0ec20e1f3cd6cb3cb359e1b3936ff9491c91d84a5174b79550c,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Same named Character, undirected INTERACTS3 connection and neighbour-name projection. Saved results match. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,observed_result_match,detected_names_covered,detected_names_present_somewhere_in_schema,detected_simple_endpoints_supported,"[[""'Jaime-Lannister'""]]","[[""'Jaime-Lannister'""]]",,,1.0,1.0,no_error_identified,no_error_identified,no_error_identified,no_issue_identified,"Same named Character, undirected INTERACTS3 connection and neighbour-name projection. Saved results match. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.
+40,instance_id_7850,complex,20261002,20261003,gemma-4-26b-a4b-it,"Find the Journal with a journal_id starting with J, and linked with an Article through PUBLISHED_IN relationship. The Article must have title: Classification of Subsystems for Local Nets with Trivial Superselection
+  Structure and be PUBLISHED_IN with meta recorded!","Relevant node labels and their properties (with datatypes) are:
+Article {title: STRING}
+Journal {journal_id: STRING}
+
+Relevant relationships are:
+{'start': Article, 'type': PUBLISHED_IN, 'end': Journal }
+
+
+Relevant relationship properties (with datatypes) are:
+PUBLISHED_IN {meta: STRING}",MATCH (n:Article {title: 'Classification of Subsystems for Local Nets with Trivial Superselection   Structure'}) -[r:PUBLISHED_IN]- (m:Journal) WHERE m.journal_id STARTS WITH 'J' AND r.meta IS NOT NULL RETURN n.journal_id,"MATCH (a:Article)-[r:PUBLISHED_IN]->(j:Journal)
+WHERE j.journal_id STARTS WITH 'J' 
+  AND a.title = 'Classification of Subsystems for Local Nets with Trivial Superselection Structure' 
+  AND r.meta IS NOT NULL
+RETURN j",cfb0b6dae46c0d85ac09eeedeb26edcedeee4803746ae489bf510f66a7b1ae3b,f435f5a23ab643d362d8108d0782f4f056a00fc5711b0d4f47412fe0bb38573c,no_error_identified,no_error_identified,uncertain,issue_identified,"Gemma follows declared Article-to-Journal PUBLISHED_IN direction, checks relationship meta and returns Journal. Reference returns undeclared Article.journal_id. Exact title whitespace differs between question/reference/Gemma, leaving literal matching unresolved. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.",Shreya Nair,2026-10-08T01:52:14.982290+00:00,2026-10-08T01:52:14.982290+00:00,not_assessed,completed,verified,Saved automatic evidence and AI-assisted flagged-case suggestions supplied; student assessment pending,Model identified; saved outcomes and AI suggestions visible; not blinded,accepted,,source_graph_unavailable,detected_names_covered,detected_names_present_somewhere_in_schema,detected_simple_endpoints_supported,,,,,,,no_error_identified,no_error_identified,uncertain,issue_identified,"Gemma follows declared Article-to-Journal PUBLISHED_IN direction, checks relationship meta and returns Journal. Reference returns undeclared Article.journal_id. Exact title whitespace differs between question/reference/Gemma, leaving literal matching unresolved. Schema judgement covers inspected declared names, property ownership and explicit typed patterns; untyped relationships in sparse schemas cannot be fully validated.","AI-assisted query inspection, supplied schema and saved evidence; no independent adjudication or database rerun",,,2026-10-08T01:45:57.694900+00:00,Student confirmed inspection and agreement with all 40 proposed assessments in conversation; not independent adjudication.

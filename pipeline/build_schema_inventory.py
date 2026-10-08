@@ -10,7 +10,6 @@ from pathlib import Path
 
 import pandas as pd
 
-
 PROJECT = Path(__file__).resolve().parents[1]
 INPUT = PROJECT / "data" / "generated_queries.csv"
 OUTPUT = PROJECT / "outputs" / "schema_inventory.csv"
@@ -39,17 +38,12 @@ def extract_schema(text):
 
             kind = details.get("type")
             properties = details.get("properties", {})
-            properties = (
-                properties.keys() if isinstance(properties, dict) else []
-            )
+            properties = properties.keys() if isinstance(properties, dict) else []
 
             if kind == "node":
                 add(nodes, name, properties)
                 for rel, info in details.get("relationships", {}).items():
-                    props = (
-                        info.get("properties", {})
-                        if isinstance(info, dict) else {}
-                    )
+                    props = info.get("properties", {}) if isinstance(info, dict) else {}
                     add(
                         relationships,
                         rel,
@@ -82,9 +76,7 @@ def extract_schema(text):
             section, current = None, None
             continue
 
-        heading = re.fullmatch(
-            rf"-\s*\*\*({NAME})\*\*", stripped
-        )
+        heading = re.fullmatch(rf"-\s*\*\*({NAME})\*\*", stripped)
 
         if heading and section:
             current = heading.group(1)
@@ -93,9 +85,7 @@ def extract_schema(text):
             formats.add("markdown")
             continue
 
-        property_match = re.match(
-            rf"-\s*`({NAME})(?:`:\s*|:\s*[^`]+`)", stripped
-        )
+        property_match = re.match(rf"-\s*`({NAME})(?:`:\s*|:\s*[^`]+`)", stripped)
 
         if property_match and current and section:
             container = nodes if section == "node" else relationships
@@ -103,11 +93,9 @@ def extract_schema(text):
 
     # Format 3: Label {property: TYPE} declarations.
     # Split node and relationship property sections where supplied.
-    boundary = re.search(
-        r"Relationship properties", text, flags=re.IGNORECASE
-    )
-    node_text = text[:boundary.start()] if boundary else text
-    rel_text = text[boundary.end():] if boundary else ""
+    boundary = re.search(r"Relationship properties", text, flags=re.IGNORECASE)
+    node_text = text[: boundary.start()] if boundary else text
+    rel_text = text[boundary.end() :] if boundary else ""
 
     declaration = rf"(?<![A-Za-z0-9_])({NAME})\s*\{{([^{{}}]*)\}}"
 
@@ -139,9 +127,7 @@ def extract_schema(text):
     # Format 4: Pipe-separated label : property, property declarations.
     if text.lstrip().startswith("|"):
         for piece in text.split("|"):
-            match = re.fullmatch(
-                rf"\s*({NAME})\s*:\s*(.*?)\s*", piece
-            )
+            match = re.fullmatch(rf"\s*({NAME})\s*:\s*(.*?)\s*", piece)
             if match:
                 properties = [
                     value.strip()
@@ -173,16 +159,14 @@ def extract_schema(text):
     )
     if relationship_section:
         dictionary_pattern = (
-            r"['\"]type['\"]\s*:\s*['\"]?"
-            r"([A-Za-z_][A-Za-z0-9_]*)"
-            r"['\"]?\s*[,}]"
+            r"['\"]type['\"]\s*:\s*['\"]?" r"([A-Za-z_][A-Za-z0-9_]*)" r"['\"]?\s*[,}]"
         )
         for relationship_name in re.findall(
             dictionary_pattern, relationship_section.group(1)
         ):
             add(relationships, relationship_name)
             formats.add("relationship_dictionary")
-    
+
     return nodes, relationships, formats
 
 
@@ -201,19 +185,22 @@ def main():
         text = "" if pd.isna(row["schema"]) else str(row["schema"])
         nodes, relationships, formats = extract_schema(text)
 
-        records.append({
-            "instance_id": row["instance_id"],
-            "data_source": row["data_source"],
-            "schema_status": (
-                "extracted_needs_validation"
-                if nodes else "unrecognised_needs_review"
-            ),
-            "formats": "; ".join(sorted(formats)),
-            "node_count": len(nodes),
-            "relationship_count": len(relationships),
-            "node_properties": serialise(nodes),
-            "relationship_properties": serialise(relationships),
-        })
+        records.append(
+            {
+                "instance_id": row["instance_id"],
+                "data_source": row["data_source"],
+                "schema_status": (
+                    "extracted_needs_validation"
+                    if nodes
+                    else "unrecognised_needs_review"
+                ),
+                "formats": "; ".join(sorted(formats)),
+                "node_count": len(nodes),
+                "relationship_count": len(relationships),
+                "node_properties": serialise(nodes),
+                "relationship_properties": serialise(relationships),
+            }
+        )
 
     results = pd.DataFrame(records)
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
@@ -224,10 +211,12 @@ def main():
 
     print("\nCOVERAGE BY SOURCE")
     print(
-        results.groupby("data_source").agg(
+        results.groupby("data_source")
+        .agg(
             records=("instance_id", "size"),
             schemas_with_nodes=("node_count", lambda values: (values > 0).sum()),
-        ).to_string()
+        )
+        .to_string()
     )
 
     print(f"\nSaved to: {OUTPUT}")
